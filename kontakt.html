@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kontakt · Digitalni partner</title>
+<meta name="description" content="Pošaljite upit Digitalnom partneru: napišite čime se bavite i što Vam treba, a mi Vam se javljamo s prijedlogom.">
+<meta name="theme-color" content="#E7E4DE">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="hr_HR">
+<meta property="og:site_name" content="Digitalni partner">
+<meta property="og:title" content="Kontakt · Digitalni partner">
+<meta property="og:description" content="Pošaljite upit Digitalnom partneru: napišite čime se bavite i što Vam treba, a mi Vam se javljamo s prijedlogom.">
+<meta property="og:image" content="slike/og-slika.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="icon" href="slike/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="slike/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="slike/apple-touch-icon.png">
+<link rel="preload" href="fontovi/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="stil.css">
+<script>
+document.documentElement.classList.add("js-menu");
+(function(){
+  var n = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+  if(n && n.type === "back_forward") return;
+  var moved = false;
+  ["wheel","touchstart","keydown"].forEach(function(ev){ addEventListener(ev, function(){ moved = true; }, {once:true, passive:true}); });
+  function go(){
+    if(moved) return;
+    var t = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+    if(t) t.scrollIntoView({block:"start", behavior:"instant"}); else window.scrollTo(0,0);
+  }
+  document.addEventListener("DOMContentLoaded", go);
+  addEventListener("load", go);
+})();
+</script>
+</head>
+<body class="kontakt-page">
+<a class="skip" href="#sadrzaj">Preskoči na sadržaj</a>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
+    <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
+    <div class="links" id="izbornik"><a class="home-link" href="index.html">Naslovna</a><a href="o-nama.html">O nama</a><a href="usluge.html">Usluge</a><a href="cjenik.html">Cjenik</a><a class="cta on" aria-current="page" href="kontakt.html">Kontakt</a></div>
+  </div>
+</nav>
+
+<main id="sadrzaj" tabindex="-1">
+<section class="final" id="kontakt">
+  <div class="wrap">
+    <div>
+      <span class="label">Kontakt</span>
+      <h1>Recite nam nešto o svom poslu.</h1>
+      <p class="lead">Napišite nam čime se bavite i što Vam treba, a mi Vam se javljamo s prijedlogom. Upit Vas ni na što ne obvezuje.</p>
+      <p class="sig">Digitalno. Po mjeri.</p>
+    </div>
+    <form id="cform" novalidate>
+      <div class="field"><label for="ime">Ime i prezime</label><input id="ime" name="ime" aria-describedby="ime-err" type="text" required autocomplete="name"><p class="err" id="ime-err"></p></div>
+      <div class="field"><label for="email">E-mail</label><input id="email" name="email" aria-describedby="email-err" type="email" required autocomplete="email"><p class="err" id="email-err"></p></div>
+      <div class="field"><label for="tel">Telefon (neobavezno)</label><input id="tel" name="tel" type="tel" autocomplete="tel"></div>
+      <div class="field"><label for="poruka">Poruka</label><textarea id="poruka" name="poruka" aria-describedby="poruka-err" required></textarea><p class="err" id="poruka-err"></p></div>
+      <button class="btn primary" type="submit">Pošaljite upit</button>
+      <p id="msg" role="status"></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-brand"><span class="mono">dp</span><span>© <span id="y"></span> Digitalni partner</span></div>
+    <span class="f-sl">Digitalno. Po mjeri.</span>
+  </div>
+</footer>
+<script>
+document.getElementById("y").textContent = new Date().getFullYear();
+// Izbornik na mobitelu: gumb s tri crte otvara i zatvara popis, klik na poveznicu ili Esc ga zatvara
+(function(){
+  var nav = document.querySelector("nav"), btn = nav.querySelector(".menu-btn");
+  function set(open){ nav.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
+  btn.addEventListener("click", function(){ set(!nav.classList.contains("open")); });
+  nav.querySelectorAll(".links a").forEach(function(a){ a.addEventListener("click", function(){ set(false); }); });
+  addEventListener("keydown", function(e){ if(e.key === "Escape") set(false); });
+  addEventListener("resize", function(){ if(innerWidth > 860) set(false); });
+})();
+</script>
+<script src="js/kontakt.js"></script>
+</body>
+</html>

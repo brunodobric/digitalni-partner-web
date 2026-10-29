@@ -1,0 +1,244 @@
+/* Digitalni partner: zajednički stil za sve stranice.
+   Raspored: kamen je osnovna podloga, svjetliji kamen razdvaja trake, smaragd je jedina obojena traka (paketi),
+   oniks samo u tekstu i podnožju. Tanke zlatne linije su jedini ukras; zlato se na svijetlom ne koristi za tekst (1,9 : 1). */
+
+@font-face{font-family:"Manrope";font-style:normal;font-weight:400 700;font-display:swap;src:url(fontovi/manrope-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Manrope";font-style:normal;font-weight:400 700;font-display:swap;src:url(fontovi/manrope-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --oniks:#0B0B0C; --smaragd:#0F3B33; --kamen:#E7E4DE; --kamen-svj:#F1EFEA; --grafit:#5E6266; --zlato:#C6A15B;
+  --linija:rgba(11,11,12,.14); --linija-tam:rgba(231,228,222,.18); --tekst-tam:#B9B6AF;
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --pad:max(24px,8vw);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;overflow-x:hidden;background:var(--kamen);color:var(--oniks);font:400 17px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-weight:600;line-height:1.1;margin:0;letter-spacing:-.025em;text-wrap:balance}
+em{font-style:normal}
+p{margin:0}
+a{color:inherit}
+::selection{background:var(--smaragd);color:var(--kamen)}
+:focus-visible{outline:1.5px solid var(--smaragd);outline-offset:4px}
+.green :focus-visible,footer :focus-visible{outline-color:var(--zlato)}
+.wrap{max-width:calc(1120px + 2 * var(--pad));margin:0 auto;padding-left:max(var(--pad),env(safe-area-inset-left,0px));padding-right:max(var(--pad),env(safe-area-inset-right,0px))}
+section{padding-block:clamp(80px,11vw,140px)}
+.svj{background:var(--kamen-svj)}
+.green{background:var(--smaragd);color:var(--kamen)}
+.label{display:inline-flex;align-items:center;gap:14px;font:600 .74rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
+.label::before{content:"";width:36px;height:1px;background:var(--zlato)}
+.green .label{color:var(--zlato)}
+.txt-link{color:var(--smaragd);text-underline-offset:4px;text-decoration-thickness:1px}
+
+/* LOGO (svijetla podloga: sve u smaragdu; tamna podloga: znak u kamenu, „digitalni” u zlatu) */
+.mono{display:grid;place-items:center;background:var(--smaragd);border-radius:.46em;font:700 1em/1 var(--sans);letter-spacing:-.02em;color:var(--kamen);width:2.1em;height:2.1em;padding-bottom:.1em}
+.word{font:400 1em/1.1 var(--sans);letter-spacing:.005em;white-space:nowrap;color:var(--smaragd)}
+.word b{font-weight:700}
+footer .mono{background:var(--kamen);color:var(--smaragd)}
+
+/* Preskoči na sadržaj: vidljivo tek kad dobije fokus tipkovnicom */
+.skip{position:fixed;top:8px;left:8px;z-index:60;padding:12px 18px;background:var(--smaragd);color:var(--kamen);font:600 .8rem var(--sans);text-decoration:none;transform:translateY(-200%)}
+.skip:focus{transform:none}
+main:focus{outline:none}
+
+/* IZBORNIK */
+nav{--p:1;position:fixed;inset:0 0 auto 0;z-index:30;padding-top:env(safe-area-inset-top,0px);background:var(--kamen);border-bottom:1px solid rgba(11,11,12,calc(.12 * var(--p)))}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;height:72px}
+.brand{display:flex;align-items:center;gap:14px;text-decoration:none;min-height:44px}
+.brand .mono{font-size:15px}
+.brand .word{font-size:20px}
+.links{display:flex;align-items:center;gap:32px}
+.links a{text-decoration:none;font:600 .74rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--oniks);position:relative}
+.links a:not(.cta)::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:var(--zlato);transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.links a:not(.cta):hover::after,.links a.on:not(.cta)::after{transform:scaleX(1)}
+.links a.on{color:var(--smaragd)}
+.links .cta{border:1px solid var(--smaragd);padding:10px 18px;color:var(--smaragd);transition:background .25s,color .25s}
+.links .cta:hover,.links .cta.on{background:var(--smaragd);color:var(--kamen)}
+/* MOBITEL: izbornik se otvara gumbom s tri crte (klasa js-menu znači da skripta radi; bez nje poveznice ostaju vidljive u drugom redu) */
+.menu-btn{display:none}
+@media(max-width:860px){
+  .brand .word{font-size:17px}
+  html:not(.js-menu) nav .wrap{flex-wrap:wrap;height:auto;padding-top:14px;padding-bottom:12px;row-gap:12px}
+  html:not(.js-menu) .links{width:100%;justify-content:space-between;gap:10px}
+  html:not(.js-menu) .links a{font-size:.68rem;letter-spacing:.1em}
+  html:not(.js-menu) .links .cta{padding:8px 12px}
+  .js-menu nav .wrap{height:64px}
+  .js-menu .menu-btn{display:grid;place-content:center;gap:6px;width:44px;height:44px;margin-right:-10px;padding:0;border:0;background:transparent;cursor:pointer}
+  .js-menu .menu-btn span{display:block;width:24px;height:1.5px;background:var(--oniks);transition:transform .25s,opacity .2s}
+  .js-menu nav.open .menu-btn span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+  .js-menu nav.open .menu-btn span:nth-child(2){opacity:0}
+  .js-menu nav.open .menu-btn span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+  .js-menu .links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:var(--kamen);border-bottom:1px solid var(--linija);padding:8px var(--pad) 28px;max-height:calc(100vh - 64px);overflow:auto}
+  .js-menu nav.open{z-index:40}
+  .js-menu nav.open .links{display:flex}
+  .js-menu .links a{font-size:.85rem;padding:18px 0;border-bottom:1px solid var(--linija)}
+  .js-menu .links a:not(.cta)::after{bottom:12px;right:auto;width:36px}
+  .js-menu .links .cta{margin-top:24px;padding:16px 18px;text-align:center;border-bottom:1px solid var(--smaragd)}
+}
+
+/* GUMBI */
+.btns{display:flex;flex-wrap:wrap;gap:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 30px;font:600 .8rem var(--sans);letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid;cursor:pointer;transition:background .25s,color .25s,border-color .25s}
+.btn.primary{background:var(--smaragd);border-color:var(--smaragd);color:var(--kamen)}
+.btn.primary:hover{background:var(--oniks);border-color:var(--oniks)}
+.btn.outline{background:transparent;border-color:rgba(11,11,12,.4);color:var(--oniks)}
+.btn.outline:hover{border-color:var(--smaragd);color:var(--smaragd)}
+.btn.line{background:transparent;border-color:var(--linija-tam);color:var(--kamen)}
+.btn.line:hover{border-color:var(--zlato);color:var(--zlato)}
+
+/* NASLOV SEKCIJE */
+.head{display:grid;gap:22px;max-width:720px;margin-bottom:clamp(48px,7vw,80px)}
+.head h2{font-size:clamp(2rem,4.2vw,3rem)}
+.note-min{font:600 .74rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
+.green .note-min{color:var(--tekst-tam)}
+
+/* NASLOVNICA: HERO */
+.hero{padding-block:calc(130px + env(safe-area-inset-top,0px)) clamp(90px,12vw,150px);text-align:center}
+.hero-label{margin-bottom:24px}
+.hero-label::after{content:"";width:36px;height:1px;background:var(--zlato)}
+.hero h1{font-size:clamp(2.2rem,5.4vw,3.8rem);max-width:15em;margin:0 auto}
+.hero h1 em{color:var(--smaragd)}
+.hero .sub{max-width:600px;margin:28px auto 44px;color:var(--grafit)}
+.hero .sub::before{content:"";display:block;width:48px;height:1px;background:var(--zlato);margin:0 auto 28px}
+.hero .btns{justify-content:center}
+/* Hero s vizualom: na računalu tekst lijevo i shematska stranica desno, na mobitelu vizual ide ispod gumba */
+.hero.split-hero{text-align:left}
+.split-hero .wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(40px,6vw,80px);align-items:center}
+.split-hero h1{margin:0;max-width:none;font-size:clamp(2.2rem,4.4vw,3.4rem)}
+.split-hero .sub{margin:28px 0 40px;max-width:32em}
+.split-hero .sub::before{margin:0 0 28px}
+.split-hero .btns{justify-content:flex-start}
+.vis{width:100%;max-width:560px;justify-self:end}
+.vis svg{display:block;width:100%;height:auto;overflow:visible}
+@media(max-width:900px){
+  .hero.split-hero{text-align:center}
+  .split-hero .wrap{grid-template-columns:1fr}
+  .split-hero h1,.split-hero .sub{margin-left:auto;margin-right:auto}
+  .split-hero .sub::before{margin:0 auto 28px}
+  .split-hero .btns{justify-content:center}
+  .vis{justify-self:center;max-width:440px;margin-top:8px}
+}
+/* Vizual se jednom mirno složi, a zatim se na mobitelu odabere termin; bez ponavljanja */
+.vis .in{opacity:0;transform:translateY(6px);animation:vis-in .6s ease forwards;animation-delay:calc(var(--d,0) * 1ms)}
+@keyframes vis-in{to{opacity:1;transform:none}}
+.vis .slot-on{fill:var(--kamen);animation:vis-pick .5s ease forwards;animation-delay:2.4s}
+@keyframes vis-pick{to{fill:var(--smaragd)}}
+.vis .slot-txt{fill:var(--oniks);animation:vis-picktxt .5s ease forwards;animation-delay:2.4s}
+@keyframes vis-picktxt{to{fill:var(--kamen)}}
+@media(prefers-reduced-motion:reduce){
+  .vis .in{opacity:1;transform:none;animation:none}
+  .vis .slot-on{fill:var(--smaragd);animation:none}
+  .vis .slot-txt{fill:var(--kamen);animation:none}
+}
+@media(max-width:600px){
+        .hero-label::before,.hero-label::after{width:20px}
+}
+
+#bar{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:2px;width:0;z-index:45;background:var(--zlato)}
+/* NASLOVNICA: USLUGE */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:clamp(40px,7vw,96px);align-items:start}
+.split .head{margin-bottom:0}
+.split .head p{color:var(--grafit);max-width:30em}
+.svc-list{border-top:1px solid var(--linija)}
+.svc{display:grid;grid-template-columns:3rem minmax(0,1fr);gap:6px 16px;padding:32px 0;border-bottom:1px solid var(--linija)}
+.svc .n{font:600 .95rem/1.6 var(--sans);color:var(--smaragd)}
+.svc h3{font-size:1.45rem}
+.svc p{grid-column:2;color:var(--grafit);font-size:.98rem}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+
+/* NASLOVNICA: KAKO RADIMO */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;counter-reset:s}
+.step{display:grid;gap:12px;align-content:start;padding-top:28px;border-top:1px solid var(--linija);position:relative}
+.step::before{counter-increment:s;content:"0" counter(s);position:absolute;top:-1px;left:0;transform:translateY(calc(-100% - 10px));font:600 .74rem/1 var(--sans);letter-spacing:.12em;color:var(--grafit)}
+.step::after{content:"";position:absolute;top:-1px;left:0;width:48px;height:1px;background:var(--zlato)}
+.step h3{font-size:1.5rem}
+.step p{color:var(--grafit)}
+@media(max-width:820px){.steps{grid-template-columns:1fr;gap:64px}}
+
+/* PAKETI (smaragdna traka) */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:stretch}
+.plan{position:relative;display:flex;flex-direction:column;padding:40px 32px 32px;border:1px solid var(--linija-tam);min-width:0}
+.plan h3{font-size:1.7rem}
+.price{margin-top:14px;font:600 3rem/1 var(--sans);letter-spacing:-.03em;color:var(--zlato);font-variant-numeric:tabular-nums}
+.price small{font:400 .85rem var(--sans);letter-spacing:0;color:var(--tekst-tam);margin-left:6px}
+.plan .from{min-height:1.6em;margin:16px 0 22px;font-weight:500}
+.plan ul{list-style:none;padding:24px 0 0;margin:0;flex:1;display:grid;gap:14px;align-content:start;border-top:1px solid var(--linija-tam)}
+.plan li{position:relative;padding-left:24px;font-size:.94rem;color:var(--tekst-tam)}
+.plan li::before{content:"";position:absolute;left:0;top:.72em;width:12px;height:1px;background:var(--zlato)}
+.plan .btn{margin-top:32px;width:100%}
+/* Preporučeni paket je obrnut: kamen na smaragdu */
+.plan.hot{background:var(--kamen);color:var(--oniks);border:1px solid var(--zlato)}
+.plan.hot .price{color:var(--smaragd)}
+.plan.hot .price small,.plan.hot li{color:var(--grafit)}
+.plan.hot ul{border-top-color:var(--linija)}
+.plan .tag{position:absolute;top:0;left:32px;transform:translateY(-50%);background:var(--zlato);color:var(--oniks);padding:2px 10px;font:600 .68rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.once{max-width:40em;margin:40px auto 0;text-align:center;color:var(--tekst-tam)}
+.once-btn{margin-top:24px;text-align:center}
+@media(max-width:960px){.plans{grid-template-columns:1fr;max-width:520px;margin:0 auto}}
+
+/* POZIV NA KONTAKT I OBRAZAC */
+.final .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(48px,7vw,96px);align-items:start}
+.final h1,.final h2{font-size:clamp(2.2rem,4.6vw,3.4rem);margin:22px 0 24px}
+.final .lead{color:var(--grafit);max-width:30em}
+.final .sig{margin-top:40px;font:600 1.25rem var(--sans);color:var(--smaragd)}
+.final .cta-box{align-self:center}
+@media(max-width:860px){.final .wrap{grid-template-columns:1fr}}
+.kontakt-page .final{padding-top:calc(150px + env(safe-area-inset-top,0px))}
+form{display:grid;gap:22px;min-width:0}
+.field{display:grid;gap:8px}
+label{font:600 .72rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
+input,textarea{width:100%;padding:12px 0;border:0;border-bottom:1px solid rgba(11,11,12,.3);background:transparent;color:var(--oniks);font:400 1rem var(--sans);border-radius:0;transition:border-color .2s}
+input:focus,textarea:focus{outline:none;border-bottom-color:var(--smaragd)}
+textarea{min-height:120px;resize:vertical}
+form .btn{margin-top:8px;justify-self:start}
+#msg{min-height:1.5em;font-size:.9rem;color:var(--grafit)}
+.err{font-size:.85rem;color:#8C2F2F}
+.err:empty{display:none}
+input[aria-invalid="true"],textarea[aria-invalid="true"]{border-bottom:2px solid #8C2F2F}
+#msg a{color:var(--smaragd)}
+
+/* PODSTRANICE: ZAGLAVLJE */
+.top{padding-block:calc(150px + env(safe-area-inset-top,0px)) clamp(56px,7vw,88px)}
+.top h1{font-size:clamp(2.4rem,5.5vw,3.6rem);margin:24px 0 22px}
+.top p{max-width:640px;color:var(--grafit)}
+.back{margin-top:44px}
+
+/* CJENIK: TABLICE */
+.tbl{border-top:1px solid var(--linija)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--linija)}
+.row .n{font-weight:600}
+.row .d{grid-column:1;max-width:44em;font-size:.9rem;color:var(--grafit)}
+.row .c{grid-row:1;grid-column:2;text-align:right;font:600 1.2rem var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .c small{display:block;font:600 .7rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
+@media(max-width:600px){.row .c{font-size:1.05rem}}
+.promo{margin-top:48px;padding:32px;border:1px solid var(--zlato);display:grid;gap:10px}
+.promo .k{font:600 .72rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--smaragd)}
+.promo p{font:500 1.15rem/1.5 var(--sans)}
+.notes{margin-top:40px;display:grid;gap:8px;font-size:.9rem;color:var(--grafit)}
+
+/* USLUGE: POPIS */
+.slist{display:grid;border-top:1px solid var(--linija)}
+.sitem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px 48px;padding:44px 0;border-bottom:1px solid var(--linija)}
+.sitem .n{font:600 .95rem var(--sans);color:var(--smaragd);display:block;margin-bottom:12px}
+.sitem h2{font-size:clamp(1.5rem,2.6vw,2rem)}
+.sitem p{color:var(--grafit);max-width:36em}
+.sitem p + p{margin-top:14px}
+.sitem .pr{font:600 .74rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--oniks)}
+@media(max-width:820px){.sitem{grid-template-columns:1fr;padding:34px 0}}
+
+/* O NAMA */
+.about-p{margin-top:28px;font:500 clamp(1.45rem,2.9vw,2.2rem)/1.32 var(--sans);letter-spacing:-.015em;max-width:26em}
+.facts{margin-top:clamp(48px,6vw,72px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;border-top:1px solid var(--linija);padding-top:32px}
+.facts h3{font-size:1.2rem;margin-bottom:8px}
+.facts p{color:var(--grafit)}
+@media(max-width:820px){.facts{grid-template-columns:1fr}}
+
+/* PODNOŽJE */
+footer{background:var(--oniks);color:var(--tekst-tam);font-size:.85rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;justify-content:space-between;padding-block:32px calc(32px + env(safe-area-inset-bottom,0px))}
+footer .f-brand{display:flex;align-items:center;gap:14px}
+footer .mono{font-size:13px}
+footer .f-sl{font:600 .7rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}

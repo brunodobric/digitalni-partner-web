@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>O nama · Digitalni partner</title>
+<meta name="description" content="Digitalni partner iz Zagreba izrađuje web stranice i vodi digitalnu prisutnost malih obrta i tvrtki iz cijele Hrvatske.">
+<meta name="theme-color" content="#E7E4DE">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="hr_HR">
+<meta property="og:site_name" content="Digitalni partner">
+<meta property="og:title" content="O nama · Digitalni partner">
+<meta property="og:description" content="Digitalni partner iz Zagreba izrađuje web stranice i vodi digitalnu prisutnost malih obrta i tvrtki iz cijele Hrvatske.">
+<meta property="og:image" content="slike/og-slika.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="icon" href="slike/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="slike/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="slike/apple-touch-icon.png">
+<link rel="preload" href="fontovi/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="stil.css">
+<script>
+document.documentElement.classList.add("js-menu");
+(function(){
+  var n = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+  if(n && n.type === "back_forward") return;
+  var moved = false;
+  ["wheel","touchstart","keydown"].forEach(function(ev){ addEventListener(ev, function(){ moved = true; }, {once:true, passive:true}); });
+  function go(){
+    if(moved) return;
+    var t = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+    if(t) t.scrollIntoView({block:"start", behavior:"instant"}); else window.scrollTo(0,0);
+  }
+  document.addEventListener("DOMContentLoaded", go);
+  addEventListener("load", go);
+})();
+</script>
+</head>
+<body>
+<a class="skip" href="#sadrzaj">Preskoči na sadržaj</a>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
+    <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
+    <div class="links" id="izbornik"><a class="home-link" href="index.html">Naslovna</a><a class="on" aria-current="page" href="o-nama.html">O nama</a><a href="usluge.html">Usluge</a><a href="cjenik.html">Cjenik</a><a class="cta" href="kontakt.html">Kontakt</a></div>
+  </div>
+</nav>
+
+<main id="sadrzaj" tabindex="-1">
+<header class="top">
+  <div class="wrap">
+    <span class="label">O nama</span>
+    <h1>Vaš digitalni partner za uspjeh.</h1>
+    <p>Malim obrtima i tvrtkama slažemo sve što im treba na internetu i u digitalnom poslovanju.</p>
+  </div>
+</header>
+<section class="svj">
+  <div class="wrap">
+    <span class="label">Tko smo</span>
+    <p class="about-p">Izrađujemo web stranice, postavljamo Google poslovni profil, vodimo oglase i uvodimo AI asistente. S klijentima iz cijele Hrvatske radimo online. Vi radite ono u čemu ste najbolji, a mi se brinemo da Vas klijenti pronađu.</p>
+    <div class="facts">
+      <div><h3>Za koga</h3><p>Saloni, osobni treneri, apartmani i mali hoteli, restorani i drugi mali uslužni obrti.</p></div>
+      <div><h3>Što</h3><p>Sedam usluga, od web stranice do AI asistenta. Svaku možete naručiti zasebno ili u <a class="txt-link" href="cjenik.html#paketi">paketu</a>.</p></div>
+      <div><h3>Koliko traje</h3><p>Od ispunjenog upitnika do objavljene stranice prođe oko dva tjedna.</p></div>
+    </div>
+    <div class="back"><a class="btn primary" href="kontakt.html">Javite nam se</a></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-brand"><span class="mono">dp</span><span>© <span id="y"></span> Digitalni partner</span></div>
+    <span class="f-sl">Digitalno. Po mjeri.</span>
+  </div>
+</footer>
+<script>
+document.getElementById("y").textContent = new Date().getFullYear();
+// Izbornik na mobitelu: gumb s tri crte otvara i zatvara popis, klik na poveznicu ili Esc ga zatvara
+(function(){
+  var nav = document.querySelector("nav"), btn = nav.querySelector(".menu-btn");
+  function set(open){ nav.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
+  btn.addEventListener("click", function(){ set(!nav.classList.contains("open")); });
+  nav.querySelectorAll(".links a").forEach(function(a){ a.addEventListener("click", function(){ set(false); }); });
+  addEventListener("keydown", function(e){ if(e.key === "Escape") set(false); });
+  addEventListener("resize", function(){ if(innerWidth > 860) set(false); });
+})();
+</script>
+</body>
+</html>
