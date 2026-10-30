@@ -102,34 +102,96 @@ nav .wrap{display:flex;justify-content:space-between;align-items:center;height:7
 .hero .sub{max-width:600px;margin:28px auto 44px;color:var(--grafit)}
 .hero .sub::before{content:"";display:block;width:48px;height:1px;background:var(--zlato);margin:0 auto 28px}
 .hero .btns{justify-content:center}
-/* Hero s vizualom: na računalu tekst lijevo i shematska stranica desno, na mobitelu vizual ide ispod gumba */
+/* Hero s vizualom: na računalu tekst lijevo i crtani mobitel desno, na mobitelu mobitel ide ispod gumba */
 .hero.split-hero{text-align:left}
 .split-hero .wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(40px,6vw,80px);align-items:center}
 .split-hero h1{margin:0;max-width:none;font-size:clamp(2.2rem,4.4vw,3.4rem)}
 .split-hero .sub{margin:28px 0 40px;max-width:32em}
 .split-hero .sub::before{margin:0 0 28px}
 .split-hero .btns{justify-content:flex-start}
-.vis{width:100%;max-width:560px;justify-self:end}
-.vis svg{display:block;width:100%;height:auto;overflow:visible}
 @media(max-width:900px){
   .hero.split-hero{text-align:center}
   .split-hero .wrap{grid-template-columns:1fr}
   .split-hero h1,.split-hero .sub{margin-left:auto;margin-right:auto}
   .split-hero .sub::before{margin:0 auto 28px}
   .split-hero .btns{justify-content:center}
-  .vis{justify-self:center;max-width:440px;margin-top:8px}
 }
-/* Vizual se jednom mirno složi, a zatim se na mobitelu odabere termin; bez ponavljanja */
-.vis .in{opacity:0;transform:translateY(6px);animation:vis-in .6s ease forwards;animation-delay:calc(var(--d,0) * 1ms)}
-@keyframes vis-in{to{opacity:1;transform:none}}
-.vis .slot-on{fill:var(--kamen);animation:vis-pick .5s ease forwards;animation-delay:2.4s}
-@keyframes vis-pick{to{fill:var(--smaragd)}}
-.vis .slot-txt{fill:var(--oniks);animation:vis-picktxt .5s ease forwards;animation-delay:2.4s}
-@keyframes vis-picktxt{to{fill:var(--kamen)}}
-@media(prefers-reduced-motion:reduce){
-  .vis .in{opacity:1;transform:none;animation:none}
-  .vis .slot-on{fill:var(--smaragd);animation:none}
-  .vis .slot-txt{fill:var(--kamen);animation:none}
+
+/* NASLOVNICA: MOBITEL U HERU
+   Crtani mobitel sam polako odvrti put klijenta: pretraga, Google profil, web stranica, AI asistent upiše termin.
+   js/naslovnica.js vremenom pomiče napredak 0 do 1 i svakom elementu s data-a="od,do" (pojavi se) ili data-o="od,do"
+   (nestane) postavlja --t; CSS animira samo pomak i prozirnost. Bez skripte ili uz "smanjeno kretanje" mobitel stoji
+   na zadnjem kadru (web i razgovor). Sve mjere u ekranu su u cqw pa se ekran skalira kao slika. */
+.mob{justify-self:center;width:min(330px,100%);aspect-ratio:9/18.5;border:1.5px solid var(--oniks);border-radius:44px;padding:10px;background:var(--kamen-svj);container-type:inline-size}
+.mob-ekran{position:relative;height:100%;overflow:hidden;border-radius:34px;background:var(--kamen-svj);font-size:4.2cqw;line-height:1.35;text-align:left}
+.sloj{position:absolute;inset:0;padding:14cqw 6cqw 6cqw}
+.mob [data-a]{opacity:var(--t,1);transform:translateY(calc((1 - var(--t,1)) * 8cqw))}
+.mob .pretraga{display:none}
+.vrti .mob .pretraga{display:block}
+
+/* 1. Pretraga i Google profil */
+.trazilica{border:1px solid var(--linija);border-radius:999px;padding:3cqw 5cqw;background:#fff;color:var(--grafit);font-weight:600}
+.trazilica::before{content:"";display:inline-block;width:3.2cqw;height:3.2cqw;border:1.5px solid var(--grafit);border-radius:50%;margin-right:2.6cqw;vertical-align:-.2em}
+.tr-tekst{display:inline-block;white-space:nowrap;overflow:hidden;vertical-align:bottom;max-width:calc(var(--pis,1) * 100%)}
+.karta{position:relative;height:38cqw;margin:5cqw 0 4cqw;background:var(--kamen);border-radius:3cqw;overflow:hidden}
+.cesta{position:absolute;background:var(--kamen-svj)}
+.c1{left:0;right:0;top:44%;height:3cqw}
+.c2{top:0;bottom:0;left:30%;width:3cqw}
+.c3{left:55%;top:-10%;width:2.4cqw;height:130%;transform:rotate(28deg)}
+.pin{position:absolute;left:58%;top:30%;width:5cqw;height:5cqw;border-radius:50% 50% 50% 0;background:var(--smaragd);rotate:-45deg}
+.rez{padding:3cqw 0;border-bottom:1px solid var(--linija)}
+.rez b,.rez i{display:block;height:2.6cqw;border-radius:1cqw;background:var(--kamen)}
+.rez b{width:55%;margin-bottom:2cqw}
+.rez i{width:80%}
+.mob .profil{position:absolute;left:0;right:0;bottom:0;padding:4cqw 6cqw 8cqw;background:#fff;border-top:1px solid var(--linija);border-radius:6cqw 6cqw 0 0;transform:translateY(calc((1 - var(--t,1)) * 100%));opacity:1}
+.ruckica{display:block;width:12cqw;height:1.2cqw;border-radius:1cqw;background:var(--linija);margin:0 auto 4cqw}
+.pr-ime{font-size:6.4cqw;font-weight:700;color:var(--smaragd);letter-spacing:-.02em}
+.pr-opis{color:var(--grafit)}
+.pr-otv{color:var(--smaragd);font-weight:600;margin-top:1cqw}
+.pr-foto{display:grid;grid-template-columns:repeat(3,1fr);gap:2cqw;margin:4cqw 0}
+.pr-foto i{height:16cqw;border-radius:2cqw;background:var(--kamen)}
+.pr-foto i:nth-child(2){background:#D9D4CA}
+.pr-gumbi{display:flex;gap:2cqw;font-size:3.4cqw;font-weight:600}
+.pr-gumbi span{flex:1;text-align:center;padding:2.6cqw 0;border:1px solid var(--linija);border-radius:999px;color:var(--smaragd)}
+.mob .pr-web{opacity:1;transform:none;outline:1.5px solid rgba(198,161,91,var(--t,1));outline-offset:.6cqw}
+
+/* 2. Web stranica */
+.web{background:var(--kamen-svj);padding-top:12cqw}
+.w-nav{display:flex;align-items:center;gap:2.4cqw;padding-bottom:4cqw;font-size:4.4cqw;color:var(--smaragd)}
+.w-logo{display:block;width:4.8cqw;height:4.8cqw;border-radius:1cqw;background:var(--smaragd)}
+.w-nav span{margin-left:auto;font-size:2.8cqw;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--smaragd);padding:1.4cqw 2.6cqw}
+.w-hero{background:var(--smaragd);color:var(--kamen);padding:7cqw 5cqw;margin:0 -6cqw 5cqw}
+.w-h1{font-size:7cqw;font-weight:600;line-height:1.15;letter-spacing:-.02em}
+.w-h1.zl{color:var(--zlato)}
+.w-mali{font-size:3.4cqw;color:var(--tekst-tam);margin:3cqw 0 4cqw}
+.w-btn{display:inline-block;background:var(--zlato);color:var(--oniks);font-size:2.8cqw;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:2cqw 3.6cqw}
+.w-red{display:flex;flex-direction:column;padding:3cqw 0;border-bottom:1px solid var(--linija)}
+.w-red b{font-weight:600}
+.w-red span{font-size:3.4cqw;color:var(--grafit)}
+.w-sat{margin-top:4cqw;font-size:3.2cqw;color:var(--grafit)}
+
+/* 3. AI asistent: razgovor izlazi preko weba */
+.mob .chat{top:30%;padding:5cqw 5cqw 6cqw;background:#fff;border-top:1px solid var(--linija);border-radius:6cqw 6cqw 0 0;display:flex;flex-direction:column;transform:translateY(calc((1 - var(--t,1)) * 100%));opacity:1}
+.ch-glava{display:flex;align-items:center;gap:2.4cqw;padding-bottom:4cqw;border-bottom:1px solid var(--linija);color:var(--smaragd)}
+.ch-glava span{margin-left:auto;font-size:3cqw;color:var(--grafit)}
+.ch-poruke{display:flex;flex-direction:column;gap:3cqw;padding-top:4cqw}
+.msg{max-width:82%;padding:3cqw 4cqw;border-radius:4cqw;font-size:3.8cqw}
+.msg small{display:block;font-size:2.6cqw;opacity:.6;margin-top:1cqw}
+.msg.ja{align-self:flex-end;background:var(--smaragd);color:var(--kamen);border-bottom-right-radius:1cqw}
+.msg.on{align-self:flex-start;background:var(--kamen);color:var(--oniks);border-bottom-left-radius:1cqw}
+.potvrda{align-self:center;margin-top:2cqw;padding:2.4cqw 4cqw;border:1px solid var(--zlato);font-size:3.4cqw;font-weight:600;color:var(--smaragd)}
+
+@media(max-width:900px){
+  /* Na mobitelu naslov, gumbi i crtani mobitel moraju stati na prvi ekran, pa podnaslov ovdje ne prikazujemo */
+  .mob-hero{padding-block:calc(100px + env(safe-area-inset-top,0px)) 64px}
+  .mob-hero .wrap{gap:32px}
+  .mob-hero .hero-label{margin-bottom:16px}
+  .mob-hero h1{font-size:clamp(1.7rem,6.8vw,2.4rem)}
+  .mob-hero .sub{display:none}
+  .mob-hero .btns{margin-top:24px;gap:10px}
+  .mob-hero .btn{min-height:46px;padding:0 18px;font-size:.72rem}
+  .mob{width:min(250px,60vw);border-radius:36px;padding:8px}
+  .mob-ekran{border-radius:28px}
 }
 @media(max-width:600px){
         .hero-label::before,.hero-label::after{width:20px}

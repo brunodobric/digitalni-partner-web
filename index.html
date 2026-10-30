@@ -50,7 +50,7 @@ document.documentElement.classList.add("js-menu");
 <main id="sadrzaj" tabindex="-1">
 <div id="bar"></div>
 
-<header class="hero split-hero" id="top">
+<header class="hero split-hero mob-hero" id="top">
   <div class="wrap">
     <div>
       <p class="label hero-label">Digitalno. Po mjeri.</p>
@@ -58,62 +58,57 @@ document.documentElement.classList.add("js-menu");
       <p class="sub">Izrađujemo web stranice, postavljamo Google poslovni profil i vodimo Google i Meta oglase. Za salone, trenere, apartmane, restorane i druge male obrte koji žele da ih novi klijenti i gosti lakše pronađu.</p>
       <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#cijene">Pogledajte pakete</a></div>
     </div>
-    <div class="vis" aria-hidden="true">
-      <svg viewBox="0 0 560 400" font-family="Manrope, sans-serif">
-        <g class="in" style="--d:0">
-          <rect x="40" y="20" width="440" height="280" rx="10" fill="#F1EFEA" stroke="#0B0B0C" stroke-width="1.5"/>
-          <path d="M10 312 H510 L496 326 H24 Z" fill="#E7E4DE" stroke="#0B0B0C" stroke-width="1.5" stroke-linejoin="round"/>
-          <line x1="230" y1="312" x2="290" y2="312" stroke="#5E6266" stroke-width="3" stroke-linecap="round"/>
-        </g>
-        <g class="in" style="--d:250" font-size="9" font-weight="600">
-          <rect x="60" y="38" width="16" height="16" rx="3" fill="#0F3B33"/>
-          <text x="84" y="50" font-size="11" font-weight="700" fill="#0F3B33">Vaš salon</text>
-          <text x="282" y="50" fill="#5E6266">Usluge</text>
-          <text x="322" y="50" fill="#5E6266">Cjenik</text>
-          <text x="360" y="50" fill="#5E6266">Kontakt</text>
-          <rect x="402" y="38" width="58" height="17" fill="none" stroke="#0F3B33" stroke-width="1.2"/>
-          <text x="431" y="50" text-anchor="middle" font-size="7.5" letter-spacing=".8" fill="#0F3B33">TERMIN</text>
-        </g>
-        <g class="in" style="--d:450">
-          <rect x="60" y="66" width="400" height="124" fill="#0F3B33"/>
-          <text x="80" y="102" font-size="20" font-weight="600" fill="#E7E4DE">Vaš novi izgled</text>
-          <text x="80" y="126" font-size="20" font-weight="600" fill="#C6A15B">počinje ovdje.</text>
-          <text x="80" y="148" font-size="9" fill="#B9B6AF">Šišanje, bojanje i njega kose u centru grada.</text>
-          <rect x="80" y="160" width="96" height="18" fill="#C6A15B"/>
-          <text x="128" y="172" text-anchor="middle" font-size="7.5" font-weight="600" letter-spacing=".8" fill="#0B0B0C">REZERVIRAJTE</text>
-          <circle cx="390" cy="128" r="36" fill="none" stroke="#C6A15B" stroke-width="1"/>
-          <circle cx="390" cy="128" r="22" fill="none" stroke="#E7E4DE" stroke-opacity=".2" stroke-width="1"/>
-        </g>
-        <g class="in" style="--d:650" font-size="9">
-          <text x="60" y="214" font-size="11" font-weight="600" fill="#0B0B0C">Šišanje</text>
-          <text x="60" y="230" fill="#5E6266">Žensko, muško i dječje</text>
-          <text x="200" y="214" font-size="11" font-weight="600" fill="#0B0B0C">Bojanje</text>
-          <text x="200" y="230" fill="#5E6266">Pramenovi i balayage</text>
-          <text x="340" y="214" font-size="11" font-weight="600" fill="#0B0B0C">Njega</text>
-          <text x="340" y="230" fill="#5E6266">Tretmani i pakiranja</text>
-          <line x1="60" y1="250" x2="460" y2="250" stroke="#0B0B0C" stroke-opacity=".12"/>
-          <text x="60" y="270" fill="#5E6266">Radno vrijeme: pon. do sub. · Rezervacija online, 0-24</text>
-        </g>
-        <g class="in" style="--d:900">
-          <rect x="400" y="130" width="150" height="262" rx="18" fill="#E7E4DE" stroke="#0B0B0C" stroke-width="1.5"/>
-          <rect x="455" y="140" width="40" height="5" rx="2.5" fill="#0B0B0C" opacity=".8"/>
-          <rect x="414" y="156" width="12" height="12" rx="2" fill="#0F3B33"/>
-          <text x="432" y="166" font-size="9" font-weight="700" fill="#0F3B33">Vaš salon</text>
-          <text x="414" y="192" font-size="11" font-weight="600" fill="#0B0B0C">Odaberite termin</text>
-          <line x1="414" y1="202" x2="436" y2="202" stroke="#C6A15B"/>
-        </g>
-        <g class="in" style="--d:1150" font-size="11" font-weight="600">
-          <rect x="414" y="214" width="122" height="30" fill="none" stroke="#0B0B0C" stroke-opacity=".25"/>
-          <text x="426" y="233" fill="#5E6266">09:00</text>
-          <rect x="414" y="250" width="122" height="30" class="slot-on" stroke="#0F3B33"/>
-          <text x="426" y="269" class="slot-txt">10:30</text>
-          <rect x="414" y="286" width="122" height="30" fill="none" stroke="#0B0B0C" stroke-opacity=".25"/>
-          <text x="426" y="305" fill="#5E6266">13:00</text>
-          <rect x="414" y="342" width="122" height="30" fill="#0F3B33"/>
-          <text x="475" y="361" text-anchor="middle" font-size="9.5" letter-spacing="1.1" fill="#E7E4DE">REZERVIRAJTE</text>
-        </g>
-      </svg>
+    <div class="mob" aria-hidden="true">
+      <div class="mob-ekran">
+
+        <!-- 1. Pretraga i Google profil -->
+        <div class="sloj pretraga" data-o=".40,.47">
+          <div class="trazilica"><span class="tr-tekst">frizer u blizini</span></div>
+          <div class="karta">
+            <i class="cesta c1"></i><i class="cesta c2"></i><i class="cesta c3"></i>
+            <i class="pin" data-a=".14,.20"></i>
+          </div>
+          <div class="rez"><b></b><i></i></div>
+          <div class="rez"><b></b><i></i></div>
+          <div class="profil" data-a=".16,.26">
+            <span class="ruckica"></span>
+            <p class="pr-ime">Vaš salon</p>
+            <p class="pr-opis">Frizerski salon · Centar</p>
+            <p class="pr-otv">Otvoreno danas</p>
+            <div class="pr-foto"><i></i><i></i><i></i></div>
+            <div class="pr-gumbi"><span>Nazovi</span><span>Upute</span><span class="pr-web" data-a=".33,.38">Web stranica</span></div>
+          </div>
+        </div>
+
+        <!-- 2. Web stranica -->
+        <div class="sloj web" data-a=".40,.47">
+          <div class="w-nav" data-a=".44,.50"><i class="w-logo"></i><b>Vaš salon</b><span>Termin</span></div>
+          <div class="w-hero" data-a=".47,.54">
+            <p class="w-h1">Vaš novi izgled</p>
+            <p class="w-h1 zl">počinje ovdje.</p>
+            <p class="w-mali">Šišanje, bojanje i njega kose u centru grada.</p>
+            <span class="w-btn">Rezervirajte</span>
+          </div>
+          <div class="w-red" data-a=".53,.58"><b>Šišanje</b><span>Žensko, muško i dječje</span></div>
+          <div class="w-red" data-a=".56,.61"><b>Bojanje</b><span>Pramenovi i balayage</span></div>
+          <div class="w-red" data-a=".59,.64"><b>Njega</b><span>Tretmani i pakiranja</span></div>
+          <div class="w-sat" data-a=".62,.66">Pon. do sub. · rezervacija online</div>
+        </div>
+
+        <!-- 3. AI asistent -->
+        <div class="sloj chat" data-a=".69,.75">
+          <div class="ch-glava"><i class="w-logo"></i><b>Vaš salon</b><span>AI asistent</span></div>
+          <div class="ch-poruke">
+            <p class="msg ja" data-a=".74,.78">Imate li slobodan termin u subotu ujutro?<small>22:14</small></p>
+            <p class="msg on" data-a=".78,.82">Imamo u 10:30. Želite li da Vas upišem za šišanje?<small>22:14</small></p>
+            <p class="msg ja" data-a=".82,.85">Može, hvala.<small>22:15</small></p>
+            <p class="potvrda" data-a=".86,.90">Upisano: subota, 10:30</p>
+          </div>
+        </div>
+
+      </div>
     </div>
+
   </div>
 </header>
 
