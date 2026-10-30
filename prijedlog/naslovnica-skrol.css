@@ -78,8 +78,7 @@
 
 /* STATIČNO (bez skripte ili uz smanjeno kretanje): kadar 0 i 4, mobitel prikazuje web i razgovor */
 .skrol:not(.radi) .kadar[data-k="1"],.skrol:not(.radi) .kadar[data-k="2"],.skrol:not(.radi) .kadar[data-k="3"]{display:none}
-.skrol:not(.radi) .kadar[data-k="4"] .label,.skrol:not(.radi) .kadar[data-k="4"] h2{display:none}
-.skrol:not(.radi) .kadar[data-k="4"] .btns{margin-top:0}
+.skrol:not(.radi) .kadar[data-k="4"]{display:none}
 .skrol:not(.radi) .pretraga{display:none}
 
 /* ANIMIRANO */
@@ -89,7 +88,7 @@
 .radi .skrol-tekst{position:relative;display:block;min-height:22em}
 .radi .kadar{position:absolute;left:0;right:0;top:50%;opacity:var(--t,0);transform:translateY(calc(-50% + (1 - var(--t,0)) * 18px));pointer-events:none}
 .radi .kadar.vidljiv{pointer-events:auto}
-.radi .skrol-uputa{display:flex;align-items:center;gap:14px;margin-top:40px;font:600 .74rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
+.radi .skrol-uputa{display:flex;align-items:center;gap:14px;margin-top:32px;font:600 .74rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
 .radi .skrol-uputa::before{content:"";width:1px;height:36px;background:var(--zlato)}
 .radi .skrol-koraci{display:flex;gap:28px;position:absolute;left:0;top:calc(100% + 48px);margin:0;padding:0;list-style:none;font:600 .7rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
 .skrol-koraci li{display:grid;gap:10px;min-width:88px}
@@ -113,6 +112,7 @@
   .radi .kadar .btns{margin-top:22px;gap:10px}
   .radi .kadar .btn{min-height:46px;padding:0 18px;font-size:.72rem}
   .radi .skrol-uputa,.radi .skrol-koraci{display:none}
+  .radi .kadar[data-k="0"] .sub{display:none}
   .radi .mob{height:100%;width:auto;max-width:78vw;min-height:0;justify-self:center;border-radius:36px;padding:8px}
   .radi .mob-ekran{border-radius:28px}
 }
