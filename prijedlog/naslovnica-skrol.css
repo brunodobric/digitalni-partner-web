@@ -120,3 +120,20 @@
   .radi .kadar .sub{display:none}
   .radi .skrol-tekst{min-height:8em}
 }
+
+/* VARIJANTA BEZ SKROLA (naslovnica-auto.js): raspored ostaje statičan, mobitel se sam vrti */
+.skrol.vrti .pretraga{display:block}
+.vrti .tr-tekst{--pis:0}
+.vrti .mob-ekran{will-change:opacity}
+@media(max-width:860px){
+  /* Na mobitelu i tekst i telefon moraju stati na prvi ekran, inače se animacija ne vidi */
+  .vrti .skrol-scena{padding-block:calc(88px + env(safe-area-inset-top,0px)) 48px}
+  .vrti .skrol-raspored{gap:28px}
+  .vrti .kadar .label{margin-bottom:14px}
+  .vrti .kadar h1{font-size:clamp(1.6rem,6.6vw,2.2rem)}
+  .vrti .kadar .sub{display:none}
+  .vrti .kadar .btns{margin-top:22px;gap:10px}
+  .vrti .kadar .btn{min-height:46px;padding:0 18px;font-size:.72rem}
+  .vrti .mob{width:min(250px,60vw);border-radius:36px;padding:8px}
+  .vrti .mob-ekran{border-radius:28px}
+}

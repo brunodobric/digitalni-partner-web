@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Naslovnica bez skrola · Digitalni partner</title>
+<meta name="description" content="Digitalni partner izrađuje web stranice, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
+<meta name="theme-color" content="#E7E4DE">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="hr_HR">
+<meta property="og:site_name" content="Digitalni partner">
+<meta property="og:title" content="Digitalni partner · web stranice i Google profil za male obrte">
+<meta property="og:description" content="Digitalni partner izrađuje web stranice, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
+<meta property="og:image" content="slike/og-slika.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="icon" href="slike/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="slike/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="slike/apple-touch-icon.png">
+<link rel="preload" href="fontovi/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="stil.css">
+<link rel="stylesheet" href="prijedlog/naslovnica-skrol.css">
+<script>
+document.documentElement.classList.add("js-menu");
+(function(){
+  var n = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+  if(n && n.type === "back_forward") return;
+  var moved = false;
+  ["wheel","touchstart","keydown"].forEach(function(ev){ addEventListener(ev, function(){ moved = true; }, {once:true, passive:true}); });
+  function go(){
+    if(moved) return;
+    var t = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+    if(t) t.scrollIntoView({block:"start", behavior:"instant"}); else window.scrollTo(0,0);
+  }
+  document.addEventListener("DOMContentLoaded", go);
+  addEventListener("load", go);
+})();
+</script>
+</head>
+<body class="home">
+<a class="skip" href="#sadrzaj">Preskoči na sadržaj</a>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
+    <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
+    <div class="links" id="izbornik"><a class="home-link on" aria-current="page" href="index.html">Naslovna</a><a href="o-nama.html">O nama</a><a href="usluge.html">Usluge</a><a href="cjenik.html">Cjenik</a><a class="cta" href="kontakt.html">Kontakt</a></div>
+  </div>
+</nav>
+
+<main id="sadrzaj" tabindex="-1">
+<div id="bar"></div>
+
+<section class="skrol" id="top" aria-label="Digitalni partner">
+  <div class="skrol-scena">
+    <div class="wrap skrol-raspored">
+
+      <div class="skrol-tekst">
+        <div class="kadar" data-k="0">
+          <p class="label hero-label">Digitalno. Po mjeri.</p>
+          <h1>Digitalne usluge <em>za male obrte i tvrtke.</em></h1>
+          <p class="sub">Web stranice, Google poslovni profil, oglasi i AI asistent za salone, trenere, apartmane i restorane.</p>
+          <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#cijene">Pogledajte pakete</a></div>
+                  </div>
+        <div class="kadar" data-k="1">
+          <p class="label">01 · Google profil</p>
+          <h2>Klijent traži frizera u blizini. Prvo vidi Vas.</h2>
+          <p class="sub">Postavljamo Google poslovni profil s adresom, radnim vremenom i fotografijama, pa Vas klijent pronađe prije nego što otvori bilo što drugo.</p>
+        </div>
+        <div class="kadar" data-k="2">
+          <p class="label">02 · Web stranica</p>
+          <h2>Jedan dodir i otvori se Vaša stranica.</h2>
+          <p class="sub">Usluge, cjenik i radno vrijeme na jednom mjestu, pregledno na mobitelu. Izrađujemo je po mjeri, od 399 €.</p>
+        </div>
+        <div class="kadar" data-k="3">
+          <p class="label">03 · AI asistent</p>
+          <h2>Pita u 22 sata. Odgovor dobije odmah.</h2>
+          <p class="sub">AI asistent odgovara na pitanja i upisuje termine dok ste Vi s klijentom ili je salon već zatvoren.</p>
+        </div>
+        <div class="kadar" data-k="4">
+          <p class="label">Od pretrage do termina</p>
+          <h2>Vi radite s klijentima. <em>Ostalo postavljamo mi.</em></h2>
+          <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#cijene">Pogledajte pakete</a></div>
+        </div>
+        <ol class="skrol-koraci" aria-hidden="true">
+          <li><span data-c="1"></span>Google profil</li>
+          <li><span data-c="2"></span>Web</li>
+          <li><span data-c="3"></span>AI asistent</li>
+        </ol>
+      </div>
+
+      <div class="mob" aria-hidden="true">
+        <div class="mob-ekran">
+
+          <!-- 1. Pretraga i Google profil -->
+          <div class="sloj pretraga" data-o=".40,.47">
+            <div class="trazilica"><span class="tr-tekst">frizer u blizini</span></div>
+            <div class="karta">
+              <i class="cesta c1"></i><i class="cesta c2"></i><i class="cesta c3"></i>
+              <i class="pin" data-a=".14,.20"></i>
+            </div>
+            <div class="rez"><b></b><i></i></div>
+            <div class="rez"><b></b><i></i></div>
+            <div class="profil" data-a=".16,.26">
+              <span class="ruckica"></span>
+              <p class="pr-ime">Vaš salon</p>
+              <p class="pr-opis">Frizerski salon · Centar</p>
+              <p class="pr-otv">Otvoreno danas</p>
+              <div class="pr-foto"><i></i><i></i><i></i></div>
+              <div class="pr-gumbi"><span>Nazovi</span><span>Upute</span><span class="pr-web" data-a=".33,.38">Web stranica</span></div>
+            </div>
+          </div>
+
+          <!-- 2. Web stranica -->
+          <div class="sloj web" data-a=".40,.47">
+            <div class="w-nav" data-a=".44,.50"><i class="w-logo"></i><b>Vaš salon</b><span>Termin</span></div>
+            <div class="w-hero" data-a=".47,.54">
+              <p class="w-h1">Vaš novi izgled</p>
+              <p class="w-h1 zl">počinje ovdje.</p>
+              <p class="w-mali">Šišanje, bojanje i njega kose u centru grada.</p>
+              <span class="w-btn">Rezervirajte</span>
+            </div>
+            <div class="w-red" data-a=".53,.58"><b>Šišanje</b><span>Žensko, muško i dječje</span></div>
+            <div class="w-red" data-a=".56,.61"><b>Bojanje</b><span>Pramenovi i balayage</span></div>
+            <div class="w-red" data-a=".59,.64"><b>Njega</b><span>Tretmani i pakiranja</span></div>
+            <div class="w-sat" data-a=".62,.66">Pon. do sub. · rezervacija online</div>
+          </div>
+
+          <!-- 3. AI asistent -->
+          <div class="sloj chat" data-a=".69,.75">
+            <div class="ch-glava"><i class="w-logo"></i><b>Vaš salon</b><span>AI asistent</span></div>
+            <div class="ch-poruke">
+              <p class="msg ja" data-a=".74,.78">Imate li slobodan termin u subotu ujutro?<small>22:14</small></p>
+              <p class="msg on" data-a=".78,.82">Imamo u 10:30. Želite li da Vas upišem za šišanje?<small>22:14</small></p>
+              <p class="msg ja" data-a=".82,.85">Može, hvala.<small>22:15</small></p>
+              <p class="potvrda" data-a=".86,.90">Upisano: subota, 10:30</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="svj" id="usluge">
+  <div class="wrap split">
+    <div class="head">
+      <span class="label">Naše usluge</span>
+      <h2>Sve što Vašem poslu treba na internetu, na jednom mjestu.</h2>
+      <p>Možete naručiti samo izradu web stranice, od 399 €, ili uz nju i Google profil, SEO i GEO optimizaciju, oglase i AI asistenta.</p>
+      <div class="btns"><a class="btn primary" href="usluge.html">Sve usluge</a><a class="btn outline" href="cjenik.html">Pogledajte cjenik</a></div>
+    </div>
+    <div class="svc-list">
+      <article class="svc"><span class="n">I.</span><h3>Web stranica krojena po mjeri</h3><p>Izrađujemo stranicu po mjeri, a ne iz gotovog predloška. Brzo se učitava, pregledna je na mobitelu i na jednom mjestu prikazuje usluge, cjenik, fotografije i online narudžbu ili rezervaciju.</p></article>
+      <article class="svc"><span class="n">II.</span><h3>Vidljivost na Googleu i u AI tražilicama</h3><p>Postavljamo i održavamo Vaš Google poslovni profil te uređujemo stranicu tako da je lakše pronađu Google i AI tražilice poput ChatGPT-a. Kad netko u Vašem gradu traži uslugu kakvu nudite, želimo da prvo pronađe Vas.</p></article>
+      <article class="svc"><span class="n">III.</span><h3>Oglasi i AI asistent</h3><p>Postavljamo i vodimo Google i Meta oglase, uz Vaš budžet. AI asistent odgovara na upite i zakazuje termine ili rezervacije i dok Vi radite s klijentima i gostima.</p></article>
+    </div>
+  </div>
+</section>
+
+<section id="kako">
+  <div class="wrap">
+    <div class="head"><span class="label">Kako radimo</span><h2>Od upitnika do objavljene stranice za dva tjedna.</h2></div>
+    <div class="steps">
+      <div class="step"><h3>Upitnik</h3><p>Kratkim upitnikom upoznajemo Vaš posao, ciljeve i želje.</p></div>
+      <div class="step"><h3>Izrada</h3><p>Dizajniramo i razvijamo rješenje uz Vaše povratne informacije.</p></div>
+      <div class="step"><h3>Podrška</h3><p>Objavljujemo, educiramo i ostajemo uz Vas.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="svj" id="agenti">
+  <div class="wrap split">
+    <div class="head">
+      <span class="label">Integracija AI agenata</span>
+      <h2>Narudžbe iz maila u skladište, bez prepisivanja.</h2>
+      <p>Ako Vam narudžbe stižu mailom, u PDF-u ili Excelu, AI agent ih čita, provjerava stanje na lageru i priprema nalog za skladište. Vaš djelatnik odobrava samo ono što je rizično.</p>
+      <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="usluge.html">Saznajte više</a></div>
+    </div>
+    <div class="svc-list">
+      <article class="svc"><span class="n">I.</span><h3>Što radi agent</h3><p>Čita narudžbe, izvlači stavke, šifre i količine, provjerava lager i priprema nalog za skladište. Sve što napravi zapisuje u dnevnik.</p></article>
+      <article class="svc"><span class="n">II.</span><h3>Što odlučuje čovjek</h3><p>Zamjene artikala, nove kupce i svaki odgovor koji obećava rok ili cijenu odobrava Vaš djelatnik. Agent ne mijenja cijene ni rabate i ne briše narudžbe.</p></article>
+      <article class="svc"><span class="n">III.</span><h3>Kako počinjemo</h3><p>Analiza Vaših stvarnih narudžbi košta 490 €, a odbija se od cijene integracije ako nastavite. Integracija kreće od 1.490 €.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="green" id="cijene">
+  <div class="wrap">
+    <div class="head"><span class="label">Paketi</span><h2>Stranica, vidljivost i oglasi u jednom paketu.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca</p></div>
+    <div class="plans">
+      <article class="plan">
+        <h3>D start</h3>
+        <div class="price">249 €<small>mjesečno</small></div>
+        <p class="from">Web stranica i Google profil</p>
+        <ul>
+          <li>Web stranica do 5 podstranica</li>
+          <li>Održavanje web stranice, domena i hosting</li>
+          <li>Google poslovni profil, postavljanje i održavanje</li>
+        </ul>
+        <a class="btn line" href="kontakt.html?plan=paket%20D%20start">Odaberite D start</a>
+      </article>
+      <article class="plan hot">
+        <span class="tag">Preporučeno</span>
+        <h3>D plus</h3>
+        <div class="price">499 €<small>mjesečno</small></div>
+        <p class="from">Sve iz D start, uz vidljivost i Meta oglase</p>
+        <ul>
+          <li>Dvije dodatne podstranice</li>
+          <li>SEO optimizacija</li>
+          <li>GEO optimizacija za AI tražilice</li>
+          <li>Meta oglasi, mjesečno vođenje kampanje</li>
+        </ul>
+        <a class="btn primary" href="kontakt.html?plan=paket%20D%20plus">Odaberite D plus</a>
+      </article>
+      <article class="plan">
+        <h3>D premium</h3>
+        <div class="price">899 €<small>mjesečno</small></div>
+        <p class="from">Sve iz D plus, uz Google oglase i AI asistente</p>
+        <ul>
+          <li>Još dvije dodatne podstranice</li>
+          <li>Google oglasi, mjesečno vođenje kampanje</li>
+          <li>AI asistent na WhatsAppu, postavljanje i održavanje</li>
+          <li>AI asistent na web stranici, postavljanje i održavanje</li>
+        </ul>
+        <a class="btn line" href="kontakt.html?plan=paket%20D%20premium">Odaberite D premium</a>
+      </article>
+    </div>
+    <p class="once">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti. Samo web stranicu možete naručiti od 399 €, jednokratno.</p><div class="once-btn"><a class="btn line" href="cjenik.html">Pogledajte potpuni cjenik</a></div>
+  </div>
+</section>
+
+<section class="final svj" id="kontakt">
+  <div class="wrap">
+    <div>
+      <span class="label">Kontakt</span>
+      <h2>Recite nam nešto o svom poslu.</h2>
+      <p class="lead">Pošaljite nam poruku i javit ćemo Vam se. Upit Vas ni na što ne obvezuje.</p>
+    </div>
+    <div class="cta-box"><a class="btn primary" href="kontakt.html">Pošaljite upit</a></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-brand"><span class="mono">dp</span><span>© <span id="y"></span> Digitalni partner</span></div>
+    <span class="f-sl">Digitalno. Po mjeri.</span>
+  </div>
+</footer>
+<script>
+document.getElementById("y").textContent = new Date().getFullYear();
+// Izbornik na mobitelu: gumb s tri crte otvara i zatvara popis, klik na poveznicu ili Esc ga zatvara
+(function(){
+  var nav = document.querySelector("nav"), btn = nav.querySelector(".menu-btn");
+  function set(open){ nav.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
+  btn.addEventListener("click", function(){ set(!nav.classList.contains("open")); });
+  nav.querySelectorAll(".links a").forEach(function(a){ a.addEventListener("click", function(){ set(false); }); });
+  addEventListener("keydown", function(e){ if(e.key === "Escape") set(false); });
+  addEventListener("resize", function(){ if(innerWidth > 860) set(false); });
+})();
+</script>
+<script src="js/naslovnica.js"></script>
+<script src="prijedlog/naslovnica-auto.js"></script>
+</body>
+</html>
