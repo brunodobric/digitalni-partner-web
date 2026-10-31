@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Digitalni partner · web stranice i Google profil za male obrte</title>
-<meta name="description" content="Digitalni partner izrađuje web stranice, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
+<meta name="description" content="Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
 <meta name="theme-color" content="#E7E4DE">
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="hr_HR">
 <meta property="og:site_name" content="Digitalni partner">
 <meta property="og:title" content="Digitalni partner · web stranice i Google profil za male obrte">
-<meta property="og:description" content="Digitalni partner izrađuje web stranice, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
+<meta property="og:description" content="Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
 <meta property="og:image" content="slike/og-slika.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -50,85 +50,253 @@ document.documentElement.classList.add("js-menu");
 <main id="sadrzaj" tabindex="-1">
 <div id="bar"></div>
 
-<header class="hero split-hero mob-hero" id="top">
-  <div class="wrap">
-    <div>
-      <p class="label hero-label">Digitalno. Po mjeri.</p>
-      <h1>Digitalne usluge <em>za male obrte i tvrtke.</em></h1>
-      <p class="sub">Izrađujemo web stranice, postavljamo Google poslovni profil i vodimo Google i Meta oglase. Za salone, trenere, apartmane, restorane i druge male obrte koji žele da ih novi klijenti i gosti lakše pronađu.</p>
+<header class="kar" id="top" aria-roledescription="carousel" aria-label="Što radimo">
+  <div class="wrap kar__inner">
+
+    <!-- Tekst -->
+    <div class="kar__copy">
+      <h1 class="label kar__h1">Digitalne usluge za male obrte i tvrtke</h1>
+
+      <!-- Naslovi slajdova, istim redom kao vizuali. H1 je gore i ne mijenja se. -->
+      <div class="kar__titles">
+        <p class="kar__title is-active" data-slide="0"><span>Web stranice</span><span>po mjeri</span></p>
+        <p class="kar__title" data-slide="1"><span>Aplikacije</span><span>za iOS i Android</span></p>
+        <p class="kar__title" data-slide="2"><span>Bolje mjesto</span><span>na tražilicama</span></p>
+        <p class="kar__title" data-slide="3"><span>Vidljivi</span><span>na Googleu</span></p>
+        <p class="kar__title" data-slide="4"><span>AI agenti</span><span>koji rade</span></p>
+        <p class="kar__title" data-slide="5"><span>Asistenti</span><span>koji razumiju</span></p>
+      </div>
+
+      <!-- Podnaslov za svaki slajd (Dimni grafit). Tekst je preuzet s postojeće stranice (index.html, usluge.html). -->
+      <div class="kar__leads">
+        <p class="kar__lead is-active">Izrađujemo stranicu po mjeri, a ne iz gotovog predloška. Brzo se učitava, pregledna je na mobitelu i na jednom mjestu prikazuje usluge, cjenik i online rezervaciju.</p>
+        <p class="kar__lead">Kad Vam web stranica nije dovoljna, izrađujemo mobilnu aplikaciju za iOS i Android po mjeri Vašeg posla.</p>
+        <p class="kar__lead">Uređujemo stranicu tako da je lakše pronađu Google i AI tražilice poput ChatGPT-a. Kad netko u Vašem gradu traži uslugu kakvu nudite, želimo da prvo pronađe Vas.</p>
+        <p class="kar__lead">Kad netko u Vašem gradu traži uslugu kakvu nudite, Google prvo pokaže kartu i profile. Postavljamo profil s pravim radnim vremenom, fotografijama i uslugama.</p>
+        <p class="kar__lead">AI agent čita narudžbe koje Vam stižu mailom, provjerava stanje na lageru i priprema nalog za skladište. Vaš djelatnik odobrava samo ono što je rizično.</p>
+        <p class="kar__lead">AI asistent na web stranici ili na WhatsAppu odgovara na česta pitanja o cijenama i terminima te zakazuje termine i onda kad ste Vi s klijentom.</p>
+      </div>
+
       <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#cijene">Pogledajte pakete</a></div>
-    </div>
-    <div class="mob" aria-hidden="true">
-      <div class="mob-ekran">
 
-        <!-- 1. Pretraga i Google profil -->
-        <div class="sloj pretraga" data-o=".40,.47">
-          <div class="trazilica"><span class="tr-tekst">frizer u blizini</span></div>
-          <div class="karta">
-            <i class="cesta c1"></i><i class="cesta c2"></i><i class="cesta c3"></i>
-            <i class="pin" data-a=".14,.20"></i>
-          </div>
-          <div class="rez"><b></b><i></i></div>
-          <div class="rez"><b></b><i></i></div>
-          <div class="profil" data-a=".16,.26">
-            <span class="ruckica"></span>
-            <p class="pr-ime">Vaš salon</p>
-            <p class="pr-opis">Frizerski salon · Centar</p>
-            <p class="pr-otv">Otvoreno danas</p>
-            <div class="pr-foto"><i></i><i></i><i></i></div>
-            <div class="pr-gumbi"><span>Nazovi</span><span>Upute</span><span class="pr-web" data-a=".33,.38">Web stranica</span></div>
-          </div>
-        </div>
-
-        <!-- 2. Web stranica -->
-        <div class="sloj web" data-a=".40,.47">
-          <div class="w-nav" data-a=".44,.50"><i class="w-logo"></i><b>Vaš salon</b><span>Termin</span></div>
-          <div class="w-hero" data-a=".47,.54">
-            <p class="w-h1">Vaš novi izgled</p>
-            <p class="w-h1 zl">počinje ovdje.</p>
-            <p class="w-mali">Šišanje, bojanje i njega kose u centru grada.</p>
-            <span class="w-btn">Rezervirajte</span>
-          </div>
-          <div class="w-red" data-a=".53,.58"><b>Šišanje</b><span>Žensko, muško i dječje</span></div>
-          <div class="w-red" data-a=".56,.61"><b>Bojanje</b><span>Pramenovi i balayage</span></div>
-          <div class="w-red" data-a=".59,.64"><b>Njega</b><span>Tretmani i pakiranja</span></div>
-          <div class="w-sat" data-a=".62,.66">Pon. do sub. · rezervacija online</div>
-        </div>
-
-        <!-- 3. AI asistent -->
-        <div class="sloj chat" data-a=".69,.75">
-          <div class="ch-glava"><i class="w-logo"></i><b>Vaš salon</b><span>AI asistent</span></div>
-          <div class="ch-poruke">
-            <p class="msg ja" data-a=".74,.78">Imate li slobodan termin u subotu ujutro?<small>22:14</small></p>
-            <p class="msg on" data-a=".78,.82">Imamo u 10:30. Želite li da Vas upišem za šišanje?<small>22:14</small></p>
-            <p class="msg ja" data-a=".82,.85">Može, hvala.<small>22:15</small></p>
-            <p class="potvrda" data-a=".86,.90">Upisano: subota, 10:30</p>
-          </div>
-        </div>
-
+      <!-- Kontrole karusela -->
+      <div class="kar__controls">
+        <span class="kar__count" aria-hidden="true"><b id="countNow">01</b> / 06</span>
+        <ul class="kar__dots" id="dots" aria-label="Odaberite slajd">
+          <!-- gumbe dodaje skripta -->
+        </ul>
       </div>
     </div>
 
+    <!-- Vizuali -->
+    <div class="stage" id="stage">
+
+      <!-- ===== SLIDE 1 · Browser / website being assembled ===== -->
+      <div class="slide is-active" role="group" aria-roledescription="slide" aria-label="1 od 6: web stranica">
+        <div class="browser card">
+          <div class="browser__top">
+            <div class="browser__dots"><i></i><i></i><i></i></div>
+            <div class="browser__url">vas-salon.hr</div>
+          </div>
+          <div class="browser__body">
+            <div class="site-nav kb" style="--d:0">
+              <div class="bar bar--em" style="width:70px;height:10px"></div>
+              <div class="site-nav__links"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+            </div>
+            <div class="site-hero">
+              <div class="site-kar__text">
+                <div class="bar bar--dark kb" style="--d:150;width:92%"></div>
+                <div class="bar bar--dark kb" style="--d:250;width:64%"></div>
+                <div class="bar kb" style="--d:400;width:86%"></div>
+                <div class="bar kb" style="--d:450;width:72%"></div>
+                <div class="site-kar__btn kb" style="--d:600"></div>
+              </div>
+              <!-- PLACEHOLDER: real website screenshot / photography goes here -->
+              <div class="site-kar__img kb" style="--d:350"></div>
+            </div>
+            <div class="site-row">
+              <div class="site-tile kb" style="--d:750"><div class="bar"></div><div class="bar"></div><div class="bar" style="width:70%"></div></div>
+              <div class="site-tile kb" style="--d:850"><div class="bar"></div><div class="bar"></div><div class="bar" style="width:60%"></div></div>
+              <div class="site-tile kb" style="--d:950"><div class="bar"></div><div class="bar"></div><div class="bar" style="width:80%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SLIDE 2 · Laptop + phone with app UI ===== -->
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="2 od 6: aplikacija na laptopu i mobitelu">
+        <!-- PLACEHOLDER: swap the CSS-drawn screens for real app screenshots
+             (<img> inside .laptop__screen and .phone__screen) when available. -->
+        <div class="devices">
+          <div class="laptop kb" style="--d:0">
+            <div class="laptop__screen">
+              <div class="app">
+                <div class="app__side">
+                  <div class="bar"></div><div class="bar is-on"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+                <div class="app__main">
+                  <div class="bar bar--dark" style="width:34%;height:10px"></div>
+                  <div class="app__kpis">
+                    <div class="kpi"><span class="ui-label">Klijenti</span><div class="bar bar--dark" style="width:55%;height:10px"></div></div>
+                    <div class="kpi"><span class="ui-label">Termini</span><div class="bar bar--dark" style="width:40%;height:10px"></div></div>
+                    <div class="kpi"><span class="ui-label">Narudžbe</span><div class="bar bar--dark" style="width:48%;height:10px"></div></div>
+                  </div>
+                  <div class="app__chart">
+                    <i style="--h:38%;--i:0"></i><i style="--h:52%;--i:1"></i><i style="--h:46%;--i:2"></i><i style="--h:64%;--i:3"></i><i style="--h:58%;--i:4"></i><i style="--h:76%;--i:5"></i><i style="--h:92%;--i:6"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="laptop__base"></div>
+          </div>
+          <div class="phone kb" style="--d:400">
+            <div class="phone__screen">
+              <div class="phone__head"><div class="bar"></div><strong>Danas</strong></div>
+              <div class="phone__list">
+                <div class="phone__item kb" style="--d:700"><i></i><div class="bar" style="width:80%"></div></div>
+                <div class="phone__item kb" style="--d:800"><i></i><div class="bar" style="width:62%"></div></div>
+                <div class="phone__item kb" style="--d:900"><i></i><div class="bar" style="width:74%"></div></div>
+                <div class="phone__item kb" style="--d:1000"><i></i><div class="bar" style="width:55%"></div></div>
+              </div>
+              <div class="phone__tab"><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SLIDE 3 · Search ranking + rising graph ===== -->
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="3 od 6: rang na tražilici">
+        <div class="rank">
+          <div class="search card kb" style="--d:0">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#5E6266" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
+            <span class="search__q">frizer Trešnjevka</span>
+          </div>
+          <div class="results card kb" style="--d:200">
+            <!-- "Vaša stranica" kreće s 5. mjesta i penje se na 1. -->
+            <div class="result"><span class="result__pos"></span><div class="result__txt"><div class="bar"></div><div class="bar"></div></div><span></span></div>
+            <div class="result"><span class="result__pos"></span><div class="result__txt"><div class="bar"></div><div class="bar"></div></div><span></span></div>
+            <div class="result"><span class="result__pos"></span><div class="result__txt"><div class="bar"></div><div class="bar"></div></div><span></span></div>
+            <div class="result"><span class="result__pos"></span><div class="result__txt"><div class="bar"></div><div class="bar"></div></div><span></span></div>
+            <div class="result result--you"><span class="result__pos"><em class="k-od">5</em><em class="k-do">1</em></span><div class="result__txt"><div class="bar"></div><div class="bar"></div></div><span class="result__arrow">↑ 4</span></div>
+          </div>
+          <div class="graph card kb" style="--d:500">
+            <span class="ui-label">Posjeti s Googlea</span>
+            <!-- PLACEHOLDER: illustrative curve; connect to real analytics data if used in a case study -->
+            <svg viewBox="0 0 200 90" aria-hidden="true">
+              <path class="area" d="M4 80 L36 74 L68 70 L100 58 L132 48 L164 26 L196 12 L196 88 L4 88 Z"/>
+              <path class="line" d="M4 80 L36 74 L68 70 L100 58 L132 48 L164 26 L196 12"/>
+              <circle class="dot" cx="196" cy="12" r="4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SLIDE 4 · Google Business Profile / Maps card ===== -->
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="4 od 6: Google poslovni profil">
+        <div class="gbp">
+          <div class="map card kb" style="--d:0">
+            <svg viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <rect class="park" x="250" y="30" width="120" height="90" rx="10"/>
+              <rect class="block" x="30" y="30" width="90" height="70" rx="6"/>
+              <rect class="block" x="140" y="30" width="90" height="70" rx="6"/>
+              <rect class="block" x="30" y="190" width="90" height="100" rx="6"/>
+              <rect class="block" x="250" y="150" width="120" height="60" rx="6"/>
+              <rect class="block" x="250" y="230" width="120" height="70" rx="6"/>
+              <path class="road road--main" d="M-10 130 C 120 120, 220 150, 410 130"/>
+              <path class="road road--main" d="M240 -10 C 230 120, 245 220, 236 330"/>
+              <path class="road road--side" d="M130 -10 L 130 330"/>
+              <path class="road road--side" d="M-10 175 L 240 175"/>
+              <path class="road road--side" d="M240 220 L 410 222"/>
+            </svg>
+          </div>
+          <div class="pin kb" style="--d:350">
+            <svg viewBox="0 0 34 44" aria-hidden="true"><path d="M17 43s14-14.6 14-25.5C31 8.9 24.7 2 17 2S3 8.9 3 17.5C3 28.4 17 43 17 43z" fill="#0F3B33"/><circle cx="17" cy="17" r="5" fill="#C6A15B"/></svg>
+          </div>
+          <div class="place card kb" style="--d:550">
+            <!-- PLACEHOLDER: business photo -->
+            <div class="place__photo"></div>
+            <!-- Podaci kao u mockupu na postojećoj naslovnici. Ocjenu i broj recenzija dodati samo sa stvarnim podacima klijenta. -->
+            <p class="place__name">Vaš salon</p>
+            <div class="place__open"><b>Otvoreno danas</b></div>
+            <div class="place__actions"><span>Nazovi</span><span>Upute</span><span>Web stranica</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SLIDE 5 · AI agent network + activity log ===== -->
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="5 od 6: AI agent obrađuje narudžbe">
+        <div class="agent">
+          <!-- Connections between the agent and the tools it works with.
+               Coordinates are in % of the box (viewBox 0 0 100 100, stretched). -->
+          <svg class="net" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path class="edge" vector-effect="non-scaling-stroke" d="M52 40 L18 12"/>
+            <path class="edge" vector-effect="non-scaling-stroke" d="M52 40 L86 14"/>
+            <path class="edge" vector-effect="non-scaling-stroke" d="M52 40 L90 52"/>
+            <path class="edge" vector-effect="non-scaling-stroke" d="M52 40 L80 84"/>
+            <path class="edge" vector-effect="non-scaling-stroke" d="M52 40 L12 32"/>
+            <path class="flow" vector-effect="non-scaling-stroke" d="M18 12 L52 40" style="--fd:.9s"/>
+            <path class="flow" vector-effect="non-scaling-stroke" d="M52 40 L90 52" style="--fd:1.6s"/>
+            <path class="flow" vector-effect="non-scaling-stroke" d="M52 40 L80 84" style="--fd:2.3s"/>
+          </svg>
+          <!-- Nodes: label the tools the agent actually connects to -->
+          <span class="node node--core kb" style="left:52%;top:40%;--d:0"><i></i>AI agent</span>
+          <span class="node kb" style="left:18%;top:12%;--d:200"><i></i>Mail</span>
+          <span class="node kb" style="left:86%;top:14%;--d:300"><i></i>PDF i Excel</span>
+          <span class="node kb" style="left:90%;top:52%;--d:400"><i></i>Lager</span>
+          <span class="node kb" style="left:80%;top:84%;--d:500"><i></i>Skladište</span>
+          <span class="node kb" style="left:12%;top:32%;--d:600"><i></i>Dnevnik</span>
+
+          <div class="agent__chat card kb" style="--d:900">
+            <span class="ui-label">Dnevnik agenta</span>
+            <div class="agent__log kb" style="--d:1200"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg><span><b>Narudžba</b> pročitana iz maila</span></div>
+            <div class="agent__log kb" style="--d:1700"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg><span><b>Stanje</b> provjereno na lageru</span></div>
+            <div class="agent__log kb" style="--d:2200"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg><span><b>Nalog za skladište</b> pripremljen, čeka odobrenje</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SLIDE 6 · AI assistant conversation ===== -->
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="6 od 6: razgovor s AI asistentom">
+        <div class="chat card">
+          <div class="chat__head">
+            <div class="chat__avatar"><i></i></div>
+            <div class="chat__who"><strong>Vaš salon</strong><span>AI asistent</span></div>
+          </div>
+          <!-- Razgovor preuzet iz mockupa na postojećoj naslovnici -->
+          <div class="chat__body">
+            <div class="msg msg--out kb" style="--d:100">Imate li slobodan termin u subotu ujutro?</div>
+            <div class="msg msg--in kb" style="--d:900">Imamo u 10:30. Želite li da Vas upišem za šišanje?</div>
+            <div class="msg msg--out kb" style="--d:1900">Može, hvala.</div>
+            <div class="msg msg--in kb" style="--d:2700">Upisano: subota, 10:30
+              <div class="msg__slots"><span class="is-picked">Šišanje · sub 10:30</span></div>
+            </div>
+          </div>
+          <div class="chat__input">
+            <div>Napišite poruku…</div>
+            <span class="chat__send"><svg viewBox="0 0 16 16"><path d="M2 8h11M9 4l4 4-4 4"/></svg></span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.stage -->
+  </div><!-- /.kar__inner -->
+
+  <!-- Traka usluga: istaknuta je usluga s trenutnog slajda -->
+  <div class="wrap">
+    <ul class="services" aria-label="Usluge">
+      <li data-for="0">Web stranice</li>
+      <li data-for="1">Mobilne aplikacije</li>
+      <li data-for="2">SEO</li>
+      <li data-for="2">GEO</li>
+      <li data-for="3">Google poslovni profil</li>
+      <li>Google i Meta oglasi</li>
+      <li data-for="4">AI agenti</li>
+      <li data-for="5">AI asistenti</li>
+    </ul>
   </div>
 </header>
 
-<section class="svj" id="usluge">
-  <div class="wrap split">
-    <div class="head">
-      <span class="label">Naše usluge</span>
-      <h2>Sve što Vašem poslu treba na internetu, na jednom mjestu.</h2>
-      <p>Možete naručiti samo izradu web stranice, od 399 €, ili uz nju i Google profil, SEO i GEO optimizaciju, oglase i AI asistenta.</p>
-      <div class="btns"><a class="btn primary" href="usluge.html">Sve usluge</a><a class="btn outline" href="cjenik.html">Pogledajte cjenik</a></div>
-    </div>
-    <div class="svc-list">
-      <article class="svc"><span class="n">I.</span><h3>Web stranica krojena po mjeri</h3><p>Izrađujemo stranicu po mjeri, a ne iz gotovog predloška. Brzo se učitava, pregledna je na mobitelu i na jednom mjestu prikazuje usluge, cjenik, fotografije i online narudžbu ili rezervaciju.</p></article>
-      <article class="svc"><span class="n">II.</span><h3>Vidljivost na Googleu i u AI tražilicama</h3><p>Postavljamo i održavamo Vaš Google poslovni profil te uređujemo stranicu tako da je lakše pronađu Google i AI tražilice poput ChatGPT-a. Kad netko u Vašem gradu traži uslugu kakvu nudite, želimo da prvo pronađe Vas.</p></article>
-      <article class="svc"><span class="n">III.</span><h3>Oglasi i AI asistent</h3><p>Postavljamo i vodimo Google i Meta oglase, uz Vaš budžet. AI asistent odgovara na upite i zakazuje termine ili rezervacije i dok Vi radite s klijentima i gostima.</p></article>
-    </div>
-  </div>
-</section>
-
-<section id="kako">
+<section class="svj" id="kako">
   <div class="wrap">
     <div class="head"><span class="label">Kako radimo</span><h2>Od upitnika do objavljene stranice za dva tjedna.</h2></div>
     <div class="steps">
@@ -139,7 +307,7 @@ document.documentElement.classList.add("js-menu");
   </div>
 </section>
 
-<section class="svj" id="agenti">
+<section id="agenti">
   <div class="wrap split">
     <div class="head">
       <span class="label">Integracija AI agenata</span>
