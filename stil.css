@@ -586,11 +586,22 @@ input[aria-invalid="true"],textarea[aria-invalid="true"]{border-bottom:2px solid
 .facts p{color:var(--grafit)}
 @media(max-width:820px){.facts{grid-template-columns:1fr}}
 
+/* PRAVNE INFORMACIJE */
+.legal h3{font-size:1.1rem;margin:32px 0 10px}
+.legal h3:first-child{margin-top:0}
+.legal .sitem h2 + .pr{margin-top:14px;color:var(--grafit)}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 24px;margin:0}
+.kv dt{font:600 .72rem/1.65rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
+.kv dd{margin:0}
+@media(max-width:520px){.kv{grid-template-columns:1fr;gap:2px}.kv dd{margin-bottom:12px}}
+.privacy-note{font-size:.85rem;color:var(--grafit)}
+
 /* PODNOŽJE */
 footer{background:var(--oniks);color:var(--tekst-tam);font-size:.85rem}
 footer .wrap{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;justify-content:space-between;padding-block:32px calc(32px + env(safe-area-inset-bottom,0px))}
 footer .f-brand{display:flex;align-items:center;gap:14px}
 footer .mono{font-size:13px}
+footer .f-link{color:var(--kamen);text-underline-offset:4px;text-decoration-thickness:1px}
 footer .f-sl{font:600 .7rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
