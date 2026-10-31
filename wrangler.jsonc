@@ -1,0 +1,14 @@
+// Cloudflare: web je statička stranica bez serverskog koda, sve datoteke iz korijena repozitorija idu kao statičke datoteke.
+// Blok "previews" treba da bi probne verzije za grane (npx wrangler preview) radile.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "digitalni-partner-web",
+  "compatibility_date": "2026-10-23",
+  "assets": {
+    "directory": "."
+  },
+  "observability": {
+    "enabled": true
+  },
+  "previews": {}
+}
