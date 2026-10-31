@@ -11,46 +11,106 @@
   window.addEventListener("resize", update);
 })();
 
-// Mobitel u heru sam polako odvrti put klijenta (pretraga, Google profil, web, AI asistent) i krene ispočetka.
-// Element s data-a="od,do" pojavljuje se dok napredak p ide od "od" do "do", data-o ga skriva; CSS čita --t (0 do 1).
-// Vrijeme teče samo dok je mobitel na ekranu i kartica otvorena. Uz "smanjeno kretanje" mobitel stoji na zadnjem kadru.
-(function(){
-  var hero = document.querySelector(".mob-hero");
-  if(!hero || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  hero.classList.add("vrti");
+// Karusel u heru: slajd se mijenja svakih 5 s (--slide-ms u CSS-u) i vrti se u krug.
+// Naslov, podnaslov, vizual i traka usluga mijenjaju se zajedno. Staje dok je miš iznad ili je fokus u heru,
+// i dok je kartica u pozadini. Uz "smanjeno kretanje" ne vrti se sam, ali se može listati.
+(function () {
+  const hero     = document.querySelector('.kar');
+  if (!hero) return;
+  const slides   = [...hero.querySelectorAll('.slide')];
+  const titles   = [...hero.querySelectorAll('.kar__title')];
+  const leads    = [...hero.querySelectorAll('.kar__lead')];
+  const services = [...hero.querySelectorAll('.services li[data-for]')];
+  const dotsWrap = document.getElementById('dots');
+  const countNow = document.getElementById('countNow');
+  const copy     = hero.querySelector('.kar__copy');
+  const stage    = document.getElementById('stage');
 
-  var TRAJE = 18000, STOJI = 3000, GASI = 600, KRAJ = .92;   // ms: priča, zadržavanje na kraju, prijelaz na početak
+  const DURATION = parseInt(getComputedStyle(hero).getPropertyValue('--slide-ms'), 10) || 5000;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function seg(p, a, b){ return p <= a ? 0 : p >= b ? 1 : (p - a) / (b - a); }
-  function ease(x){ return x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; }
-  function raspon(el, ime){ var r = el.getAttribute(ime); return r && r.split(",").map(parseFloat); }
+  let current = 0, timer = null, startedAt = 0, remaining = DURATION, paused = false;
 
-  var anim = [].map.call(hero.querySelectorAll("[data-a],[data-o]"), function(el){
-    return {el: el, a: raspon(el, "data-a"), o: raspon(el, "data-o")};
+  // Crtice napretka (ujedno gumbi za odabir slajda)
+  const dots = slides.map((_, i) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.className = 'kar__dot';
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Prikaži slajd ' + (i + 1));
+    b.innerHTML = '<i></i>';
+    b.addEventListener('click', () => { goTo(i); restart(); });
+    li.appendChild(b); dotsWrap.appendChild(li);
+    return b;
   });
-  var pisanje = hero.querySelector(".tr-tekst"), ekran = hero.querySelector(".mob-ekran");
 
-  function crtaj(p){
-    anim.forEach(function(x){
-      var t = x.a ? ease(seg(p, x.a[0], x.a[1])) : 1;
-      if(x.o) t *= 1 - ease(seg(p, x.o[0], x.o[1]));
-      x.el.style.setProperty("--t", t.toFixed(3));
+  function setActive(list, i) { list.forEach((el, n) => el.classList.toggle('is-active', n === i)); }
+
+  function goTo(i) {
+    current = (i + slides.length) % slides.length;
+    setActive(slides, current);
+    setActive(titles, current);
+    setActive(leads, current);
+    services.forEach(li => li.classList.toggle('is-active', +li.dataset.for === current));
+    dots.forEach((d, n) => {
+      d.classList.toggle('is-done', n < current);
+      d.classList.remove('is-active');
+      d.setAttribute('aria-current', n === current ? 'true' : 'false');
     });
-    pisanje.style.setProperty("--pis", seg(p, .03, .12).toFixed(3));
+    // ponovno pokreni animaciju crtice na aktivnom slajdu
+    void dots[current].offsetWidth;
+    dots[current].classList.add('is-active');
+    countNow.textContent = String(current + 1).padStart(2, '0');
   }
 
-  var vidljiv = true, proteklo = 0, zadnji = null;
-  function korak(sad){
-    if(zadnji !== null && vidljiv && !document.hidden) proteklo += Math.min(100, sad - zadnji);
-    zadnji = sad;
-    var krug = proteklo % (TRAJE + STOJI + GASI);
-    crtaj(Math.min(1, krug / TRAJE) * KRAJ);
-    ekran.style.opacity = krug > TRAJE + STOJI ? Math.max(0, 1 - (krug - TRAJE - STOJI) / (GASI / 2)) : Math.min(1, krug / (GASI / 2) || 1);
-    requestAnimationFrame(korak);
+  function schedule(ms) {
+    clearTimeout(timer);
+    if (reduceMotion) return;
+    startedAt = performance.now();
+    remaining = ms;
+    timer = setTimeout(() => { goTo(current + 1); schedule(DURATION); }, ms);
   }
-  if("IntersectionObserver" in window){
-    new IntersectionObserver(function(e){ vidljiv = e[0].isIntersecting; }).observe(hero.querySelector(".mob"));
+  function restart() { schedule(DURATION); }
+
+  function pause() {
+    if (paused || reduceMotion) return;
+    paused = true;
+    clearTimeout(timer);
+    remaining -= performance.now() - startedAt;
+    hero.classList.add('is-paused');
   }
-  crtaj(0);
-  requestAnimationFrame(korak);
+  function resume() {
+    if (!paused) return;
+    paused = false;
+    hero.classList.remove('is-paused');
+    schedule(Math.max(remaining, 400));
+  }
+
+  // Pauza dok korisnik čita ili klikće
+  [copy, stage].forEach(el => {
+    el.addEventListener('mouseenter', pause);
+    el.addEventListener('mouseleave', resume);
+  });
+  hero.addEventListener('focusin', pause);
+  hero.addEventListener('focusout', resume);
+  document.addEventListener('visibilitychange', () => document.hidden ? pause() : resume());
+
+  // Tipkovnica: strelice lijevo/desno kad je fokus u heru
+  hero.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { goTo(current + 1); remaining = DURATION; }
+    if (e.key === 'ArrowLeft')  { goTo(current - 1); remaining = DURATION; }
+  });
+
+  // Povlačenje prstom na mobitelu
+  let touchX = null;
+  stage.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) { goTo(current + (dx < 0 ? 1 : -1)); restart(); }
+    touchX = null;
+  });
+
+  goTo(0);
+  schedule(DURATION);
 })();
