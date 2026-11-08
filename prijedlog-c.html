@@ -20,7 +20,7 @@
 .c-hero__in{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,80px);align-items:center}
 .c-copy{display:grid;gap:26px}
 .c-copy h1{font-size:.74rem;line-height:1.4;letter-spacing:.12em;font-weight:600}
-.c-veliki{margin:0;font:800 clamp(2.4rem,4.6vw,4.3rem)/1.02 var(--sans);letter-spacing:-.035em}
+.c-veliki{margin:0;font:800 clamp(2.3rem,4vw,3.9rem)/1.02 var(--sans);letter-spacing:-.035em}
 .c-red{display:block}
 .c-rijeci{display:grid;color:var(--smaragd)}
 .c-rij{grid-area:1/1;display:block;white-space:nowrap;clip-path:inset(0 0 100% 0);transform:translateY(30%);transition:clip-path .6s cubic-bezier(.7,0,.2,1),transform .6s cubic-bezier(.7,0,.2,1)}
@@ -67,7 +67,10 @@
 /* Put klijenta: mobitel stoji, ekran se mijenja s korakom */
 .c-put__in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(40px,7vw,110px);align-items:start}
 .c-put__tel{position:sticky;top:calc(72px + 6vh);display:grid;place-items:center;height:calc(88vh - 72px)}
-.c-ph{height:100%;max-height:680px;width:auto}
+.c-ph{position:relative;z-index:1;height:86%;max-height:640px;width:auto}
+.c-poz{margin:0;inset:6% 0 6% 12%!important;background:none!important;overflow:hidden}
+.c-poz img{width:100%;height:100%;object-fit:cover;display:block}
+.c-put__tel .c-ph{margin-right:30%}
 .c-ekr{position:absolute;inset:0;opacity:0;transform:translateY(16px);transition:opacity .5s,transform .6s cubic-bezier(.22,.61,.36,1);background:#F6F5F2}
 .c-ekr.is-on{opacity:1;transform:none}
 .c-put__txt .head{margin-bottom:12vh}
@@ -139,7 +142,7 @@
         <span class="c-red">Kad netko traži</span>
         <span class="c-rijeci">
           <span class="c-rij" data-i="0">frizera u kvartu,</span>
-          <span class="c-rij" data-i="1">kozmetičarku za subotu,</span>
+          <span class="c-rij" data-i="1">kozmetičarku,</span>
           <span class="c-rij" data-i="2">osobnog trenera,</span>
           <span class="c-rij" data-i="3">kafić za doručak,</span>
           <span class="c-rij" data-i="4">apartman uz more,</span>
@@ -175,12 +178,15 @@
     </div>
   </div>
   <!-- pretrage koje se upisuju, istim redom kao slajdovi -->
-  <template id="c-upiti"><i>frizer Trešnjevka</i><i>kozmetički salon subota</i><i>osobni trener Zagreb</i><i>kafić s doručkom</i><i>apartmani Makarska</i></template>
+  <template id="c-upiti"><i>frizer Trešnjevka</i><i>kozmetički salon Split</i><i>osobni trener Zagreb</i><i>kafić s doručkom</i><i>apartmani Makarska</i></template>
 </header>
 
 <section class="c-put svj" id="put">
   <div class="wrap c-put__in">
     <div class="c-put__tel" aria-hidden="true">
+      <figure class="c-poz c-ekr is-on" data-k="0"><img src="https://images.unsplash.com/photo-1785053370851-e64cbb6343bc?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1785053370851-e64cbb6343bc?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1785053370851-e64cbb6343bc?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1785053370851-e64cbb6343bc?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1785053370851-e64cbb6343bc?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Mlada žena gleda mobitel uz prozor s pogledom na grad" loading="lazy" decoding="async"></figure>
+      <figure class="c-poz c-ekr" data-k="1"><img src="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Frizerka šiša mokru kosu škarama" loading="lazy" decoding="async"></figure>
+      <figure class="c-poz c-ekr" data-k="2"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Frizerka fenira klijentici kosu okruglom četkom" loading="lazy" decoding="async"></figure>
       <div class="ph c-ph">
         <div class="ph__screen">
           <div class="c-ekr is-on" data-k="0">
