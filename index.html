@@ -69,7 +69,7 @@ document.documentElement.classList.add("js-menu");
         <p class="b-nas" data-i="3"><span>Kafić i restoran</span>Jelovnik koji se otvori na mobitelu, bez PDF-a.</p>
         <p class="b-nas" data-i="4"><span>Apartman</span>Fotografije koje gostu pokažu pogled prije dolaska.</p>
       </div>
-      <p class="b-lead">Izrađujemo stranicu po mjeri, ne iz gotovog predloška, i postavljamo Google poslovni profil s pravim radnim vremenom i fotografijama. Samo stranica stoji od 399 €, jednokratno.</p>
+      <p class="b-lead">Izrađujemo stranicu po mjeri, ne iz gotovog predloška, i postavljamo Google poslovni profil s pravim radnim vremenom i fotografijama. Samo stranica stoji 599 €, jednokratno.</p>
       <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#cijene">Pogledajte pakete</a></div>
       <div class="pk-ctrl">
         <button class="pk-pause" type="button" aria-pressed="false" aria-label="Zaustavi karusel"><i></i></button>
@@ -270,11 +270,11 @@ document.documentElement.classList.add("js-menu");
       <div class="btns"><a class="btn outline" href="cjenik.html">Pogledajte cjenik</a></div>
     </div>
     <div class="svc-list">
-      <article class="svc"><span class="n">I.</span><h3>Web stranica po mjeri</h3><p>Usluge, cjenik, fotografije i kontakt s lokacijom i gumbom za poziv, a po potrebi i online rezervacija. Od 399 €, jednokratno.</p></article>
+      <article class="svc"><span class="n">I.</span><h3>Web stranica po mjeri</h3><p>Usluge, cjenik, fotografije i kontakt s lokacijom i gumbom za poziv, a po potrebi i online rezervacija. 599 €, jednokratno.</p></article>
       <article class="svc"><span class="n">II.</span><h3>Google poslovni profil</h3><p>Profil s pravim radnim vremenom, fotografijama, uslugama i poveznicom na stranicu. Postavljanje 199 €, održavanje 99 € mjesečno.</p></article>
       <article class="svc"><span class="n">III.</span><h3>Održavanje, domena i hosting</h3><p>Brinemo se da stranica radi, a sitne izmjene poput novog cjenika unosimo mi. 49 € mjesečno.</p></article>
       <article class="svc"><span class="n">IV.</span><h3>SEO i GEO optimizacija</h3><p>Da Vas pronađu Google i AI tražilice poput ChatGPT-a, primjerice za „frizer Trešnjevka”. 199 € mjesečno za svaku.</p></article>
-      <article class="svc"><span class="n">V.</span><h3>Mobilne aplikacije</h3><p>Kad Vam stranica nije dovoljna, aplikacija za iOS i Android. Od 2.999 €, jednokratno.</p></article>
+      <article class="svc"><span class="n">V.</span><h3>Mobilne aplikacije</h3><p>Kad Vam stranica nije dovoljna, aplikacija za iOS i Android. Od 4.999 €, jednokratno, a uz paket D premium od 2.999 €.</p></article>
       <article class="svc" hidden data-skriveno="oglasi"><span class="n">VI.</span><h3>Google i Meta oglasi</h3><p>Kampanje na Googleu, Facebooku i Instagramu, uz Vaš budžet. Oglase izrađujemo od Vaših fotografija i snimki. Google oglasi 249 €, Meta oglasi 199 € mjesečno.</p></article>
       <article class="svc" hidden data-skriveno="ai"><span class="n">VII.</span><h3>AI asistent</h3><p>Na web stranici ili na WhatsAppu odgovara na česta pitanja i zakazuje termine. Postavljanje od 299 €, održavanje 99 € mjesečno.</p></article>
     </div>
@@ -310,8 +310,8 @@ document.documentElement.classList.add("js-menu");
 
 <section class="green" id="cijene">
   <div class="wrap">
-    <div class="head"><span class="label">Paketi</span><h2 hidden data-skriveno="oglasi">Stranica, vidljivost i oglasi u jednom paketu.</h2><h2 data-privremeno="oglasi">Stranica, Google profil i vidljivost u jednom paketu.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca</p></div>
-    <div class="plans" data-paketa="2"><!-- SKRIVENE USLUGE: kad se vrati D premium, data-paketa="2" ukloniti (vraća tri stupca) -->
+    <div class="head"><span class="label">Paketi</span><h2 hidden data-skriveno="oglasi">Stranica, vidljivost i oglasi u jednom paketu.</h2><h2 data-privremeno="oglasi">Stranica, Google profil i vidljivost u jednom paketu.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca, za D premium 6 mjeseci</p></div>
+    <div class="plans">
       <article class="plan">
         <h3>D start</h3>
         <div class="price">249 €<small>mjesečno</small></div>
@@ -336,6 +336,18 @@ document.documentElement.classList.add("js-menu");
         </ul>
         <a class="btn primary" href="kontakt.html?plan=paket%20D%20plus">Odaberite D plus</a>
       </article>
+      <article class="plan">
+        <h3>D premium</h3>
+        <div class="price">899 €<small>mjesečno</small></div>
+        <p class="from">Sve iz D plus, uz mobilnu aplikaciju</p>
+        <ul>
+          <li>Još dvije dodatne podstranice</li>
+          <li>Mobilna aplikacija za iOS i Android od 2.999 € umjesto od 4.999 €, plaća se jednokratno uz paket</li>
+          <li>Održavanje mobilne aplikacije i objava novih verzija u App Storeu i Google Playu</li>
+        </ul>
+        <a class="btn line" href="kontakt.html?plan=paket%20D%20premium">Odaberite D premium</a>
+      </article>
+      <!-- SKRIVENE USLUGE: stari D premium (oglasi i AI), čeka povratak tih usluga -->
       <article class="plan" hidden data-skriveno="oglasi ai">
         <h3>D premium</h3>
         <div class="price">899 €<small>mjesečno</small></div>
@@ -349,7 +361,7 @@ document.documentElement.classList.add("js-menu");
         <a class="btn line" href="kontakt.html?plan=paket%20D%20premium">Odaberite D premium</a>
       </article>
     </div>
-    <p class="once"><span hidden data-skriveno="oglasi">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti. Oglase izrađujemo od Vaših fotografija i snimki. </span>Samo web stranicu možete naručiti od 399 €, jednokratno.</p><div class="once-btn"><a class="btn line" href="cjenik.html">Pogledajte potpuni cjenik</a></div>
+    <p class="once"><span hidden data-skriveno="oglasi">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti. Oglase izrađujemo od Vaših fotografija i snimki. </span>Samo web stranicu možete naručiti za 599 €, jednokratno.</p><div class="once-btn"><a class="btn line" href="cjenik.html">Pogledajte potpuni cjenik</a></div>
   </div>
 </section>
 
