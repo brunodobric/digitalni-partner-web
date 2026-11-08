@@ -49,7 +49,9 @@ window.pkKarusel = function (root, opts) {
   });
   document.addEventListener('visibilitychange', function () { hidden = document.hidden; plan(); });
   if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { offscreen = !e[0].isIntersecting; plan(); }).observe(root);
-  root.classList.add('pk-ready');
+  // prvi slajd se prikaže odmah, bez prijelaza
+  root.classList.add('pk-init');
   go(0); plan();
+  requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('pk-init'); root.classList.add('pk-ready'); }); });
   return { go: go };
 };

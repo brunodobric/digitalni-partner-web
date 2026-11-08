@@ -32,7 +32,7 @@
   .a-hero{display:block;padding-top:0;min-height:0}
   .a-fotke{position:relative;top:auto;height:62svh;min-height:380px;margin-top:calc(64px + env(safe-area-inset-top,0px))}
   .a-panel{width:auto;margin:0}
-  .a-mob{top:calc(64px + env(safe-area-inset-top,0px) + 62svh - 260px);bottom:auto;right:20px;width:140px}
+  .a-mob{top:calc(64px + env(safe-area-inset-top,0px) + 62svh - 290px);bottom:auto;right:20px;width:128px}
   .a-ph.is-active{transform:rotate(-3deg)}
 }
 

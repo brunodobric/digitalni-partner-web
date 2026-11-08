@@ -72,6 +72,7 @@
 .pk-dots button.is-active i{animation:pk-fill var(--slide-ms,6000ms) linear forwards}
 .is-paused .pk-dots button.is-active i{animation-play-state:paused}
 @keyframes pk-fill{to{transform:scaleX(1)}}
+.pk-init [data-i],.pk-init [data-i] *{transition:none!important}
 .pk-count{font:600 .74rem var(--sans);letter-spacing:.12em;font-variant-numeric:tabular-nums}
 
 @media(prefers-reduced-motion:reduce){
