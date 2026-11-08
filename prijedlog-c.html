@@ -62,6 +62,12 @@
   .c-kolaz{order:-1;margin-top:8px}
   .c-veliki{font-size:clamp(2rem,9vw,3rem)}
   .c-rij{white-space:normal}
+  .c-kolaz{margin-bottom:28px}
+  .c-trazi{width:76%;right:0;bottom:-24px}
+  .c-trazi__q{padding:12px 14px;font-size:.92rem;white-space:nowrap}
+  .c-trazi__r{padding:10px 14px 12px;min-height:0}
+  .c-rez{font-size:.8rem}
+  .c-rez::before{margin-bottom:4px}
 }
 
 /* Put klijenta: mobitel stoji, ekran se mijenja s korakom */
@@ -107,8 +113,10 @@
 
 @media(max-width:900px){
   .c-put__in{grid-template-columns:1fr}
-  .c-put__tel{top:calc(64px + 2vh);height:52vh;z-index:1;background:linear-gradient(var(--kamen-svj) 85%,transparent)}
-  .c-korak{min-height:48vh}
+  .c-put__tel{top:64px;height:40vh;z-index:2;background:var(--kamen-svj);padding:12px 0;box-shadow:0 18px 18px -6px var(--kamen-svj)}
+  .c-ph{height:100%}
+  .c-poz{inset:8% 0 8% 18%!important}
+  .c-korak{min-height:58vh}
   .c-put__txt .head{margin-bottom:6vh}
 }
 
@@ -347,7 +355,7 @@ document.getElementById("y").textContent = new Date().getFullYear();
   if (!('IntersectionObserver' in window)) return;
   var io = new IntersectionObserver(function (es) {
     es.forEach(function (e) { if (e.isIntersecting) set(+e.target.dataset.k); });
-  }, { rootMargin: '-45% 0px -45% 0px' });
+  }, { rootMargin: '-52% 0px -38% 0px' });
   koraci.forEach(function (e) { io.observe(e); });
 })();
 

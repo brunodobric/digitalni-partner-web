@@ -29,6 +29,6 @@
   if (!('IntersectionObserver' in window)) return;
   var io = new IntersectionObserver(function (es) {
     es.forEach(function (e) { if (e.isIntersecting) set(+e.target.dataset.k); });
-  }, { rootMargin: '-45% 0px -45% 0px' });
+  }, { rootMargin: '-52% 0px -38% 0px' });
   koraci.forEach(function (e) { io.observe(e); });
 })();
