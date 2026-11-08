@@ -4,14 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Digitalni partner · web stranice i Google profil za male obrte</title>
-<meta name="description" content="Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
+<!-- SKRIVENE USLUGE: izvorni opis (meta description i og:description) dok su oglasi i AI bili u ponudi:
+Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.
+-->
+<meta name="description" content="Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google poslovni profil, radi SEO i GEO optimizaciju te održava stranicu, domenu i hosting. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
 <meta name="theme-color" content="#E7E4DE">
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="hr_HR">
 <meta property="og:site_name" content="Digitalni partner">
 <meta property="og:title" content="Digitalni partner · web stranice i Google profil za male obrte">
-<meta property="og:description" content="Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google poslovni profil, radi SEO i GEO optimizaciju, vodi Google i Meta oglase, uvodi AI asistente i integrira AI agente za obradu narudžbi. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
+<meta property="og:description" content="Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google poslovni profil, radi SEO i GEO optimizaciju te održava stranicu, domenu i hosting. Za male obrte: salone, trenere, apartmane, restorane i druge uslužne djelatnosti.">
 <meta property="og:image" content="slike/og-slika.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -63,8 +66,8 @@ document.documentElement.classList.add("js-menu");
         <p class="kar__title" data-slide="1"><span>Aplikacije</span><span>za iOS i Android</span></p>
         <p class="kar__title" data-slide="2"><span>Bolje mjesto</span><span>na tražilicama</span></p>
         <p class="kar__title" data-slide="3"><span>Vidljivi</span><span>na Googleu</span></p>
-        <p class="kar__title" data-slide="4"><span>AI agenti</span><span>koji rade</span></p>
-        <p class="kar__title" data-slide="5"><span>Asistenti</span><span>koji razumiju</span></p>
+        <p class="kar__title" hidden data-skriveno="ai" data-slide="4"><span>AI agenti</span><span>koji rade</span></p>
+        <p class="kar__title" hidden data-skriveno="ai" data-slide="5"><span>Asistenti</span><span>koji razumiju</span></p>
       </div>
 
       <!-- Podnaslov za svaki slajd (Dimni grafit). Tekst je preuzet s postojeće stranice (index.html, usluge.html). -->
@@ -73,8 +76,8 @@ document.documentElement.classList.add("js-menu");
         <p class="kar__lead">Kad Vam web stranica nije dovoljna, izrađujemo mobilnu aplikaciju za iOS i Android po mjeri Vašeg posla.</p>
         <p class="kar__lead">Uređujemo stranicu tako da je lakše pronađu Google i AI tražilice poput ChatGPT-a. Kad netko u Vašem gradu traži uslugu kakvu nudite, želimo da prvo pronađe Vas.</p>
         <p class="kar__lead">Kad netko u Vašem gradu traži uslugu kakvu nudite, Google prvo pokaže kartu i profile. Postavljamo profil s pravim radnim vremenom, fotografijama i uslugama.</p>
-        <p class="kar__lead">AI agent čita narudžbe koje Vam stižu mailom, provjerava stanje na lageru i priprema nalog za skladište. Vaš djelatnik odobrava samo ono što je rizično.</p>
-        <p class="kar__lead">AI asistent na web stranici ili na WhatsAppu odgovara na česta pitanja o cijenama i terminima te zakazuje termine i onda kad ste Vi s klijentom.</p>
+        <p class="kar__lead" hidden data-skriveno="ai">AI agent čita narudžbe koje Vam stižu mailom, provjerava stanje na lageru i priprema nalog za skladište. Vaš djelatnik odobrava samo ono što je rizično.</p>
+        <p class="kar__lead" hidden data-skriveno="ai">AI asistent na web stranici ili na WhatsAppu odgovara na česta pitanja o cijenama i terminima te zakazuje termine i onda kad ste Vi s klijentom.</p>
       </div>
 
       <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#cijene">Pogledajte pakete</a></div>
@@ -82,7 +85,7 @@ document.documentElement.classList.add("js-menu");
       <!-- Kontrole karusela -->
       <div class="kar__controls">
         <button class="kar__pause" type="button" aria-pressed="false" aria-label="Zaustavi karusel"><i></i></button>
-        <span class="kar__count" aria-hidden="true"><b id="countNow">01</b> / 06</span>
+        <span class="kar__count" aria-hidden="true"><b id="countNow">01</b> / <span id="countAll">04</span></span>
         <ul class="kar__dots" id="dots" aria-label="Odaberite slajd">
           <!-- gumbe dodaje skripta -->
         </ul>
@@ -93,7 +96,7 @@ document.documentElement.classList.add("js-menu");
     <div class="stage" id="stage">
 
       <!-- ===== SLIDE 1 · Browser / website being assembled ===== -->
-      <div class="slide is-active" role="group" aria-roledescription="slide" aria-label="1 od 6: web stranica">
+      <div class="slide is-active" role="group" aria-roledescription="slide" aria-label="web stranica">
         <div class="browser card">
           <div class="browser__top">
             <div class="browser__dots"><i></i><i></i><i></i></div>
@@ -125,7 +128,7 @@ document.documentElement.classList.add("js-menu");
       </div>
 
       <!-- ===== SLIDE 2 · Laptop + phone with app UI ===== -->
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="2 od 6: aplikacija na laptopu i mobitelu">
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="aplikacija na laptopu i mobitelu">
         <!-- PLACEHOLDER: swap the CSS-drawn screens for real app screenshots
              (<img> inside .laptop__screen and .phone__screen) when available. -->
         <div class="devices">
@@ -166,7 +169,7 @@ document.documentElement.classList.add("js-menu");
       </div>
 
       <!-- ===== SLIDE 3 · Search ranking + rising graph ===== -->
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="3 od 6: rang na tražilici">
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="rang na tražilici">
         <div class="rank">
           <div class="search card kb" style="--d:0">
             <svg viewBox="0 0 16 16" fill="none" stroke="#5E6266" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
@@ -193,7 +196,7 @@ document.documentElement.classList.add("js-menu");
       </div>
 
       <!-- ===== SLIDE 4 · Google Business Profile / Maps card ===== -->
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="4 od 6: Google poslovni profil">
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="Google poslovni profil">
         <div class="gbp">
           <div class="map card kb" style="--d:0">
             <svg viewBox="0 0 400 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -225,7 +228,7 @@ document.documentElement.classList.add("js-menu");
       </div>
 
       <!-- ===== SLIDE 5 · AI agent network + activity log ===== -->
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="5 od 6: AI agent obrađuje narudžbe">
+      <div class="slide" hidden data-skriveno="ai" role="group" aria-roledescription="slide" aria-label="AI agent obrađuje narudžbe">
         <div class="agent">
           <!-- Connections between the agent and the tools it works with.
                Coordinates are in % of the box (viewBox 0 0 100 100, stretched). -->
@@ -257,7 +260,7 @@ document.documentElement.classList.add("js-menu");
       </div>
 
       <!-- ===== SLIDE 6 · AI assistant conversation ===== -->
-      <div class="slide" role="group" aria-roledescription="slide" aria-label="6 od 6: razgovor s AI asistentom">
+      <div class="slide" hidden data-skriveno="ai" role="group" aria-roledescription="slide" aria-label="razgovor s AI asistentom">
         <div class="chat card">
           <div class="chat__head">
             <div class="chat__avatar"><i></i></div>
@@ -290,9 +293,9 @@ document.documentElement.classList.add("js-menu");
       <li data-for="2">SEO</li>
       <li data-for="2">GEO</li>
       <li data-for="3">Google poslovni profil</li>
-      <li>Google i Meta oglasi</li>
-      <li data-for="4">AI agenti</li>
-      <li data-for="5">AI asistenti</li>
+      <li hidden data-skriveno="oglasi">Google i Meta oglasi</li>
+      <li hidden data-skriveno="ai" data-for="4">AI agenti</li>
+      <li hidden data-skriveno="ai" data-for="5">AI asistenti</li>
     </ul>
   </div>
 </header>
@@ -308,7 +311,7 @@ document.documentElement.classList.add("js-menu");
   </div>
 </section>
 
-<section id="agenti">
+<section id="agenti" hidden data-skriveno="ai">
   <div class="wrap split">
     <div class="head">
       <span class="label">Integracija AI agenata</span>
@@ -326,8 +329,8 @@ document.documentElement.classList.add("js-menu");
 
 <section class="green" id="cijene">
   <div class="wrap">
-    <div class="head"><span class="label">Paketi</span><h2>Stranica, vidljivost i oglasi u jednom paketu.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca</p></div>
-    <div class="plans">
+    <div class="head"><span class="label">Paketi</span><h2 hidden data-skriveno="oglasi">Stranica, vidljivost i oglasi u jednom paketu.</h2><h2 data-privremeno="oglasi">Stranica, Google profil i vidljivost u jednom paketu.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca</p></div>
+    <div class="plans" data-paketa="2"><!-- SKRIVENE USLUGE: kad se vrati D premium, data-paketa="2" ukloniti (vraća tri stupca) -->
       <article class="plan">
         <h3>D start</h3>
         <div class="price">249 €<small>mjesečno</small></div>
@@ -343,16 +346,16 @@ document.documentElement.classList.add("js-menu");
         <span class="tag">Preporučeno</span>
         <h3>D plus</h3>
         <div class="price">499 €<small>mjesečno</small></div>
-        <p class="from">Sve iz D start, uz vidljivost i Meta oglase</p>
+        <p class="from" hidden data-skriveno="oglasi">Sve iz D start, uz vidljivost i Meta oglase</p><p class="from" data-privremeno="oglasi">Sve iz D start, uz bolju vidljivost na tražilicama</p>
         <ul>
           <li>Dvije dodatne podstranice</li>
           <li>SEO optimizacija</li>
           <li>GEO optimizacija za AI tražilice</li>
-          <li>Meta oglasi, mjesečno vođenje kampanje i izrada oglasa</li>
+          <li hidden data-skriveno="oglasi">Meta oglasi, mjesečno vođenje kampanje i izrada oglasa</li>
         </ul>
         <a class="btn primary" href="kontakt.html?plan=paket%20D%20plus">Odaberite D plus</a>
       </article>
-      <article class="plan">
+      <article class="plan" hidden data-skriveno="oglasi ai">
         <h3>D premium</h3>
         <div class="price">899 €<small>mjesečno</small></div>
         <p class="from">Sve iz D plus, uz Google oglase i AI asistente</p>
@@ -365,7 +368,7 @@ document.documentElement.classList.add("js-menu");
         <a class="btn line" href="kontakt.html?plan=paket%20D%20premium">Odaberite D premium</a>
       </article>
     </div>
-    <p class="once">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti. Oglase izrađujemo od Vaših fotografija i snimki. Samo web stranicu možete naručiti od 399 €, jednokratno.</p><div class="once-btn"><a class="btn line" href="cjenik.html">Pogledajte potpuni cjenik</a></div>
+    <p class="once"><span hidden data-skriveno="oglasi">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti. Oglase izrađujemo od Vaših fotografija i snimki. </span>Samo web stranicu možete naručiti od 399 €, jednokratno.</p><div class="once-btn"><a class="btn line" href="cjenik.html">Pogledajte potpuni cjenik</a></div>
   </div>
 </section>
 
