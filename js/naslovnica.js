@@ -17,13 +17,19 @@
 (function () {
   const hero     = document.querySelector('.kar');
   if (!hero) return;
-  const slides   = [...hero.querySelectorAll('.slide')];
-  const titles   = [...hero.querySelectorAll('.kar__title')];
-  const leads    = [...hero.querySelectorAll('.kar__lead')];
-  const services = [...hero.querySelectorAll('.services li[data-for]')];
+  // Skriveni slajdovi (atribut hidden, vidi SKRIVENE-USLUGE.md) ne ulaze u karusel
+  const slides   = [...hero.querySelectorAll('.slide:not([hidden])')];
+  const titles   = [...hero.querySelectorAll('.kar__title:not([hidden])')];
+  const leads    = [...hero.querySelectorAll('.kar__lead:not([hidden])')];
+  const services = [...hero.querySelectorAll('.services li[data-for]:not([hidden])')];
   const dotsWrap = document.getElementById('dots');
   const countNow = document.getElementById('countNow');
   const stage    = document.getElementById('stage');
+  const countAll = document.getElementById('countAll');
+
+  // Broj slajdova i oznake "1 od 4" računaju se iz vidljivih slajdova
+  if (countAll) countAll.textContent = String(slides.length).padStart(2, '0');
+  slides.forEach((s, i) => s.setAttribute('aria-label', (i + 1) + ' od ' + slides.length + ': ' + s.getAttribute('aria-label')));
 
   const DURATION = parseInt(getComputedStyle(hero).getPropertyValue('--slide-ms'), 10) || 5000;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

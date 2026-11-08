@@ -610,3 +610,7 @@ footer .f-link{color:var(--kamen);text-underline-offset:4px;text-decoration-thic
 footer .f-sl{font:600 .7rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
 
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Skrivene usluge (oglasi, AI): elementi s atributom hidden ne prikazuju se ni kad im klasa zadaje display. Vidi SKRIVENE-USLUGE.md. */
+[hidden]{display:none!important}
+@media(min-width:961px){.plans[data-paketa="2"]{grid-template-columns:repeat(2,minmax(0,1fr));max-width:860px;margin:0 auto}}
