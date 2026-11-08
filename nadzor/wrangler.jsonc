@@ -1,0 +1,23 @@
+// Worker dashboarda (dp-nadzor). Objava: npx wrangler deploy (iz mape nadzor/).
+// Javne vrijednosti su ovdje; tajne se postavljaju s "npx wrangler secret put":
+//   NADZOR_KLJUC (obavezno), CF_API_TOKEN (Cloudflare analitika), RESEND_KEY i OBAVIJEST_NA (mail o novom upitu)
+// Pristup: Cloudflare Access (tim soft-cloud-4728) pušta samo Brunin mail; /upit je javan za obrazac na webu.
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "dp-nadzor",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-23",
+  "rules": [{ "type": "Text", "globs": ["**/*.html"], "fallthrough": true }],
+  "triggers": { "crons": ["0 5 * * *"] },
+  "observability": { "enabled": true },
+  "vars": {
+    "SUPABASE_URL": "https://uzdqbuzgvtqfglujhgrm.supabase.co",
+    "SUPABASE_KEY": "sb_publishable_8lbUKiiQdvSWOc-WoChqlw_AvfNU1ao",
+    "KUVERTA_URL": "https://liomzksuolbwmefdueep.supabase.co",
+    "KUVERTA_KEY": "sb_publishable_AuP-UIk1QpnRg0YIqv90ng_tvnbRybM",
+    "DOZVOLJENI_IZVORI": "https://digitalni-partner-web.bruno-dobric32.workers.dev",
+    "ACCESS_TIM": "soft-cloud-4728.cloudflareaccess.com",
+    "ACCESS_AUD": "0144174a889f88854a0ca3a3fc3c2b7371be7369991dc0bb6566e324a3d45b77",
+    "CF_ACCOUNT_ID": "5a0c6ede647e40ba9eaeb7459590aa8f"
+  }
+}
