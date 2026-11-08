@@ -20,3 +20,7 @@ Primjer za oglase (za AI isto, samo s `ai`):
 4. Provjeriti cijenu i stavke paketa D plus: Meta oglasi su u njemu bili uključeni.
 
 Karusel na naslovnici (`js/naslovnica.js`) sam broji vidljive slajdove i preskače elemente s atributom `hidden`. Od redizajna naslovnice (studeni 2026., „Izlog”) hero prikazuje primjere stranica za pet vrsta posla i više nema AI slajdova. Stari AI slajdovi (agent i asistent) sačuvani su u arhivi projekta, `arhiva/web/stari/index-prije-redizajna-izlog.html`; ako se AI vrati u hero, treba im napraviti slajd u novom obliku (fotografija, laptop, mobitel). Na stranici Usluge skrivene usluge stoje na kraju popisa (VII. do IX.), pa se brojevi ne mijenjaju. Na naslovnici su u popisu usluga skriveni oglasi (VI.) i AI asistent (VII.).
+
+## D premium s mobilnom aplikacijom (studeni 2026.)
+
+U cjeniku i na naslovnici je vidljiv novi D premium (899 € mjesečno, ugovor najmanje 6 mjeseci, sve iz D plus, dvije podstranice, održavanje mobilne aplikacije i izrada aplikacije od 2.999 € jednokratno umjesto od 4.999 €). Stari D premium s oglasima i AI-em ostao je skriven odmah ispod njega. Kad se vrate oglasi i AI, treba odlučiti koji sastav paketa ostaje, a drugi obrisati.
