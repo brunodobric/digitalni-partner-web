@@ -1,0 +1,98 @@
+
+<!-- PRIJEDLOG C · KOLAŽ
+     Velika tipografija s riječju koja se mijenja, uz kolaž od tri fotografije koje se otkrivaju zavjesom.
+     Preko kolaža se upisuje pretraga kakvu bi upisao klijent. Ispod je put klijenta: mobitel stoji, a ekran se mijenja dok skrolate. -->
+<header class="c-hero" id="top" aria-roledescription="carousel" aria-label="Što ljudi traže">
+  <div class="wrap c-hero__in">
+    <div class="c-copy">
+      <h1 class="label">Web stranice i Google profil za male obrte</h1>
+      <p class="c-veliki">
+        <span class="c-red">Kad netko traži</span>
+        <span class="c-rijeci">
+          <span class="c-rij" data-i="0">frizera u kvartu,</span>
+          <span class="c-rij" data-i="1">kozmetičarku za subotu,</span>
+          <span class="c-rij" data-i="2">osobnog trenera,</span>
+          <span class="c-rij" data-i="3">kafić za doručak,</span>
+          <span class="c-rij" data-i="4">apartman uz more,</span>
+        </span>
+        <span class="c-red">neka pronađe Vas.</span>
+      </p>
+      <p class="c-lead">Izrađujemo web stranicu po mjeri i postavljamo Google poslovni profil, da Vas klijenti nađu na karti i odmah vide usluge, cijene i kako doći.</p>
+      <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#put">Kako to izgleda</a></div>
+      <div class="pk-ctrl">
+        <button class="pk-pause" type="button" aria-pressed="false" aria-label="Zaustavi karusel"><i></i></button>
+        <span class="pk-count" aria-hidden="true"><b class="pk-now">01</b> / 05</span>
+        <ul class="pk-dots" aria-label="Odaberite slajd"></ul>
+      </div>
+    </div>
+
+    <div class="c-kolaz" aria-hidden="true">
+      <div class="c-set" data-i="0"><figure class="c-f c-f1">{{img:salon-skare||(max-width: 900px) 70vw, 34vw|eager}}</figure><figure class="c-f c-f2">{{img:salon-boja||25vw}}</figure><figure class="c-f c-f3">{{img:salon-fen||25vw}}</figure></div>
+      <div class="c-set" data-i="1"><figure class="c-f c-f1">{{img:kozm-maska||(max-width: 900px) 70vw, 34vw}}</figure><figure class="c-f c-f2">{{img:kozm-nokti||25vw}}</figure><figure class="c-f c-f3">{{img:masaza||25vw}}</figure></div>
+      <div class="c-set" data-i="2"><figure class="c-f c-f1">{{img:trener||(max-width: 900px) 70vw, 34vw}}</figure><figure class="c-f c-f2">{{img:trener-plan||25vw}}</figure><figure class="c-f c-f3">{{img:mobitel||25vw}}</figure></div>
+      <div class="c-set" data-i="3"><figure class="c-f c-f1">{{img:kafic||(max-width: 900px) 70vw, 34vw}}</figure><figure class="c-f c-f2">{{img:kuhinja||25vw}}</figure><figure class="c-f c-f3">{{img:mobitel-kafic||25vw}}</figure></div>
+      <div class="c-set" data-i="4"><figure class="c-f c-f1">{{img:apartman||(max-width: 900px) 70vw, 34vw}}</figure><figure class="c-f c-f2">{{img:apartman-soba||25vw}}</figure><figure class="c-f c-f3">{{img:mobitel||25vw}}</figure></div>
+
+      <div class="c-trazi">
+        <div class="c-trazi__q"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg><span class="c-tip"></span><i class="c-kursor"></i></div>
+        <div class="c-trazi__r">
+          <span class="c-rez" data-i="0"><b>Vaš salon</b>Frizerski salon · Otvoreno</span>
+          <span class="c-rez" data-i="1"><b>Vaš studio</b>Kozmetički salon · Otvoreno</span>
+          <span class="c-rez" data-i="2"><b>Vaš trening</b>Osobni trener · Otvoreno</span>
+          <span class="c-rez" data-i="3"><b>Vaš kafić</b>Kafić · Otvoreno</span>
+          <span class="c-rez" data-i="4"><b>Vaš apartman</b>Apartman · Slobodno</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- pretrage koje se upisuju, istim redom kao slajdovi -->
+  <template id="c-upiti"><i>frizer Trešnjevka</i><i>kozmetički salon subota</i><i>osobni trener Zagreb</i><i>kafić s doručkom</i><i>apartmani Makarska</i></template>
+</header>
+
+<section class="c-put svj" id="put">
+  <div class="wrap c-put__in">
+    <div class="c-put__tel" aria-hidden="true">
+      <div class="ph c-ph">
+        <div class="ph__screen">
+          <div class="c-ekr is-on" data-k="0">
+            <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+            <div class="gp__q"><svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg><span>frizer Trešnjevka</span></div>
+            <svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg>
+            <div class="gp__card">
+              <div class="gp__fotke">{{img:salon-fen||30vw||1:1|}}{{img:salon-skare||20vw||1:1|}}</div>
+              <b class="gp__ime">Vaš salon</b><span class="gp__vrsta">Frizerski salon</span><span class="gp__open">Otvoreno · zatvara u 20:00</span>
+              <div class="gp__akcije"><span>Nazovi</span><span>Upute</span><span>Web</span></div>
+            </div>
+          </div>
+          <div class="c-ekr" data-k="1">
+            <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+            <div class="ms">
+              <div class="ms__nav"><b>Vaš salon</b><i></i></div>
+              <div class="ms__hero">{{img:salon-fen||40vw||4:5|}}<div><span>Frizerski salon</span><strong>Šišanje, bojanje i njega kose u Vašem kvartu</strong></div></div>
+              <div class="ms__btn">Rezervirajte termin</div>
+              <ul class="ms__usl"><li>Šišanje</li><li>Bojanje</li><li>Fen i styling</li></ul>
+            </div>
+          </div>
+          <div class="c-ekr" data-k="2">
+            <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+            <div class="rz">
+              <span class="rz__k">Rezervacija termina</span>
+              <b class="rz__n">Šišanje</b>
+              <div class="rz__dani"><span>Pet</span><span class="on">Sub</span><span>Pon</span><span>Uto</span></div>
+              <div class="rz__sati"><span>9:00</span><span class="on">10:30</span><span>12:00</span><span>14:30</span><span>16:00</span><span>17:30</span></div>
+              <div class="rz__ok"><b>Upisano</b>Subota, 10:30 · Šišanje</div>
+              <div class="ms__btn">Potvrdi termin</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="c-put__txt">
+      <div class="head"><span class="label">Put klijenta</span><h2>Od pretrage na mobitelu do termina u kalendaru.</h2></div>
+      <article class="c-korak" data-k="0"><span class="c-n">01</span><h3>Pronađe Vas na Googleu</h3><p>Upiše „frizer Trešnjevka” i na karti vidi Vaš profil s pravim radnim vremenom, fotografijama i uslugama. Profil postavljamo mi, postavljanje stoji 199 €.</p></article>
+      <article class="c-korak" data-k="1"><span class="c-n">02</span><h3>Otvori Vašu stranicu</h3><p>Stranica se brzo učita na mobitelu i odmah pokaže usluge, cjenik i gdje ste. Izrađujemo je po mjeri, ne iz gotovog predloška, od 399 € jednokratno.</p></article>
+      <article class="c-korak" data-k="2"><span class="c-n">03</span><h3>Nazove ili rezervira</h3><p>Jednim dodirom nazove, dobije upute do Vas ili, ako to želite, sam rezervira termin, stol ili smještaj. Novi cjenik ili radno vrijeme unosimo mi, uz održavanje od 49 € mjesečno.</p></article>
+      <p class="c-jos">Radimo i mobilne aplikacije te SEO i GEO optimizaciju. <a class="txt-link" href="usluge.html">Sve usluge</a></p>
+    </div>
+  </div>
+</section>

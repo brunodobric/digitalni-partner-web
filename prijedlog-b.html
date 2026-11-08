@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prijedlog B: Izlog · Digitalni partner</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Probna verzija naslovnice Digitalnog partnera: Prijedlog B: Izlog · Digitalni partner.">
+<meta name="theme-color" content="#E7E4DE">
+<link rel="icon" href="slike/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="slike/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://images.unsplash.com">
+<link rel="preload" href="fontovi/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="stil.css">
+<link rel="stylesheet" href="prijedlozi/zajednicko.css">
+<style>
+/* PRIJEDLOG B · IZLOG */
+.b-hero{--slide-ms:7000ms;min-height:100vh;min-height:100svh;display:flex;align-items:center;
+  padding:calc(72px + env(safe-area-inset-top,0px) + clamp(24px,4vh,56px)) 0 clamp(56px,8vh,96px);overflow:hidden}
+.b-hero__in{width:100%;display:grid;grid-template-columns:minmax(0,4.4fr) minmax(0,7fr);gap:clamp(32px,5vw,80px);align-items:center}
+.b-copy{display:grid;gap:24px;align-content:center}
+.b-copy h1{font-size:.74rem;line-height:1.4;letter-spacing:.12em;font-weight:600}
+.b-naslovi{display:grid}
+.b-nas{grid-area:1/1;margin:0;font:800 clamp(2.1rem,3.8vw,3.3rem)/1.02 var(--sans);letter-spacing:-.03em;text-wrap:balance;
+  opacity:0;transform:translateY(14px);transition:opacity .5s,transform .8s cubic-bezier(.22,.61,.36,1)}
+.b-nas span{display:block;margin-bottom:16px;font:600 .8rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--smaragd)}
+.b-nas.is-active{opacity:1;transform:none;transition-delay:.3s}
+.b-lead{color:var(--grafit);max-width:32em}
+
+/* Scena: fotografija kao zid, ispred laptop i mobitel */
+.b-scena{position:relative;aspect-ratio:7/6}
+.b-zid{position:absolute;top:0;right:0;width:78%;height:86%;overflow:hidden;background:#d8d4cc}
+.b-foto{position:absolute;inset:0;margin:0;opacity:0;transition:opacity 1.2s ease}
+.b-foto img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.08)}
+.b-foto.is-active{opacity:1}
+.b-foto.is-active img{animation:b-kb calc(var(--slide-ms) + 1500ms) ease-out forwards}
+@keyframes b-kb{to{transform:scale(1)}}
+
+.b-lap{position:absolute;left:0;bottom:9%;width:78%;filter:drop-shadow(0 40px 50px rgba(11,11,12,.32))}
+.b-lap__ekran{position:relative;padding:2.2% 2.2% 2.6%;background:#161616;border-radius:14px 14px 4px 4px;aspect-ratio:16/10.9}
+.b-lap__ekran::before{content:"";position:absolute;top:.9%;left:50%;width:.9%;aspect-ratio:1;border-radius:50%;background:#2c2c2c;transform:translateX(-50%)}
+.b-lap__baza{height:0;padding-bottom:3.4%;margin:0 -7%;background:linear-gradient(#d9d6d0,#bdb9b1);border-radius:0 0 18px 18px/0 0 60% 60%;position:relative}
+.b-lap__baza::before{content:"";position:absolute;left:50%;top:0;width:15%;height:40%;transform:translateX(-50%);background:#a9a59d;border-radius:0 0 8px 8px}
+.b-ekr{position:absolute;inset:2.2% 2.2% 2.6%;border-radius:3px;box-shadow:none;border:0;opacity:0;clip-path:inset(0 0 100% 0);transition:clip-path .9s cubic-bezier(.7,0,.2,1),opacity 0s .9s}
+.b-ekr .bw__view{aspect-ratio:auto;position:absolute;inset:5.4cqw 0 0 0}
+.b-ekr.is-active{opacity:1;clip-path:inset(0);transition:clip-path 1s .15s cubic-bezier(.7,0,.2,1),opacity 0s;z-index:1}
+.b-ekr.was-active{opacity:1;clip-path:inset(0)}
+.b-ekr.is-active .ss{animation:b-skrol calc(var(--slide-ms) - 400ms) 1.6s cubic-bezier(.45,0,.25,1) forwards}
+@keyframes b-skrol{0%{transform:none}55%{transform:translateY(-40%)}100%{transform:translateY(-40%)}}
+
+.b-tel{position:absolute;right:4%;bottom:0;width:23%;aspect-ratio:9/19}
+.b-ph{position:absolute;inset:0;opacity:0;transform:translateY(40px);transition:opacity .6s,transform .9s cubic-bezier(.22,.61,.36,1)}
+.b-ph.is-active{opacity:1;transform:none;transition-delay:.7s;z-index:1}
+.is-paused .b-ekr.is-active .ss,.is-paused .b-foto.is-active img{animation-play-state:paused}
+
+@media(max-width:900px){
+  .b-hero{min-height:0;display:block}
+  .b-hero__in{grid-template-columns:1fr}
+  .b-scena{order:-1;aspect-ratio:1/1;margin:0 calc(-1 * var(--pad)) 8px}
+  .b-zid{width:86%;height:80%}
+  .b-lap{width:84%;left:3%}
+  .b-tel{width:27%;right:3%}
+}
+
+/* Traka "za koga radimo": fotografije koje polako putuju */
+.b-traka{background:var(--kamen-svj);padding-bottom:clamp(80px,10vw,120px)}
+.b-traka .head{margin-bottom:48px}
+.b-film{overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.b-film__red{display:flex;gap:20px;width:max-content;list-style:none;margin:0;padding:0;animation:b-film 60s linear infinite}
+.b-film:hover .b-film__red{animation-play-state:paused}
+.b-film li{position:relative;width:clamp(220px,22vw,320px);flex:none;margin:0}
+.b-film li:nth-child(even){margin-top:48px}
+.b-film img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.b-film span{display:block;margin-top:14px;font:600 .8rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.b-film span::before{content:"";display:inline-block;vertical-align:middle;width:24px;height:1px;margin-right:10px;background:var(--zlato)}
+@keyframes b-film{to{transform:translateX(calc(-50% - 10px))}}
+
+@media(prefers-reduced-motion:reduce){
+  .b-nas,.b-foto,.b-ekr,.b-ph{transition:none!important}
+  .b-foto img,.b-ekr .ss{animation:none!important;transform:none!important}
+  .b-film{overflow-x:auto}
+  .b-film__red{animation:none}
+}
+
+</style>
+<script>document.documentElement.classList.add("js-menu");</script>
+</head>
+<body class="home p-b">
+<a class="skip" href="#sadrzaj">Preskoči na sadržaj</a>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
+    <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
+    <div class="links" id="izbornik"><a class="home-link on" aria-current="page" href="index.html">Naslovna</a><a href="o-nama.html">O nama</a><a href="usluge.html">Usluge</a><a href="cjenik.html">Cjenik</a><a class="cta" href="kontakt.html">Kontakt</a></div>
+  </div>
+</nav>
+<main id="sadrzaj" tabindex="-1">
+
+<!-- PRIJEDLOG B · IZLOG
+     Hero pokazuje gotov rezultat: velika fotografija prostora, ispred nje laptop s primjerom stranice i mobitel s Google profilom.
+     Svaki slajd je druga vrsta posla. Stranica na laptopu se sama polako skrola. Imena i domene su opći primjeri, ne stvarni klijenti. -->
+<header class="b-hero" id="top" aria-roledescription="carousel" aria-label="Primjeri stranica">
+  <div class="wrap b-hero__in">
+    <div class="b-copy">
+      <h1 class="label">Web stranice i Google profil za male obrte</h1>
+      <div class="b-naslovi">
+        <p class="b-nas" data-i="0"><span>Frizerski salon</span>Stranica na kojoj klijentica sama rezervira termin.</p>
+        <p class="b-nas" data-i="1"><span>Kozmetički salon</span>Tretmani, cijene i kontakt na jednom mjestu.</p>
+        <p class="b-nas" data-i="2"><span>Osobni trener</span>Profil na Googleu koji vodi ravno na prvi trening.</p>
+        <p class="b-nas" data-i="3"><span>Kafić i restoran</span>Jelovnik koji se otvori na mobitelu, bez PDF-a.</p>
+        <p class="b-nas" data-i="4"><span>Apartman</span>Fotografije koje gostu pokažu pogled prije dolaska.</p>
+      </div>
+      <p class="b-lead">Izrađujemo stranicu po mjeri, ne iz gotovog predloška, i postavljamo Google poslovni profil s pravim radnim vremenom i fotografijama. Samo stranica stoji od 399 €, jednokratno.</p>
+      <div class="btns"><a class="btn primary" href="kontakt.html">Javite nam se</a><a class="btn outline" href="#cijene">Pogledajte pakete</a></div>
+      <div class="pk-ctrl">
+        <button class="pk-pause" type="button" aria-pressed="false" aria-label="Zaustavi karusel"><i></i></button>
+        <span class="pk-count" aria-hidden="true"><b class="pk-now">01</b> / 05</span>
+        <ul class="pk-dots" aria-label="Odaberite slajd"></ul>
+      </div>
+    </div>
+
+    <div class="b-scena" aria-hidden="true">
+      <div class="b-zid">
+        <figure class="b-foto" data-i="0"><img src="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Frizerka šiša mokru kosu škarama" fetchpriority="high" decoding="async"></figure>
+        <figure class="b-foto" data-i="1"><img src="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Manikura u salonu za nokte" loading="lazy" decoding="async"></figure>
+        <figure class="b-foto" data-i="2"><img src="https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Trener i klijentica dogovaraju plan treninga" loading="lazy" decoding="async"></figure>
+        <figure class="b-foto" data-i="3"><img src="https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Kuhar priprema jelo u kuhinji restorana" loading="lazy" decoding="async"></figure>
+        <figure class="b-foto" data-i="4"><img src="https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=1400&q=72" srcset="https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=1400&q=72 1400w, https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=2000&q=72 2000w" sizes="(max-width: 900px) 100vw, 45vw" alt="Svijetla spavaća soba apartmana" loading="lazy" decoding="async"></figure>
+      </div>
+      <div class="b-lap">
+        <div class="b-lap__ekran">
+          <div class="bw b-ekr" data-i="0" data-site="salon">
+  <div class="bw__top"><i></i><i></i><i></i><span class="bw__url">vas-salon.hr</span></div>
+  <div class="bw__view"><div class="ss">
+    <div class="ss__nav"><b>Vaš salon</b><span class="ss__links"><span>Šišanje</span><span>Bojanje</span><span>Fen i styling</span></span><span class="ss__btn">Rezervirajte</span></div>
+    <div class="ss__hero"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=960&q=72" srcset="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1400&q=72 1400w" sizes="(max-width: 900px) 90vw, 50vw" alt="" loading="lazy" decoding="async">
+      <div class="ss__copy"><span class="ss__kick">Frizerski salon</span><strong>Šišanje, bojanje i njega kose u Vašem kvartu</strong><span class="ss__cta">Rezervirajte termin</span></div></div>
+    <div class="ss__body">
+      <div class="ss__col"><span class="ss__h">Usluge</span><ul><li>Šišanje</li><li>Bojanje</li><li>Fen i styling</li><li>Njega kose</li></ul></div>
+      <div class="ss__gal"><img src="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1712213396688-c6f2d536671f?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1712213396688-c6f2d536671f?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1712213396688-c6f2d536671f?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1712213396688-c6f2d536671f?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="ss__info"><div><span class="ss__h">Gdje smo</span><svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg></div><div><span class="ss__h">Kontakt</span><p>Otvoreno · zatvara u 20:00</p><p>Nazovite nas ili pošaljite poruku</p><span class="ss__cta ss__cta--tam">Rezervirajte termin</span></div></div>
+    <div class="ss__foot"><span>Vaš salon</span><span>vas-salon.hr</span></div>
+  </div></div>
+</div>
+          <div class="bw b-ekr" data-i="1" data-site="kozmetika">
+  <div class="bw__top"><i></i><i></i><i></i><span class="bw__url">vas-studio.hr</span></div>
+  <div class="bw__view"><div class="ss">
+    <div class="ss__nav"><b>Vaš studio</b><span class="ss__links"><span>Tretmani lica</span><span>Manikura</span><span>Pedikura</span></span><span class="ss__btn">Rezervirajte</span></div>
+    <div class="ss__hero"><img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=960&q=72" srcset="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1400&q=72 1400w" sizes="(max-width: 900px) 90vw, 50vw" alt="" loading="lazy" decoding="async">
+      <div class="ss__copy"><span class="ss__kick">Kozmetički salon</span><strong>Njega lica, manikura i masaža na jednom mjestu</strong><span class="ss__cta">Rezervirajte tretman</span></div></div>
+    <div class="ss__body">
+      <div class="ss__col"><span class="ss__h">Usluge</span><ul><li>Tretmani lica</li><li>Manikura</li><li>Pedikura</li><li>Masaža</li></ul></div>
+      <div class="ss__gal"><img src="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="ss__info"><div><span class="ss__h">Gdje smo</span><svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg></div><div><span class="ss__h">Kontakt</span><p>Otvoreno · zatvara u 19:00</p><p>Nazovite nas ili pošaljite poruku</p><span class="ss__cta ss__cta--tam">Rezervirajte tretman</span></div></div>
+    <div class="ss__foot"><span>Vaš studio</span><span>vas-studio.hr</span></div>
+  </div></div>
+</div>
+          <div class="bw b-ekr" data-i="2" data-site="trener">
+  <div class="bw__top"><i></i><i></i><i></i><span class="bw__url">vas-trening.hr</span></div>
+  <div class="bw__view"><div class="ss">
+    <div class="ss__nav"><b>Vaš trening</b><span class="ss__links"><span>Osobni trening</span><span>Trening u paru</span><span>Prvi razgovor</span></span><span class="ss__btn">Dogovorite</span></div>
+    <div class="ss__hero"><img src="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=960&q=72" srcset="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=1400&q=72 1400w" sizes="(max-width: 900px) 90vw, 50vw" alt="" loading="lazy" decoding="async">
+      <div class="ss__copy"><span class="ss__kick">Osobni trener</span><strong>Osobni treninzi jedan na jedan, uz plan koji pratimo zajedno</strong><span class="ss__cta">Dogovorite prvi trening</span></div></div>
+    <div class="ss__body">
+      <div class="ss__col"><span class="ss__h">Usluge</span><ul><li>Osobni trening</li><li>Trening u paru</li><li>Prvi razgovor</li><li>Termini</li></ul></div>
+      <div class="ss__gal"><img src="https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="ss__info"><div><span class="ss__h">Gdje smo</span><svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg></div><div><span class="ss__h">Kontakt</span><p>Otvoreno · zatvara u 21:00</p><p>Nazovite nas ili pošaljite poruku</p><span class="ss__cta ss__cta--tam">Dogovorite prvi trening</span></div></div>
+    <div class="ss__foot"><span>Vaš trening</span><span>vas-trening.hr</span></div>
+  </div></div>
+</div>
+          <div class="bw b-ekr" data-i="3" data-site="kafic">
+  <div class="bw__top"><i></i><i></i><i></i><span class="bw__url">vas-kafic.hr</span></div>
+  <div class="bw__view"><div class="ss">
+    <div class="ss__nav"><b>Vaš kafić</b><span class="ss__links"><span>Jelovnik</span><span>Doručak</span><span>Rezervacija stola</span></span><span class="ss__btn">Rezervirajte</span></div>
+    <div class="ss__hero"><img src="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=960&q=72" srcset="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=1400&q=72 1400w" sizes="(max-width: 900px) 90vw, 50vw" alt="" loading="lazy" decoding="async">
+      <div class="ss__copy"><span class="ss__kick">Kafić</span><strong>Kava, doručak i kolači iz naše kuhinje</strong><span class="ss__cta">Rezervirajte stol</span></div></div>
+    <div class="ss__body">
+      <div class="ss__col"><span class="ss__h">Usluge</span><ul><li>Jelovnik</li><li>Doručak</li><li>Rezervacija stola</li><li>Kontakt</li></ul></div>
+      <div class="ss__gal"><img src="https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1790749871520-25b238a7ce94?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1790749871520-25b238a7ce94?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1790749871520-25b238a7ce94?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1790749871520-25b238a7ce94?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="ss__info"><div><span class="ss__h">Gdje smo</span><svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg></div><div><span class="ss__h">Kontakt</span><p>Otvoreno · zatvara u 23:00</p><p>Nazovite nas ili pošaljite poruku</p><span class="ss__cta ss__cta--tam">Rezervirajte stol</span></div></div>
+    <div class="ss__foot"><span>Vaš kafić</span><span>vas-kafic.hr</span></div>
+  </div></div>
+</div>
+          <div class="bw b-ekr" data-i="4" data-site="apartman">
+  <div class="bw__top"><i></i><i></i><i></i><span class="bw__url">vas-apartman.hr</span></div>
+  <div class="bw__view"><div class="ss">
+    <div class="ss__nav"><b>Vaš apartman</b><span class="ss__links"><span>Smještaj</span><span>Slobodni datumi</span><span>Kako doći</span></span><span class="ss__btn">Provjerite</span></div>
+    <div class="ss__hero"><img src="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=960&q=72" srcset="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=640&q=72 640w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=960&q=72 960w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=1400&q=72 1400w" sizes="(max-width: 900px) 90vw, 50vw" alt="" loading="lazy" decoding="async">
+      <div class="ss__copy"><span class="ss__kick">Apartman</span><strong>Apartman s pogledom na more, dvije minute od plaže</strong><span class="ss__cta">Provjerite slobodne datume</span></div></div>
+    <div class="ss__body">
+      <div class="ss__col"><span class="ss__h">Usluge</span><ul><li>Smještaj</li><li>Slobodni datumi</li><li>Kako doći</li><li>Kontakt</li></ul></div>
+      <div class="ss__gal"><img src="https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=480&q=72&h=360" srcset="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=320&q=72&h=240 320w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=480&q=72&h=360 480w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=720&q=72&h=540 720w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+    </div>
+    <div class="ss__info"><div><span class="ss__h">Gdje smo</span><svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg></div><div><span class="ss__h">Kontakt</span><p>Prijava od 14:00</p><p>Nazovite nas ili pošaljite poruku</p><span class="ss__cta ss__cta--tam">Provjerite slobodne datume</span></div></div>
+    <div class="ss__foot"><span>Vaš apartman</span><span>vas-apartman.hr</span></div>
+  </div></div>
+</div>
+        </div>
+        <div class="b-lap__baza"></div>
+      </div>
+      <div class="b-tel">
+        <div class="ph b-ph" data-i="0" data-site="salon">
+  <div class="ph__screen">
+    <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+    <div class="gp__q"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg><span>frizer Trešnjevka</span></div>
+    <svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg>
+    <div class="gp__card">
+      <div class="gp__fotke"><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=480&q=72&h=480" srcset="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=320&q=72&h=320 320w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=480&q=72&h=480 480w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=720&q=72&h=720 720w" sizes="30vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=360&q=72&h=360" srcset="https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=240&q=72&h=240 240w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=360&q=72&h=360 360w, https://images.unsplash.com/photo-1700760934268-8aa0ef52ce0a?auto=format&fit=crop&w=480&q=72&h=480 480w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+      <b class="gp__ime">Vaš salon</b>
+      <span class="gp__vrsta">Frizerski salon</span>
+      <span class="gp__open">Otvoreno · zatvara u 20:00</span>
+      <div class="gp__akcije"><span>Nazovi</span><span>Upute</span><span>Web</span></div>
+      <div class="gp__usl"><span class="gp__h">Usluge</span><i>Šišanje</i><i>Bojanje</i><i>Fen i styling</i><i>Njega kose</i></div>
+      <div class="gp__web"><span class="gp__h">Web stranica</span>vas-salon.hr</div>
+    </div>
+  </div>
+</div>
+        <div class="ph b-ph" data-i="1" data-site="kozmetika">
+  <div class="ph__screen">
+    <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+    <div class="gp__q"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg><span>kozmetički salon blizu mene</span></div>
+    <svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg>
+    <div class="gp__card">
+      <div class="gp__fotke"><img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=480&q=72&h=480" srcset="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=320&q=72&h=320 320w, https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=480&q=72&h=480 480w, https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=720&q=72&h=720 720w" sizes="30vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=360&q=72&h=360" srcset="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=240&q=72&h=240 240w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=360&q=72&h=360 360w, https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=480&q=72&h=480 480w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+      <b class="gp__ime">Vaš studio</b>
+      <span class="gp__vrsta">Kozmetički salon</span>
+      <span class="gp__open">Otvoreno · zatvara u 19:00</span>
+      <div class="gp__akcije"><span>Nazovi</span><span>Upute</span><span>Web</span></div>
+      <div class="gp__usl"><span class="gp__h">Usluge</span><i>Tretmani lica</i><i>Manikura</i><i>Pedikura</i><i>Masaža</i></div>
+      <div class="gp__web"><span class="gp__h">Web stranica</span>vas-studio.hr</div>
+    </div>
+  </div>
+</div>
+        <div class="ph b-ph" data-i="2" data-site="trener">
+  <div class="ph__screen">
+    <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+    <div class="gp__q"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg><span>osobni trener Zagreb</span></div>
+    <svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg>
+    <div class="gp__card">
+      <div class="gp__fotke"><img src="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=480&q=72&h=480" srcset="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=320&q=72&h=320 320w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=480&q=72&h=480 480w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=720&q=72&h=720 720w" sizes="30vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=360&q=72&h=360" srcset="https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=240&q=72&h=240 240w, https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=360&q=72&h=360 360w, https://images.unsplash.com/photo-1758875569399-99a7d80ace43?auto=format&fit=crop&w=480&q=72&h=480 480w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+      <b class="gp__ime">Vaš trening</b>
+      <span class="gp__vrsta">Osobni trener</span>
+      <span class="gp__open">Otvoreno · zatvara u 21:00</span>
+      <div class="gp__akcije"><span>Nazovi</span><span>Upute</span><span>Web</span></div>
+      <div class="gp__usl"><span class="gp__h">Usluge</span><i>Osobni trening</i><i>Trening u paru</i><i>Prvi razgovor</i><i>Termini</i></div>
+      <div class="gp__web"><span class="gp__h">Web stranica</span>vas-trening.hr</div>
+    </div>
+  </div>
+</div>
+        <div class="ph b-ph" data-i="3" data-site="kafic">
+  <div class="ph__screen">
+    <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+    <div class="gp__q"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg><span>kafić s doručkom</span></div>
+    <svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg>
+    <div class="gp__card">
+      <div class="gp__fotke"><img src="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=480&q=72&h=480" srcset="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=320&q=72&h=320 320w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=480&q=72&h=480 480w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=720&q=72&h=720 720w" sizes="30vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=360&q=72&h=360" srcset="https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=240&q=72&h=240 240w, https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=360&q=72&h=360 360w, https://images.unsplash.com/photo-1775403834271-619d9a264f0e?auto=format&fit=crop&w=480&q=72&h=480 480w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+      <b class="gp__ime">Vaš kafić</b>
+      <span class="gp__vrsta">Kafić</span>
+      <span class="gp__open">Otvoreno · zatvara u 23:00</span>
+      <div class="gp__akcije"><span>Nazovi</span><span>Upute</span><span>Web</span></div>
+      <div class="gp__usl"><span class="gp__h">Usluge</span><i>Jelovnik</i><i>Doručak</i><i>Rezervacija stola</i><i>Kontakt</i></div>
+      <div class="gp__web"><span class="gp__h">Web stranica</span>vas-kafic.hr</div>
+    </div>
+  </div>
+</div>
+        <div class="ph b-ph" data-i="4" data-site="apartman">
+  <div class="ph__screen">
+    <div class="ph__status"><span>9:41</span><span class="ph__isl"></span><span>5G</span></div>
+    <div class="gp__q"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg><span>apartmani Makarska</span></div>
+    <svg class="gp__map" viewBox="0 0 300 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="300" height="120" fill="#ECEAE4"/><rect x="190" y="10" width="80" height="45" rx="6" fill="#D9E3D6"/><rect x="20" y="14" width="60" height="36" rx="4" fill="#E1DED7"/><rect x="96" y="14" width="74" height="36" rx="4" fill="#E1DED7"/><rect x="20" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><rect x="200" y="74" width="80" height="36" rx="4" fill="#E1DED7"/><path d="M-5 62 C 80 58, 160 68, 305 60" stroke="#fff" stroke-width="9" fill="none"/><path d="M180 -5 C 176 40, 184 80, 178 125" stroke="#fff" stroke-width="7" fill="none"/><path d="M110 -5 L 110 125" stroke="#fff" stroke-width="4" fill="none"/><g transform="translate(140 32)"><path d="M10 26s9-9.3 9-16.3C19 4.4 15 0 10 0S1 4.4 1 9.7C1 16.7 10 26 10 26z" fill="#0F3B33"/><circle cx="10" cy="10" r="3.4" fill="#C6A15B"/></g></svg>
+    <div class="gp__card">
+      <div class="gp__fotke"><img src="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=480&q=72&h=480" srcset="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=320&q=72&h=320 320w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=480&q=72&h=480 480w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=720&q=72&h=720 720w" sizes="30vw" alt="" loading="lazy" decoding="async"><img src="https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=360&q=72&h=360" srcset="https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=240&q=72&h=240 240w, https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=360&q=72&h=360 360w, https://images.unsplash.com/photo-1512918580421-b2feee3b85a6?auto=format&fit=crop&w=480&q=72&h=480 480w" sizes="20vw" alt="" loading="lazy" decoding="async"></div>
+      <b class="gp__ime">Vaš apartman</b>
+      <span class="gp__vrsta">Apartman</span>
+      <span class="gp__open">Prijava od 14:00</span>
+      <div class="gp__akcije"><span>Nazovi</span><span>Upute</span><span>Web</span></div>
+      <div class="gp__usl"><span class="gp__h">Usluge</span><i>Smještaj</i><i>Slobodni datumi</i><i>Kako doći</i><i>Kontakt</i></div>
+      <div class="gp__web"><span class="gp__h">Web stranica</span>vas-apartman.hr</div>
+    </div>
+  </div>
+</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="b-traka" aria-labelledby="b-za-koga">
+  <div class="wrap"><div class="head"><span class="label">Za koga radimo</span><h2 id="b-za-koga">Za obrte koje ljudi traže na mobitelu, u svom kvartu.</h2></div></div>
+  <div class="b-film">
+    <ul class="b-film__red">
+      <li><img src="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1400&q=72&h=1867" srcset="https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=640&q=72&h=853 640w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=960&q=72&h=1280 960w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=1400&q=72&h=1867 1400w, https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=2000&q=72&h=2667 2000w" sizes="30vw" alt="Frizerka fenira klijentici kosu okruglom četkom" loading="lazy" decoding="async"><span>Frizerski saloni</span></li>
+      <li><img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1400&q=72&h=1867" srcset="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=640&q=72&h=853 640w, https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=960&q=72&h=1280 960w, https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1400&q=72&h=1867 1400w, https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=2000&q=72&h=2667 2000w" sizes="30vw" alt="Kozmetičarka nanosi masku za lice klijentici" loading="lazy" decoding="async"><span>Kozmetički saloni</span></li>
+      <li><img src="https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=1400&q=72&h=1867" srcset="https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=640&q=72&h=853 640w, https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=960&q=72&h=1280 960w, https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=1400&q=72&h=1867 1400w, https://images.unsplash.com/photo-1745327883508-b6cd32e5dde5?auto=format&fit=crop&w=2000&q=72&h=2667 2000w" sizes="30vw" alt="Terapeutkinja masira leđa klijentu" loading="lazy" decoding="async"><span>Saloni za masažu</span></li>
+      <li><img src="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=1400&q=72&h=1867" srcset="https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=640&q=72&h=853 640w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=960&q=72&h=1280 960w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=1400&q=72&h=1867 1400w, https://images.unsplash.com/photo-1758875569256-f37c438cac65?auto=format&fit=crop&w=2000&q=72&h=2667 2000w" sizes="30vw" alt="Osobni trener prati klijenticu dok diže uteg" loading="lazy" decoding="async"><span>Osobni treneri</span></li>
+      <li><img src="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=1400&q=72&h=1867" srcset="https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=640&q=72&h=853 640w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=960&q=72&h=1280 960w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=1400&q=72&h=1867 1400w, https://images.unsplash.com/photo-1507914372368-b2b085b925a1?auto=format&fit=crop&w=2000&q=72&h=2667 2000w" sizes="30vw" alt="Vlasnica kafića za aparatom za kavu" loading="lazy" decoding="async"><span>Kafići i restorani</span></li>
+      <li><img src="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=1400&q=72&h=1867" srcset="https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=640&q=72&h=853 640w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=960&q=72&h=1280 960w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=1400&q=72&h=1867 1400w, https://images.unsplash.com/photo-1760204741315-abfc98ce3bf5?auto=format&fit=crop&w=2000&q=72&h=2667 2000w" sizes="30vw" alt="Soba apartmana s pogledom na more u sumrak" loading="lazy" decoding="async"><span>Apartmani</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="usluge">
+  <div class="wrap split">
+    <div class="head">
+      <span class="label">Usluge</span>
+      <h2>Što točno dobijete i koliko stoji.</h2>
+      <p>Možete naručiti samo web stranicu ili uz nju i ostale usluge. Paketi su ispod, a sve cijene u cjeniku.</p>
+      <div class="btns"><a class="btn outline" href="cjenik.html">Pogledajte cjenik</a></div>
+    </div>
+    <div class="svc-list">
+      <article class="svc"><span class="n">I.</span><h3>Web stranica po mjeri</h3><p>Usluge, cjenik, fotografije i kontakt s lokacijom i gumbom za poziv, a po potrebi i online rezervacija. Od 399 €, jednokratno.</p></article>
+      <article class="svc"><span class="n">II.</span><h3>Google poslovni profil</h3><p>Profil s pravim radnim vremenom, fotografijama, uslugama i poveznicom na stranicu. Postavljanje 199 €, održavanje 99 € mjesečno.</p></article>
+      <article class="svc"><span class="n">III.</span><h3>Održavanje, domena i hosting</h3><p>Brinemo se da stranica radi, a sitne izmjene poput novog cjenika unosimo mi. 49 € mjesečno.</p></article>
+      <article class="svc"><span class="n">IV.</span><h3>SEO i GEO optimizacija</h3><p>Da Vas pronađu Google i AI tražilice poput ChatGPT-a, primjerice za „frizer Trešnjevka”. 199 € mjesečno za svaku.</p></article>
+      <article class="svc"><span class="n">V.</span><h3>Mobilne aplikacije</h3><p>Kad Vam stranica nije dovoljna, aplikacija za iOS i Android. Od 2.999 €, jednokratno.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="svj" id="kako">
+  <div class="wrap">
+    <div class="head"><span class="label">Kako radimo</span><h2>Od upitnika do objavljene stranice za dva tjedna.</h2></div>
+    <div class="steps">
+      <div class="step"><h3>Upitnik</h3><p>Kratkim upitnikom upoznajemo Vaš posao, ciljeve i želje.</p></div>
+      <div class="step"><h3>Izrada</h3><p>Dizajniramo i razvijamo rješenje uz Vaše povratne informacije.</p></div>
+      <div class="step"><h3>Podrška</h3><p>Objavljujemo, educiramo i ostajemo uz Vas.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="green" id="cijene">
+  <div class="wrap">
+    <div class="head"><span class="label">Paketi</span><h2>Stranica, Google profil i vidljivost u jednom paketu.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca</p></div>
+    <div class="plans" data-paketa="2">
+      <article class="plan">
+        <h3>D start</h3>
+        <div class="price">249 €<small>mjesečno</small></div>
+        <p class="from">Web stranica i Google profil</p>
+        <ul>
+          <li>Web stranica do 5 podstranica</li>
+          <li>Održavanje web stranice, domena i hosting</li>
+          <li>Google poslovni profil, postavljanje i održavanje</li>
+        </ul>
+        <a class="btn line" href="kontakt.html?plan=paket%20D%20start">Odaberite D start</a>
+      </article>
+      <article class="plan hot">
+        <span class="tag">Preporučeno</span>
+        <h3>D plus</h3>
+        <div class="price">499 €<small>mjesečno</small></div>
+        <p class="from">Sve iz D start, uz bolju vidljivost na tražilicama</p>
+        <ul>
+          <li>Dvije dodatne podstranice</li>
+          <li>SEO optimizacija</li>
+          <li>GEO optimizacija za AI tražilice</li>
+        </ul>
+        <a class="btn primary" href="kontakt.html?plan=paket%20D%20plus">Odaberite D plus</a>
+      </article>
+    </div>
+    <p class="once">Samo web stranicu možete naručiti od 399 €, jednokratno.</p><div class="once-btn"><a class="btn line" href="cjenik.html">Pogledajte potpuni cjenik</a></div>
+  </div>
+</section>
+
+<section class="final svj" id="kontakt">
+  <div class="wrap">
+    <div>
+      <span class="label">Kontakt</span>
+      <h2>Recite nam nešto o svom poslu.</h2>
+      <p class="lead">Pošaljite nam poruku i javit ćemo Vam se. Upit Vas ni na što ne obvezuje.</p>
+    </div>
+    <div class="cta-box"><a class="btn primary" href="kontakt.html">Pošaljite upit</a></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-brand"><span class="mono">dp</span><span>© <span id="y"></span> Digitalni partner</span></div>
+    <a class="f-link" href="pravne-informacije.html">Pravne informacije</a>
+    <span class="f-sl">Digitalno. Po mjeri.</span>
+  </div>
+</footer>
+
+<aside class="probna" aria-label="Probne verzije naslovnice">
+  <a href="prijedlozi.html">Prijedlozi</a>
+  <a href="prijedlog-a.html">A<span> · Kadar</span></a><a href="prijedlog-b.html" aria-current="page">B<span> · Izlog</span></a><a href="prijedlog-c.html">C<span> · Kolaž</span></a>
+</aside>
+
+<script>
+document.getElementById("y").textContent = new Date().getFullYear();
+(function(){
+  var nav = document.querySelector("nav"), btn = nav.querySelector(".menu-btn");
+  function set(open){ nav.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
+  btn.addEventListener("click", function(){ set(!nav.classList.contains("open")); });
+  nav.querySelectorAll(".links a").forEach(function(a){ a.addEventListener("click", function(){ set(false); }); });
+  addEventListener("keydown", function(e){ if(e.key === "Escape") set(false); });
+  addEventListener("resize", function(){ if(innerWidth > 860) set(false); });
+  // Linija ispod izbornika tek pri skrolanju
+  function line(){ nav.style.setProperty("--p", Math.min(1, (window.pageYOffset||0) / 120).toFixed(3)); }
+  line(); addEventListener("scroll", line, {passive:true});
+})();
+</script>
+<script src="prijedlozi/karusel.js"></script>
+<script>
+// Prijedlog B: karusel u heru; traka fotografija se udvostruči da putuje bez prekida
+pkKarusel(document.querySelector('.b-hero'));
+(function () {
+  var red = document.querySelector('.b-film__red');
+  if (!red || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  [].slice.call(red.children).forEach(function (li) { var k = li.cloneNode(true); k.setAttribute('aria-hidden', 'true'); red.appendChild(k); });
+})();
+
+</script>
+</body>
+</html>
