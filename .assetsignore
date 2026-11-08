@@ -5,3 +5,5 @@ wrangler.jsonc
 .claude
 README.md
 .wrangler
+nadzor
+node_modules

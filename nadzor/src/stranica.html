@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Nadzor poslovanja · Digitalni partner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--oniks:#0B0B0C;--smaragd:#0F3B33;--kamen:#E7E4DE;--kamen-svj:#F1EFEA;--papir:#FBFAF7;--grafit:#5E6266;--zlato:#C6A15B;--kadulja:#6E8F86;--crvena:#8A2C1E;--linija:rgba(11,11,12,.12)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--kamen-svj);color:var(--oniks);font:400 15px/1.55 Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--smaragd)}
+h1,h2,p{margin:0}
+h1{font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.025em;line-height:1.1}
+h2{font-size:20px;font-weight:600;letter-spacing:-.01em}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+header{background:var(--kamen);border-bottom:1px solid var(--linija)}
+header .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 40px;min-height:72px}
+.brand{display:flex;align-items:center;gap:12px}
+.mono{width:32px;height:32px;border-radius:7px;background:var(--smaragd);color:var(--kamen);display:grid;place-items:center;font-weight:700;font-size:15px;letter-spacing:-.02em}
+.word{font-size:18px;color:var(--smaragd)}.word b{font-weight:700}
+.sub{font-size:12px;color:var(--grafit);margin-left:8px;padding-left:12px;border-left:1px solid rgba(11,11,12,.2)}
+nav{display:flex;flex-wrap:wrap;gap:4px 28px}
+nav button{background:none;border:0;font:600 12px Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--oniks);padding:14px 0;border-bottom:1px solid transparent;cursor:pointer;min-height:44px}
+nav button[aria-selected=true]{color:var(--smaragd);border-bottom-color:var(--zlato)}
+.traka{background:var(--oniks);color:var(--kamen);font-size:13px}
+.traka .wrap{padding-top:10px;padding-bottom:10px;display:flex;flex-wrap:wrap;gap:4px 16px}
+.traka b{color:var(--zlato);letter-spacing:.12em;font-size:11.5px}
+main .wrap{padding-top:44px;padding-bottom:64px;display:flex;flex-direction:column;gap:32px}
+.lbl{display:flex;align-items:center;gap:12px;font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--grafit)}
+.lbl::before{content:"";width:28px;height:1px;background:var(--zlato)}
+.panel{background:var(--papir);border:1px solid var(--linija);padding:28px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.red{display:flex;flex-wrap:wrap;gap:32px}
+.red>.sir{flex:999 1 560px}.red>.uz{flex:1 1 320px}
+.num{font-variant-numeric:tabular-nums}
+.src{font-size:12px;color:var(--grafit)}
+.og{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.1em;color:var(--zlato);border:1px solid var(--zlato);padding:1px 5px;margin-left:6px;vertical-align:middle}
+.zeleno{background:var(--smaragd);color:var(--kamen);display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.zeleno>div{padding:32px;display:flex;flex-direction:column;gap:10px;border-right:1px solid rgba(231,228,222,.16)}
+.zeleno .k{font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--zlato)}
+.zeleno .v{font-size:clamp(36px,5vw,48px);font-weight:600;letter-spacing:-.03em;line-height:1}
+.zeleno .o{font-size:14px;color:#B9B6AF}
+.zeleno .og{border-color:var(--zlato)}
+.bar{height:6px;background:rgba(231,228,222,.18)}.bar i{display:block;height:100%;background:var(--zlato)}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px 32px}
+.kpi>div{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--zlato);padding-top:16px}
+.kpi .v{font-size:34px;font-weight:600;letter-spacing:-.02em}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--grafit);padding:0 16px 12px 0;border-bottom:1px solid rgba(11,11,12,.14);white-space:nowrap}
+td{padding:13px 16px 13px 0;border-bottom:1px solid rgba(11,11,12,.08);vertical-align:top}
+.r{text-align:right}.nw{white-space:nowrap}
+.skrol{overflow-x:auto}
+.stavka{padding:14px 0;border-bottom:1px solid rgba(11,11,12,.08);display:flex;flex-direction:column;gap:4px}
+.stavka:last-child{border-bottom:0}
+.stavka b{font-size:11.5px;letter-spacing:.1em}
+.hitno{color:var(--crvena)}
+.trak{height:10px;background:rgba(11,11,12,.06)}.trak i{display:block;height:100%;background:var(--smaragd)}
+.legenda{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--grafit)}
+.legenda span{display:flex;align-items:center;gap:8px}.legenda i{width:12px;height:12px;display:inline-block}
+form.unos{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;align-items:end}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--grafit)}
+input,select{font:inherit;font-size:14px;padding:9px 10px;border:1px solid rgba(11,11,12,.25);background:#fff;color:var(--oniks);min-height:44px}
+button.gumb{font:600 13px Manrope,sans-serif;background:var(--smaragd);color:var(--kamen);border:0;padding:0 18px;min-height:44px;cursor:pointer}
+:focus-visible{outline:2px solid var(--smaragd);outline-offset:2px}
+footer{border-top:1px solid var(--linija);background:var(--kamen)}
+footer .wrap{padding-top:18px;padding-bottom:18px;display:flex;flex-wrap:wrap;gap:6px 24px}
+[hidden]{display:none!important}
+.prazno{color:var(--grafit);font-size:14px}
+svg text{font-family:Manrope,sans-serif}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="brand"><div class="mono">dp</div><div class="word"><b>digitalni</b>partner</div><div class="sub">nadzor poslovanja</div></div>
+  <nav role="tablist" aria-label="Ekrani">
+    <button role="tab" data-ekran="pregled" aria-selected="true">Pregled</button>
+    <button role="tab" data-ekran="usluge" aria-selected="false">Usluge</button>
+    <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
+    <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
+  </nav>
+</div></header>
+<div class="traka" id="traka" hidden><div class="wrap"><b>OGLEDNI PODACI</b><span>Brojevi s oznakom OGLEDNO nisu stvarni. Nestaju kad se spoji pravi izvor.</span></div></div>
+<main><div class="wrap" id="sadrzaj"><p class="prazno">Učitavam podatke…</p></div></main>
+<footer><div class="wrap"><span class="src" id="osvjezeno"></span><span class="src" id="korisnik"></span></div></footer>
+
+<script>
+(function(){
+"use strict";
+var D = null, ekran = (location.hash || "#pregled").slice(1);
+var MJ = ["siječanj","veljača","ožujak","travanj","svibanj","lipanj","srpanj","kolovoz","rujan","listopad","studeni","prosinac"];
+var MJK = ["Sij","Velj","Ožu","Tra","Svi","Lip","Srp","Kol","Ruj","Lis","Stu","Pro"];
+var PRAG = 60000;
+
+function e(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+function eur(n, dec){ var v = Number(n || 0); var s = v.toLocaleString("hr-HR", {minimumFractionDigits: dec ? 2 : 0, maximumFractionDigits: dec ? 2 : 0}); return s + " €"; }
+function br(n){ return Number(n || 0).toLocaleString("hr-HR"); }
+function pct(n){ return (n >= 0 ? "+" : "") + n.toLocaleString("hr-HR", {maximumFractionDigits: 1}) + " %"; }
+function datum(d){ if(!d) return "–"; var p = String(d).slice(0,10).split("-"); return Number(p[2]) + ". " + Number(p[1]) + "."; }
+function og(b){ return b ? '<span class="og">OGLEDNO</span>' : ""; }
+function dana(d){ return Math.round((new Date(String(d).slice(0,10)) - new Date(D.danas)) / 864e5); }
+function zbroj(a, f){ return a.reduce(function(s, x){ return s + Number(f(x) || 0); }, 0); }
+
+function ucitaj(){
+  fetch("/api/podaci", {credentials: "same-origin"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){ D = d; crtaj(); })
+    .catch(function(err){ document.getElementById("sadrzaj").innerHTML = '<p class="prazno">Podaci se nisu učitali (' + e(err.message) + '). Osvježi stranicu za minutu.</p>'; });
+}
+
+function crtaj(){
+  var imaOgl = D.prihod_godina_ogledno || D.klijenti.some(function(k){ return k.ogledno; }) || Object.keys(D.metrike).some(function(k){ return D.metrike[k].ogledno; });
+  document.getElementById("traka").hidden = !imaOgl;
+  document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); });
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja}[ekran] || pregled;
+  document.getElementById("sadrzaj").innerHTML = f();
+  if (ekran === "pregled") vezi();
+  if (ekran === "usluge") veziUpite();
+  var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
+  document.getElementById("osvjezeno").textContent = dijelovi.length ? "Zadnje osvježavanje · " + dijelovi.join(" · ") : "Prikupljači se još nisu pokrenuli.";
+  document.getElementById("korisnik").textContent = D.korisnik ? "Prijavljen: " + D.korisnik : "";
+}
+
+// ---------- izračuni ----------
+function mjeseci(){ return D.prihodi_po_mjesecima; }
+function ovaj(){ var m = mjeseci(); return m[m.length - 1]; }
+function prosli(){ var m = mjeseci(); return m[m.length - 2]; }
+function ukupno(m){ return Number(m.usluge) + Number(m.aplikacije) + Number(m.vjencanja); }
+function mrr(){ return zbroj(D.klijenti, function(k){ return k.mjesecno; }); }
+function klijOgl(){ return D.klijenti.some(function(k){ return k.ogledno; }); }
+function met(k){ return D.metrike[k] || null; }
+
+// ---------- Pregled ----------
+function pregled(){
+  var t = ovaj(), p = prosli(), u = ukupno(t), up = ukupno(p);
+  var promjena = up ? (u - up) / up * 100 : 0;
+  var god = Number(D.prihod_godina), udio = Math.min(100, god / PRAG * 100);
+  var danUGod = (new Date(D.danas) - new Date(D.danas.slice(0,4) + "-01-01")) / 864e5 + 1;
+  var tempo = god / danUGod, ostaje = tempo > 0 ? (PRAG - god) / tempo : Infinity;
+  var kad = god >= PRAG ? "Prag je dosegnut." : (isFinite(ostaje) ? "Uz ovaj tempo prag se dostiže oko " + new Date(Date.now() + ostaje * 864e5).toLocaleDateString("hr-HR", {month:"long", year:"numeric"}).replace(/\.$/, "") + "." : "Još nema prihoda.");
+  var mj = MJ[Number(D.danas.slice(5,7)) - 1];
+
+  var h = '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 32px"><div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Cijeli obrt</p><h1>' + e(mj.charAt(0).toUpperCase() + mj.slice(1)) + ' ' + D.danas.slice(0,4) + '.</h1></div><p class="src">Stanje ' + datum(D.danas) + '</p></div>';
+  h += '<section class="zeleno" aria-label="Glavni brojevi">'
+    + '<div><span class="k">Prihod ovog mjeseca' + og(t.ogledno) + '</span><span class="v num">' + eur(u) + '</span><span class="o">' + (up ? pct(promjena) + " u odnosu na prošli mjesec (" + eur(up) + ")" : "Prošli mjesec bez prihoda.") + '</span></div>'
+    + '<div><span class="k">Mjesečni ponavljajući prihod' + og(klijOgl()) + '</span><span class="v num">' + eur(mrr()) + '</span><span class="o">' + D.klijenti.length + ' aktivnih klijenata</span></div>'
+    + '<div style="border-right:0"><span class="k">Prag od 60.000 € ove godine' + og(D.prihod_godina_ogledno) + '</span><span class="v num">' + Math.round(udio) + ' %</span><div class="bar" role="img" aria-label="Naplaćeno ' + eur(god) + ' od 60.000 €"><i style="width:' + udio.toFixed(1) + '%"></i></div><span class="o">' + eur(god) + ' naplaćeno. ' + kad + '</span></div>'
+    + '</section>';
+
+  h += '<div class="red"><section class="panel sir"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px"><h2>Prihod po mjesecima' + og(mjeseci().some(function(m){ return m.ogledno; })) + '</h2><div class="legenda"><span><i style="background:#0F3B33"></i>Usluge</span><span><i style="background:#6E8F86"></i>Aplikacije</span><span><i style="background:#C6A15B"></i>Kuverta</span></div></div><p class="num" id="tip" style="min-height:22px;font-size:14px"></p>' + grafPrihoda() + '<p class="src">Iznosi su nakon provizije Applea i naknada Stripea.</p></section>';
+  h += '<section class="panel uz"><h2>Za danas</h2>' + zaDanas() + '</section></div>';
+
+  var kv = D.kuverta || {};
+  h += '<section class="panel"><h2>Poslovne linije</h2><div class="skrol"><table class="num"><thead><tr><th>Linija</th><th class="r">Ovaj mjesec</th><th class="r">Prošli</th><th>Korisnici</th><th>Ključni broj</th></tr></thead><tbody>'
+    + linija("#0F3B33", "Usluge za klijente", t.usluge, p.usluge, D.klijenti.length + " klijenata" + og(klijOgl()), "MRR " + eur(mrr()))
+    + linija("#6E8F86", "Aplikacije", t.aplikacije, p.aplikacije, met("aplikacije.aktivni_mjesecno") ? br(met("aplikacije.aktivni_mjesecno").vrijednost) + " aktivnih mjesečno" + og(met("aplikacije.aktivni_mjesecno").ogledno) : "nije spojeno", met("aplikacije.pretplatnici") ? br(met("aplikacije.pretplatnici").vrijednost) + " pretplatnika" : "")
+    + linija("#C6A15B", "Kuverta", t.vjencanja, p.vjencanja, kv.greska ? "baza nedostupna" : br(kv.pozivnice) + " pozivnica u bazi", kv.greska ? "" : br(zbroj(kv.po_mjesecima || [], function(x){ return x.broj; })) + " vjenčanja u 12 mjeseci")
+    + '</tbody></table></div></section>';
+
+  var tr = D.troskovi_ovaj_mjesec, tu = zbroj(tr, function(x){ return x.iznos; });
+  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px"><h2>Troškovi ovog mjeseca' + og(tr.some(function(x){ return x.ogledno; })) + '</h2><span class="num" style="font-weight:600">' + eur(tu, true) + ' · dobit ' + eur(u - tu, true) + '</span></div>'
+    + (tr.length ? '<div class="skrol"><table class="num"><tbody>' + tr.map(function(x){ return '<tr><td>' + e(x.opis) + og(x.ogledno) + '</td><td class="src">' + e(x.linija) + '</td><td class="nw">' + datum(x.datum) + '</td><td class="r nw">' + eur(x.iznos, true) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Ovaj mjesec još nema upisanih troškova.</p>')
+    + '<form class="unos" id="trosak"><label>Datum<input name="datum" type="date" required value="' + D.danas + '"></label><label>Opis<input name="opis" required maxlength="200" placeholder="npr. domena"></label><label>Iznos (€)<input name="iznos" type="number" step="0.01" min="0" required></label><label>Linija<select name="linija"><option value="obrt">Obrt</option><option value="usluge">Usluge</option><option value="aplikacije">Aplikacije</option><option value="vjencanja">Kuverta</option></select></label><button class="gumb" type="submit">Dodaj trošak</button></form><p class="src" id="trosak-poruka" role="status"></p></section>';
+  return h;
+}
+
+function linija(boja, ime, a, b, korisnici, kljucni){
+  var ch = Number(b) ? pct((a - b) / b * 100) : "–";
+  return '<tr><td class="nw" style="font-weight:600"><i style="display:inline-block;width:10px;height:10px;background:' + boja + ';margin-right:10px"></i>' + e(ime) + '</td><td class="r nw">' + eur(a) + '</td><td class="r nw">' + eur(b) + ' <span class="src">' + ch + '</span></td><td>' + korisnici + '</td><td>' + e(kljucni) + '</td></tr>';
+}
+
+function grafPrihoda(){
+  var m = mjeseci(), max = Math.max(1000, Math.max.apply(null, m.map(ukupno)));
+  var korak = max > 6000 ? 2000 : (max > 3000 ? 1000 : 500); max = Math.ceil(max / korak) * korak;
+  var base = 240, ph = 205, slot = (712 - 56) / m.length, w = Math.min(56, slot * .6), s = "";
+  for (var g = 0; g <= max; g += korak){ var y = base - g / max * ph; s += '<line x1="56" x2="712" y1="' + y + '" y2="' + y + '" stroke="rgba(11,11,12,.08)"/><text x="48" y="' + (y + 4) + '" text-anchor="end" font-size="11.5" fill="#5E6266">' + (g ? (g >= 1000 ? (g / 1000) + "k" : g) : 0) + '</text>'; }
+  m.forEach(function(x, i){
+    var X = 56 + i * slot + (slot - w) / 2, y = base, seg = [["usluge","#0F3B33"],["aplikacije","#6E8F86"],["vjencanja","#C6A15B"]];
+    seg.forEach(function(sg){ var hh = Number(x[sg[0]]) / max * ph; if (hh > 0){ y -= hh; s += '<rect x="' + X + '" y="' + y + '" width="' + w + '" height="' + Math.max(0, hh - 2) + '" fill="' + sg[1] + '"/>'; } });
+    var mi = Number(x.mjesec.slice(5,7)) - 1;
+    s += '<text x="' + (X + w / 2) + '" y="' + (y - 8) + '" text-anchor="middle" font-size="12" font-weight="600" fill="#0B0B0C">' + (ukupno(x) ? eur(ukupno(x)) : "") + '</text><text x="' + (X + w / 2) + '" y="262" text-anchor="middle" font-size="12" fill="#5E6266">' + MJK[mi] + '</text>';
+    s += '<rect class="hit" data-i="' + i + '" x="' + (56 + i * slot) + '" y="0" width="' + slot + '" height="270" fill="transparent" tabindex="0" aria-label="' + MJ[mi] + ' ' + eur(ukupno(x)) + '"/>';
+  });
+  return '<svg viewBox="0 0 720 270" role="img" aria-label="Prihod po mjesecima, složeno po linijama" style="width:100%;height:auto;display:block">' + s + '</svg>';
+}
+
+function zaDanas(){
+  var st = [];
+  D.klijenti.forEach(function(k){
+    if (k.stanje === "neuspjela naplata") st.push(["hitno", "NEUSPJELA NAPLATA", e(k.oznaka) + ", " + e(k.paket) + ", " + eur(k.mjesecno) + "." + og(k.ogledno)]);
+    if (k.obveza_do && dana(k.obveza_do) >= 0 && dana(k.obveza_do) <= 30) st.push(["", "OBVEZA ISTJEČE", e(k.oznaka) + ", " + e(k.paket) + ". Minimalna 3 mjeseca prolaze " + datum(k.obveza_do) + og(k.ogledno)]);
+  });
+  D.upiti.forEach(function(u){ var sati = (Date.now() - new Date(u.stvoreno)) / 36e5; if (u.status === "novi" && sati > 24) st.push(["hitno", "UPIT BEZ ODGOVORA", e(u.ime) + ", poslan prije " + Math.round(sati) + " h." + og(u.ogledno)]); });
+  ((D.kuverta && D.kuverta.iduca) || []).forEach(function(v){ var d = dana(v.datum); if (d >= 0 && d <= 14) st.push(["", "VJENČANJE ZA " + d + " DANA", datum(v.datum) + ": " + v.potvrde + " potvrda dolaska, " + v.dolazi + " gostiju dolazi."]); });
+  if (!st.length) return '<p class="prazno">Ništa hitno. Novi upiti, neuspjele naplate i ugovori koji istječu pojavit će se ovdje.</p>';
+  return st.slice(0, 8).map(function(s){ return '<div class="stavka"><b class="' + s[0] + '">' + s[1] + '</b><span style="font-size:14px">' + s[2] + '</span></div>'; }).join("");
+}
+
+function vezi(){
+  var m = mjeseci(), tip = document.getElementById("tip");
+  function pokazi(i){ var x = m[i], mi = Number(x.mjesec.slice(5,7)) - 1; tip.innerHTML = '<b>' + MJ[mi].charAt(0).toUpperCase() + MJ[mi].slice(1) + ': ' + eur(ukupno(x)) + '.</b> Usluge ' + eur(x.usluge) + ', aplikacije ' + eur(x.aplikacije) + ', Kuverta ' + eur(x.vjencanja) + '.'; }
+  pokazi(m.length - 1);
+  document.querySelectorAll(".hit").forEach(function(r){ r.addEventListener("mouseenter", function(){ pokazi(+r.dataset.i); }); r.addEventListener("focus", function(){ pokazi(+r.dataset.i); }); });
+  var f = document.getElementById("trosak"), por = document.getElementById("trosak-poruka");
+  f.addEventListener("submit", function(ev){
+    ev.preventDefault(); por.textContent = "Spremam…";
+    var b = {datum: f.datum.value, opis: f.opis.value, iznos: f.iznos.value, linija: f.linija.value};
+    fetch("/api/trosak", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(b)})
+      .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); }); })
+      .then(function(){ ucitaj(); }).catch(function(err){ por.textContent = "Nije spremljeno: " + err.message; });
+  });
+}
+
+// ---------- Usluge ----------
+function usluge(){
+  var o = klijOgl(), po = {};
+  D.klijenti.forEach(function(k){ po[k.paket] = po[k.paket] || {n:0, iznos:0, cijena:k.mjesecno}; po[k.paket].n++; po[k.paket].iznos += Number(k.mjesecno); });
+  var paketi = Object.keys(po).sort(function(a, b){ return po[b].iznos - po[a].iznos; }), top = paketi.length ? po[paketi[0]].iznos : 1;
+  var jedn = D.prihodi_ovaj_mjesec.filter(function(p){ return p.linija === "usluge" && p.opis.indexOf("pretplata") !== 0; });
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Linija 1</p><h1>Usluge za klijente</h1></div>';
+  h += '<section class="kpi"><div><span class="src">Mjesečni ponavljajući prihod' + og(o) + '</span><span class="v num">' + eur(mrr()) + '</span></div><div><span class="src">Aktivni klijenti' + og(o) + '</span><span class="v num">' + D.klijenti.length + '</span><span class="src">' + D.otkazani_ovaj_mjesec + ' otkazanih ovaj mjesec</span></div><div><span class="src">Prosječno po klijentu</span><span class="v num">' + eur(D.klijenti.length ? mrr() / D.klijenti.length : 0) + '</span><span class="src">mjesečno</span></div><div><span class="src">Upiti ovaj mjesec</span><span class="v num">' + upitiMj().length + '</span><span class="src">s obrasca na webu</span></div></section>';
+  h += '<div class="red"><section class="panel uz" style="flex:1 1 440px"><h2>MRR po paketu' + og(o) + '</h2>' + (paketi.length ? paketi.map(function(k){ var x = po[k]; return '<div class="num" style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span><b>' + e(k) + '</b> <span class="src">' + x.n + ' × ' + eur(x.cijena) + '</span></span><b>' + eur(x.iznos) + '</b></div><div class="trak"><i style="width:' + (x.iznos / top * 100).toFixed(1) + '%"></i></div></div>'; }).join("") : '<p class="prazno">Još nema klijenata.</p>') + '<p class="src">Izvor: tablica klijenata, kasnije Stripe pretplate.</p></section>';
+  h += '<section class="panel uz" style="flex:1 1 440px"><h2>Od upita do ugovora, ovaj mjesec</h2>' + lijevak() + '<p class="src">Status upita mijenjaš u tablici ispod.</p></section></div>';
+  h += '<section class="panel"><h2>Klijenti' + og(o) + '</h2>' + (D.klijenti.length ? '<div class="skrol"><table class="num"><thead><tr><th>Klijent</th><th>Djelatnost</th><th>Paket</th><th class="r">Mjesečno</th><th>Početak</th><th>Obveza do</th><th>Stanje</th></tr></thead><tbody>' + D.klijenti.map(function(k){ return '<tr><td class="nw" style="font-weight:600">' + e(k.oznaka) + '</td><td>' + e(k.djelatnost) + '</td><td class="nw">' + e(k.paket) + '</td><td class="r nw">' + eur(k.mjesecno) + '</td><td class="nw">' + datum(k.pocetak) + '</td><td class="nw">' + (k.obveza_do && dana(k.obveza_do) < 0 ? "ispunjena" : datum(k.obveza_do)) + '</td><td class="nw ' + (k.stanje === "neuspjela naplata" ? "hitno" : "") + '">' + e(k.stanje) + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Još nema klijenata.</p>') + '</section>';
+  h += '<section class="panel"><h2>Upiti</h2>' + (D.upiti.length ? '<div class="skrol"><table><thead><tr><th>Stiglo</th><th>Ime</th><th>Kontakt</th><th>Poruka</th><th>Status</th></tr></thead><tbody>' + D.upiti.map(function(u){ return '<tr><td class="nw num">' + datum(u.stvoreno) + '</td><td class="nw" style="font-weight:600">' + e(u.ime) + og(u.ogledno) + '</td><td>' + e(u.kontakt) + '</td><td style="min-width:240px">' + e(u.poruka) + '</td><td><select data-upit="' + u.id + '" aria-label="Status upita ' + e(u.ime) + '">' + ["novi","razgovor","ponuda","ugovor","odbijen"].map(function(s){ return '<option' + (s === u.status ? " selected" : "") + '>' + s + '</option>'; }).join("") + '</select></td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Još nema upita. Čim netko pošalje obrazac na webu, pojavit će se ovdje.</p>') + '</section>';
+  return h;
+}
+function upitiMj(){ var mj = D.danas.slice(0,7); return D.upiti.filter(function(u){ return String(u.stvoreno).slice(0,7) === mj; }); }
+function lijevak(){
+  var u = upitiMj(), red = ["novi","razgovor","ponuda","ugovor"], n = u.length;
+  if (!n) return '<p class="prazno">Ovaj mjesec još nema upita.</p>';
+  var dosli = red.map(function(s, i){ return u.filter(function(x){ return red.indexOf(x.status) >= i; }).length; });
+  var ime = ["upita","razgovora","poslanih ponuda","potpisanih ugovora"];
+  return dosli.map(function(c, i){ var stopa = i === 0 ? "početak" : (dosli[i-1] ? Math.round(c / dosli[i-1] * 100) + " % od prethodnog koraka" : "–"); return '<div class="num" style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span><b>' + c + '</b> ' + ime[i] + '</span><span class="src">' + stopa + '</span></div><div class="trak"><i style="width:' + (c / n * 100).toFixed(1) + '%;' + (i === 3 ? "background:#C6A15B" : "") + '"></i></div></div>'; }).join("");
+}
+function veziUpite(){
+  document.querySelectorAll("select[data-upit]").forEach(function(s){ s.addEventListener("change", function(){
+    fetch("/api/upit-status", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({id: s.dataset.upit, status: s.value})}).then(function(){ ucitaj(); });
+  }); });
+}
+
+// ---------- Aplikacije ----------
+function aplikacije(){
+  var imena = [["app1","Aplikacija 1"],["app2","Aplikacija 2"],["app3","Aplikacija 3"]];
+  var polja = [["preuzimanja_30d","Preuzimanja, 30 dana",0],["prihod_mjesec","Prihod ovaj mjesec",1],["pretplatnici","Pretplatnici",0],["aktivni_mjesecno","Aktivni mjesečno",0],["ocjena","Ocjena",2],["rusenja_7d","Rušenja, 7 dana",0]];
+  var ima = imena.some(function(a){ return met("aplikacije." + a[0] + ".preuzimanja_30d"); });
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Linija 2</p><h1>Aplikacije u App Storeu</h1></div>';
+  if (!ima) return h + '<section class="panel"><p class="prazno">App Store Connect još nije spojen. Spaja se u fazi 2, kad aplikacije budu u trgovini.</p></section>';
+  h += '<section class="panel"><h2>Po aplikaciji</h2><div class="skrol"><table class="num"><thead><tr><th>Aplikacija</th>' + polja.map(function(p){ return '<th class="r">' + p[1] + '</th>'; }).join("") + '</tr></thead><tbody>' + imena.map(function(a){ return '<tr><td class="nw" style="font-weight:600">' + a[1] + ' [naziv]' + og(met("aplikacije." + a[0] + ".preuzimanja_30d") && met("aplikacije." + a[0] + ".preuzimanja_30d").ogledno) + '</td>' + polja.map(function(p){ var m = met("aplikacije." + a[0] + "." + p[0]); return '<td class="r nw">' + (m ? (p[2] === 1 ? eur(m.vrijednost) : (p[2] === 2 ? Number(m.vrijednost).toLocaleString("hr-HR", {minimumFractionDigits:1}) : br(m.vrijednost))) : "–") + '</td>'; }).join("") + '</tr>'; }).join("") + '</tbody></table></div><p class="src">Izvor: App Store Connect API. Prihod je nakon provizije Applea.</p></section>';
+  return h;
+}
+
+// ---------- Kuverta ----------
+function vjencanja(){
+  var k = D.kuverta || {};
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Linija 3 · Kuverta</p><h1>Pozivnica, album i raspored sjedenja</h1></div>';
+  if (k.greska) return h + '<section class="panel"><p class="prazno">Baza Kuverte trenutno ne odgovara: ' + e(k.greska) + '</p></section>';
+  var t = ovaj();
+  h += '<section class="kpi"><div><span class="src">Prihod ovaj mjesec' + og(t.ogledno) + '</span><span class="v num">' + eur(t.vjencanja) + '</span></div><div><span class="src">Pozivnice u bazi</span><span class="v num">' + br(k.pozivnice) + '</span><span class="src">' + br(k.pozivnice_objavljene) + ' objavljenih</span></div><div><span class="src">Potvrde dolaska</span><span class="v num">' + br(k.potvrde) + '</span><span class="src">' + br(k.gosti_potvrdeni) + ' gostiju dolazi</span></div><div><span class="src">Albumi</span><span class="v num">' + br(k.albumi) + '</span><span class="src">' + br(k.fotografije) + ' datoteka, ' + (Number(k.album_bajtovi) / 1073741824).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + ' GB</span></div><div><span class="src">Rasporedi sjedenja</span><span class="v num">' + br(k.rasporedi) + '</span><span class="src">' + br(k.stolovi) + ' stolova, ' + br(k.gosti_u_rasporedu) + ' gostiju</span></div></section>';
+  var pm = k.po_mjesecima || [], max = Math.max(4, Math.max.apply(null, pm.map(function(x){ return x.broj; })));
+  var s = "", slot = (712 - 32) / Math.max(1, pm.length), w = Math.min(32, slot * .6);
+  pm.forEach(function(x, i){ var hh = x.broj / max * 170, X = 32 + i * slot + (slot - w) / 2, mi = Number(x.mjesec.slice(5,7)) - 1; s += '<rect x="' + X + '" y="' + (200 - hh) + '" width="' + w + '" height="' + hh + '" fill="#0F3B33"><title>' + MJ[mi] + ': ' + x.broj + '</title></rect><text x="' + (X + w / 2) + '" y="' + (192 - hh) + '" text-anchor="middle" font-size="12" font-weight="600" fill="#0B0B0C">' + (x.broj || "") + '</text><text x="' + (X + w / 2) + '" y="222" text-anchor="middle" font-size="11.5" fill="#5E6266">' + MJK[mi] + '</text>'; });
+  h += '<section class="panel"><h2>Vjenčanja po mjesecima, idućih 12 mjeseci</h2><svg viewBox="0 0 720 230" role="img" aria-label="Broj vjenčanja po mjesecu" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="200" y2="200" stroke="rgba(11,11,12,.14)"/>' + s + '</svg><p class="src">Izvor: datum vjenčanja na pozivnicama i rasporedima. Stvarni podaci iz baze MyWeddingInvite.</p></section>';
+  var id = k.iduca || [];
+  h += '<section class="panel"><h2>Iduća vjenčanja</h2>' + (id.length ? '<div class="skrol"><table class="num"><thead><tr><th>Datum</th><th>Objavljena</th><th class="r">Potvrde</th><th class="r">Gostiju dolazi</th><th>Album</th><th class="r">Stolova</th></tr></thead><tbody>' + id.map(function(v){ return '<tr><td class="nw" style="font-weight:600">' + datum(v.datum) + '</td><td>' + (v.objavljena ? "da" : "ne") + '</td><td class="r">' + v.potvrde + '</td><td class="r">' + v.dolazi + '</td><td>' + (v.ima_album ? "da" : "ne") + '</td><td class="r">' + v.stolovi + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Nema pozivnica s datumom u budućnosti.</p>') + '<p class="src">Imena parova i gostiju se ne prenose u dashboard, samo brojevi.</p></section>';
+  return h;
+}
+
+document.querySelectorAll("nav button").forEach(function(b){ b.addEventListener("click", function(){ ekran = b.dataset.ekran; history.replaceState(null, "", "#" + ekran); if (D) crtaj(); window.scrollTo(0, 0); }); });
+ucitaj();
+setInterval(ucitaj, 10 * 60 * 1000);
+})();
+</script>
+</body>
+</html>

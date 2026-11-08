@@ -1,8 +1,9 @@
 // Obrazac za upit.
-// FORM_ENDPOINT: adresa servisa za obrasce (npr. Formspree ili Web3Forms). Dok je prazna, upit se šalje preko
-// programa za e-poštu, a ako se on ne otvori, posjetitelj vidi adresu na koju može pisati izravno.
+// FORM_ENDPOINT: upit ide u Worker dashboarda (dp-nadzor), koji ga sprema u bazu i prikazuje u lijevku prodaje.
+// Ako slanje ne uspije, posjetitelj vidi adresu na koju može pisati izravno. Prazna adresa vraća stari način
+// (upit se šalje preko programa za e-poštu).
 (function(){
-  var FORM_ENDPOINT = "";
+  var FORM_ENDPOINT = "https://dp-nadzor.bruno-dobric32.workers.dev/upit";
   var CONTACT_EMAIL = atob("YnJ1bm8uZG9icmljMzJAZ21haWwuY29t");
   var f = document.getElementById("cform"), msg = document.getElementById("msg");
   var plan = new URLSearchParams(location.search).get("plan");
