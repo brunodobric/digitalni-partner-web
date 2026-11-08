@@ -6,6 +6,7 @@
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "dp-nadzor",
   "main": "src/index.js",
+  "preview_urls": false,
   "compatibility_date": "2026-10-23",
   "rules": [{ "type": "Text", "globs": ["**/*.html"], "fallthrough": true }],
   "triggers": { "crons": ["0 5 * * *"] },
