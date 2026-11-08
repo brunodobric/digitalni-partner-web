@@ -20,3 +20,7 @@ Primjer za oglase (za AI isto, samo s `ai`):
 4. Provjeriti cijenu i stavke paketa D plus: Meta oglasi su u njemu bili uključeni.
 
 Karusel na naslovnici sam broji vidljive slajdove (`js/naslovnica.js`), pa se nakon vraćanja AI slajdova brojač i oznake "1 od 6" ažuriraju bez izmjena u skripti. Na stranici Usluge skrivene usluge stoje na kraju popisa (VII. do IX.), pa se brojevi ne mijenjaju.
+
+## D premium s mobilnom aplikacijom (studeni 2026.)
+
+U cjeniku je vidljiv novi D premium (899 € mjesečno, sve iz D plus, dvije podstranice i mobilna aplikacija od 1.999 € jednokratno umjesto od 2.999 €). Stari D premium s oglasima i AI-em ostao je skriven odmah ispod njega. Kad se vrate oglasi i AI, treba odlučiti koji sastav paketa ostaje, a drugi obrisati.
