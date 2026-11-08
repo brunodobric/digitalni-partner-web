@@ -1,5 +1,9 @@
-nadzor
+wrangler.jsonc
+.assetsignore
 .git
 .github
-node_modules
+.claude
+README.md
 .wrangler
+nadzor
+node_modules
