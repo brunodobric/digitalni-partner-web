@@ -19,7 +19,7 @@ Primjer za oglase (za AI isto, samo s `ai`):
 3. Kad su vraćeni i oglasi i AI: odlučiti koji D premium ostaje (vidi zadnji odlomak) i drugi obrisati, obrisati `data-privremeno="oglasi ai"` u `o-nama.html` te vratiti meta opise iz komentara na `index.html`, `usluge.html` i `cjenik.html`.
 4. Provjeriti cijenu i stavke paketa D plus: Meta oglasi su u njemu bili uključeni.
 
-Karusel na naslovnici (`js/naslovnica.js`) sam broji vidljive slajdove i preskače elemente s atributom `hidden`. Od redizajna naslovnice (studeni 2026., „Izlog”) hero prikazuje primjere stranica za pet vrsta posla i više nema AI slajdova. Stari AI slajdovi (agent i asistent) sačuvani su u arhivi projekta, `arhiva/web/stari/index-prije-redizajna-izlog.html`; ako se AI vrati u hero, treba im napraviti slajd u novom obliku (fotografija, laptop, mobitel). Na stranici Usluge skrivene usluge stoje na kraju popisa (VII. do IX.), pa se brojevi ne mijenjaju. Na naslovnici su u popisu usluga skriveni oglasi (VI.) i AI asistent (VII.).
+Karusel na naslovnici (`js/naslovnica.js`) sam broji vidljive slajdove i preskače elemente s atributom `hidden`. Od redizajna naslovnice (studeni 2026., „Izlog”) hero prikazuje primjere stranica za pet vrsta posla i više nema AI slajdova. Stari AI slajdovi (agent i asistent) sačuvani su u arhivi projekta, `arhiva/web/stari/index-prije-redizajna-izlog.html`; ako se AI vrati u hero, treba im napraviti slajd u novom obliku (fotografija i mobitel; laptop je iz hera maknut kad je naslov postao slogan). Na stranici Usluge skrivene usluge stoje na kraju popisa (VII. do IX.), pa se brojevi ne mijenjaju. Na naslovnici su u popisu usluga skriveni oglasi (VI.) i AI asistent (VII.).
 
 ## D premium s mobilnom aplikacijom (studeni 2026.)
 

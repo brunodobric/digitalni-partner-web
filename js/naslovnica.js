@@ -12,7 +12,7 @@
 })();
 
 // Karusel u heru: svaki slajd je druga vrsta posla (salon, kozmetika, trener, kafić, apartman).
-// Svaki element s atributom data-i (fotografija, primjer stranice na laptopu, mobitel s profilom, naslov) dobiva
+// Svaki element s atributom data-i (fotografija, mobitel s profilom, naziv vrste posla) dobiva
 // klasu is-active kad je njegov slajd na redu; prethodni dobiva was-active dok se novi ne pojavi.
 // Slajd stoji --slide-ms (u stil.css) i vrti se u krug. Staje na gumb, dok je hero izvan ekrana,
 // dok je kartica u pozadini i dok je fokus tipkovnicom u heru. Uz "smanjeno kretanje" ne vrti se sam, ali se može listati.

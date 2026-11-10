@@ -94,38 +94,9 @@ nav .wrap{display:flex;justify-content:space-between;align-items:center;height:7
 .green .note-min{color:var(--tekst-tam)}
 
 /* NASLOVNICA: HERO S KARUSELOM
-   Pet slajdova, svaki za drugu vrstu posla: velika fotografija prostora, ispred nje laptop s primjerom stranice
-   koja se sama skrola i mobitel s Google profilom. Skripta je u js/naslovnica.js.
-   Primjer web stranice (.bw) i mobitel s profilom (.ph) su HTML; mjere unutar njih su u cqw,
-   pa se cijeli prikaz skalira kao snimka zaslona. */
-
-/* ---------- Prozor preglednika s primjerom stranice ---------- */
-.bw{container-type:inline-size;background:#fff;border-radius:12px;overflow:hidden;
-  box-shadow:0 1px 2px rgba(11,11,12,.06),0 30px 70px -20px rgba(11,11,12,.35);border:1px solid rgba(11,11,12,.08)}
-.bw__top{display:flex;align-items:center;gap:1.1cqw;height:5.4cqw;padding:0 2cqw;background:#F1EFEA;border-bottom:1px solid rgba(11,11,12,.07)}
-.bw__top i{width:1.25cqw;height:1.25cqw;border-radius:50%;background:#D5D1C9}
-.bw__url{margin-left:2cqw;flex:1;max-width:44cqw;height:3.2cqw;border-radius:1.6cqw;background:#fff;font:500 1.55cqw/3.2cqw var(--sans);color:var(--grafit);padding-left:2.4cqw}
-.bw__view{position:relative;aspect-ratio:16/10;overflow:hidden}
-.ss{position:absolute;inset:0 0 auto 0;font-family:var(--sans);color:var(--oniks);background:#FBFAF8;will-change:transform}
-.ss__nav{display:flex;align-items:center;gap:3cqw;height:7cqw;padding:0 4cqw;font-size:1.7cqw}
-.ss__nav b{font-size:2.2cqw;letter-spacing:-.02em;margin-right:auto}
-.ss__links{display:flex;gap:2.6cqw;color:var(--grafit)}
-.ss__btn{padding:.9cqw 2cqw;background:var(--smaragd);color:#fff;font-weight:600}
-.ss__hero{position:relative;height:40cqw;margin:0 4cqw;overflow:hidden;border-radius:.8cqw}
-.ss__hero img{width:100%;height:100%;object-fit:cover;display:block}
-.ss__hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,11,12,.62),rgba(11,11,12,.05) 70%)}
-.ss__copy{position:absolute;z-index:1;left:4cqw;bottom:4cqw;width:52cqw;display:grid;gap:1.4cqw;color:#fff}
-.ss__kick{font:600 1.3cqw var(--sans);letter-spacing:.14em;text-transform:uppercase;opacity:.85}
-.ss__copy strong{font:700 3.9cqw/1.08 var(--sans);letter-spacing:-.02em}
-.ss__cta{justify-self:start;margin-top:.8cqw;padding:1.2cqw 2.4cqw;background:#fff;color:var(--oniks);font:600 1.5cqw var(--sans)}
-.ss__body{display:grid;grid-template-columns:1fr 2.1fr;gap:4cqw;padding:5cqw 4cqw 3cqw}
-.ss__h{display:block;font:600 1.3cqw var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--grafit);margin-bottom:1.6cqw}
-.ss__col ul{list-style:none;margin:0;padding:0;font-size:1.9cqw;font-weight:600}
-.ss__col li{padding:1.3cqw 0;border-bottom:1px solid rgba(11,11,12,.1)}
-.ss__gal{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4cqw}
-.ss__gal img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:.5cqw}
-.ss__foot{display:flex;justify-content:space-between;gap:4cqw;margin:0;padding:3cqw 4cqw;background:var(--oniks);color:#B9B6AF!important;border-top:1px solid rgba(11,11,12,.1);font-size:1.6cqw;color:var(--grafit)}
-.ss__foot span{color:#B9B6AF}.ss__foot span:first-child{color:#fff;font-weight:700}
+   Naslov (slogan) stoji na mjestu. Pet slajdova mijenja samo prizor, svaki za drugu vrstu posla:
+   uspravna fotografija posla i mobitel s pretragom na Googleu. Skripta je u js/naslovnica.js.
+   Mobitel s profilom (.ph) je HTML; mjere unutar njega su u cqw, pa se skalira kao snimka zaslona. */
 
 /* ---------- Mobitel s Google poslovnim profilom ---------- */
 .ph{container-type:inline-size;aspect-ratio:9/19;padding:3.2%;background:#141414;border-radius:15%/7.2%;
@@ -146,7 +117,7 @@ nav .wrap{display:flex;justify-content:space-between;align-items:center;height:7
 .gp__akcije span{display:grid;place-items:center;height:10cqw;border-radius:5cqw;border:1px solid rgba(11,11,12,.16);font:600 3.7cqw var(--sans);color:var(--smaragd)}
 .gp__akcije span:last-child{background:var(--smaragd);border-color:var(--smaragd);color:#fff}
 
-/* Kontrole karusela: gumb za pauzu, brojač i crtice napretka */
+/* Kontrole karusela: gumb za pauzu i crtice napretka */
 .pk-ctrl{display:flex;align-items:center;gap:16px}
 .pk-pause{width:44px;height:44px;margin:-8px;display:grid;place-items:center;background:none;border:0;cursor:pointer;color:inherit}
 .pk-pause i{width:10px;height:12px;border-left:2px solid currentColor;border-right:2px solid currentColor}
@@ -160,67 +131,56 @@ nav .wrap{display:flex;justify-content:space-between;align-items:center;height:7
 .is-paused .pk-dots button.is-active i{animation-play-state:paused}
 @keyframes pk-fill{to{transform:scaleX(1)}}
 .pk-init [data-i],.pk-init [data-i] *{transition:none!important}
-.pk-count{font:600 .74rem var(--sans);letter-spacing:.12em;font-variant-numeric:tabular-nums}
 
 @media(prefers-reduced-motion:reduce){
   .pk-dots button.is-active i{animation:none;transform:scaleX(1)}
 }
 
-/* dodatni dijelovi primjera stranice i profila */
-.ss__info{display:grid;grid-template-columns:1.3fr 1fr;gap:4cqw;margin:0 4cqw;padding:4cqw 0 5cqw;border-top:1px solid rgba(11,11,12,.1);font-size:1.7cqw;color:var(--grafit)}
-.ss__info .gp__map{height:20cqw;border-radius:.6cqw}
-.ss__info p{margin:0 0 1.2cqw}
-.ss__info p:first-of-type{color:var(--smaragd);font-weight:600}
-.ss__cta--tam{display:inline-block;margin-top:1.4cqw;background:var(--smaragd);color:#fff}
+/* dodatni dijelovi profila */
 .gp__h{display:block;font:600 3.2cqw var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--grafit);margin:4cqw 0 2cqw}
 .gp__usl i{display:inline-block;font-style:normal;margin:0 1.6cqw 1.6cqw 0;padding:1.6cqw 3cqw;border-radius:4cqw;background:#F1EFEA;font:500 3.6cqw var(--sans)}
 .gp__web{font:500 3.9cqw var(--sans);color:var(--smaragd);border-top:1px solid rgba(11,11,12,.1)}
 
-.b-hero{--slide-ms:7000ms;min-height:100vh;min-height:100svh;display:flex;align-items:center;
-  padding:calc(72px + env(safe-area-inset-top,0px) + clamp(24px,4vh,56px)) 0 clamp(56px,8vh,96px);overflow:hidden}
-.b-hero__in{width:100%;display:grid;grid-template-columns:minmax(0,4.4fr) minmax(0,7fr);gap:clamp(32px,5vw,80px);align-items:center}
-.b-copy{display:grid;gap:24px;align-content:center}
-.b-copy h1{font-size:.74rem;line-height:1.4;letter-spacing:.12em;font-weight:600}
-.b-naslovi{display:grid}
-.b-nas{grid-area:1/1;margin:0;font:800 clamp(2.1rem,3.8vw,3.3rem)/1.02 var(--sans);letter-spacing:-.03em;text-wrap:balance;
-  opacity:0;transform:translateY(14px);transition:opacity .5s,transform .8s cubic-bezier(.22,.61,.36,1)}
-.b-nas span{display:block;margin-bottom:16px;font:600 .8rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--smaragd)}
-.b-nas.is-active{opacity:1;transform:none;transition-delay:.3s}
-.b-lead{color:var(--grafit);max-width:32em}
+.b-hero{--slide-ms:6000ms;min-height:100vh;min-height:100svh;display:flex;align-items:center;
+  padding:calc(72px + env(safe-area-inset-top,0px) + clamp(24px,4vh,56px)) 0 clamp(48px,7vh,88px);overflow:hidden}
+.b-hero__in{width:100%;display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:clamp(40px,7vw,112px);align-items:center}
+.b-copy{display:grid;gap:28px;align-content:center;justify-items:start}
+.b-h1{font:800 clamp(2.5rem,5.2vw,4.5rem)/1 var(--sans);letter-spacing:-.035em;text-wrap:balance}
+.b-lead{color:var(--grafit);max-width:27em;font-size:1.06rem}
+.b-copy .btns{align-items:center;gap:14px 32px;margin-top:8px}
+.b-vise{display:inline-flex;align-items:center;min-height:44px;font:600 .8rem var(--sans);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--oniks);text-decoration:underline;text-decoration-color:var(--zlato);text-decoration-thickness:1px;text-underline-offset:8px;transition:color .25s}
+.b-vise:hover{color:var(--smaragd)}
 
-/* Scena: fotografija kao zid, ispred laptop i mobitel */
-.b-scena{position:relative;aspect-ratio:7/6}
-.b-zid{position:absolute;top:0;right:0;width:78%;height:86%;overflow:hidden;background:#d8d4cc}
+/* Scena: jedna uspravna fotografija posla, a preko njezina ruba mobitel s pretragom na Googleu */
+.b-desno{display:grid;gap:20px}
+.b-scena{position:relative;aspect-ratio:5/6}
+.b-zid{position:absolute;top:0;right:0;width:82%;height:100%;overflow:hidden;background:#d8d4cc}
 .b-foto{position:absolute;inset:0;margin:0;opacity:0;transition:opacity 1.2s ease}
-.b-foto img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.08)}
+.b-foto img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.06)}
 .b-foto.is-active{opacity:1}
 .b-foto.is-active img{animation:b-kb calc(var(--slide-ms) + 1500ms) ease-out forwards}
 @keyframes b-kb{to{transform:scale(1)}}
 
-.b-lap{position:absolute;left:0;bottom:9%;width:78%;filter:drop-shadow(0 40px 50px rgba(11,11,12,.32))}
-.b-lap__ekran{position:relative;padding:2.2% 2.2% 2.6%;background:#161616;border-radius:14px 14px 4px 4px;aspect-ratio:16/10.9}
-.b-lap__ekran::before{content:"";position:absolute;top:.9%;left:50%;width:.9%;aspect-ratio:1;border-radius:50%;background:#2c2c2c;transform:translateX(-50%)}
-.b-lap__baza{height:0;padding-bottom:3.4%;margin:0 -7%;background:linear-gradient(#d9d6d0,#bdb9b1);border-radius:0 0 18px 18px/0 0 60% 60%;position:relative}
-.b-lap__baza::before{content:"";position:absolute;left:50%;top:0;width:15%;height:40%;transform:translateX(-50%);background:#a9a59d;border-radius:0 0 8px 8px}
-.b-ekr{position:absolute;inset:2.2% 2.2% 2.6%;border-radius:3px;box-shadow:none;border:0;opacity:0;clip-path:inset(0 0 100% 0);transition:clip-path .9s cubic-bezier(.7,0,.2,1),opacity 0s .9s}
-.b-ekr .bw__view{aspect-ratio:auto;position:absolute;inset:5.4cqw 0 0 0}
-.b-ekr.is-active{opacity:1;clip-path:inset(0);transition:clip-path 1s .15s cubic-bezier(.7,0,.2,1),opacity 0s;z-index:1}
-.b-ekr.was-active{opacity:1;clip-path:inset(0)}
-.b-ekr.is-active .ss{animation:b-skrol calc(var(--slide-ms) - 400ms) 1.6s cubic-bezier(.45,0,.25,1) forwards}
-@keyframes b-skrol{0%,18%{transform:none}62%{transform:translateY(-40%)}100%{transform:translateY(-40%)}}
+.b-tel{position:absolute;left:0;bottom:7%;width:38%;aspect-ratio:9/19}
+.b-ph{position:absolute;inset:0;opacity:0;transform:translateY(28px);transition:opacity .6s,transform .9s cubic-bezier(.22,.61,.36,1)}
+.b-ph.is-active{opacity:1;transform:none;transition-delay:.35s;z-index:1}
+.is-paused .b-foto.is-active img{animation-play-state:paused}
 
-.b-tel{position:absolute;right:4%;bottom:0;width:23%;aspect-ratio:9/19}
-.b-ph{position:absolute;inset:0;opacity:0;transform:translateY(40px);transition:opacity .6s,transform .9s cubic-bezier(.22,.61,.36,1)}
-.b-ph.is-active{opacity:1;transform:none;transition-delay:.7s;z-index:1}
-.is-paused .b-ekr.is-active .ss,.is-paused .b-foto.is-active img{animation-play-state:paused}
+/* Ispod scene: vrsta posla na slajdu, crtice napretka i pauza */
+.b-desno .pk-ctrl{padding-left:18%;gap:20px}
+.b-vrste{display:grid;margin-right:auto}
+.b-vrsta{grid-area:1/1;font:600 .74rem/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--smaragd);white-space:nowrap;opacity:0;transition:opacity .5s}
+.b-vrsta.is-active{opacity:1;transition-delay:.3s}
+.b-desno .pk-dots button{width:28px}
 
 @media(max-width:900px){
-  .b-hero{min-height:0;display:block}
-  .b-hero__in{grid-template-columns:1fr}
-  .b-scena{order:-1;aspect-ratio:1/1;margin:0 calc(-1 * var(--pad)) 8px}
-  .b-zid{width:86%;height:80%}
-  .b-lap{width:84%;left:3%}
-  .b-tel{width:27%;right:3%}
+  .b-hero{min-height:0;display:block;padding-top:calc(72px + env(safe-area-inset-top,0px) + 40px)}
+  .b-hero__in{grid-template-columns:1fr;gap:48px}
+  .b-copy{gap:22px}
+  .b-scena{aspect-ratio:1/1}
+  .b-tel{width:34%;bottom:6%}
+  .b-desno .pk-dots button{width:22px}
 }
 
 /* Traka "za koga radimo": fotografije koje polako putuju */
@@ -237,8 +197,8 @@ nav .wrap{display:flex;justify-content:space-between;align-items:center;height:7
 @keyframes b-film{to{transform:translateX(calc(-50% - 10px))}}
 
 @media(prefers-reduced-motion:reduce){
-  .b-nas,.b-foto,.b-ekr,.b-ph{transition:none!important}
-  .b-foto img,.b-ekr .ss{animation:none!important;transform:none!important}
+  .b-vrsta,.b-foto,.b-ph{transition:none!important}
+  .b-foto img{animation:none!important;transform:none!important}
   .b-film{overflow-x:auto}
   .b-film__red{animation:none}
 }
