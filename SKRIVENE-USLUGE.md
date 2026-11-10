@@ -24,3 +24,8 @@ Karusel na naslovnici (`js/naslovnica.js`) sam broji vidljive slajdove i preska�
 ## D premium s mobilnom aplikacijom (studeni 2026.)
 
 U cjeniku i na naslovnici je vidljiv novi D premium (899 € mjesečno, ugovor najmanje 6 mjeseci, sve iz D plus, dvije podstranice, održavanje mobilne aplikacije i izrada aplikacije od 2.999 € jednokratno umjesto od 4.999 €). Stari D premium s oglasima i AI-em ostao je skriven odmah ispod njega. Kad se vrate oglasi i AI, treba odlučiti koji sastav paketa ostaje, a drugi obrisati.
+
+## Slika za dijeljenje i strukturirani podaci (SEO, studeni 2026.)
+
+- `slike/og-slika.png` (pregled kad se poveznica podijeli na Facebooku, WhatsAppu i sl.) više ne spominje oglase ni AI. Izvor je u zajedničkoj mapi projekta, `web/izvor/og/og-slika.html`; kad se usluge vrate, tamo promijeniti podnaslov i ponovno izraditi sliku (`node render.js izlaz.png`).
+- JSON-LD na `usluge.html` i `cjenik.html` (popis usluga s cijenama) sadrži samo vidljive usluge. Kad se oglasi ili AI vrate, dodati ih i tamo, s istim cijenama kao u cjeniku.

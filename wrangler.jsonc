@@ -1,11 +1,13 @@
 // Cloudflare: web je statička stranica bez serverskog koda, sve datoteke iz korijena repozitorija idu kao statičke datoteke.
+// not_found_handling: nepostojeća adresa vraća 404.html sa statusom 404, pa je tražilice ne indeksiraju kao pravu stranicu.
 // Blok "previews" treba da bi probne verzije za grane (npx wrangler preview) radile.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "digitalni-partner-web",
   "compatibility_date": "2026-10-23",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "not_found_handling": "404-page"
   },
   "observability": {
     "enabled": true

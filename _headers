@@ -1,3 +1,9 @@
 # Pravi web je na https://digitalnipartner.hr. Adrese na workers.dev (glavna i probne verzije) tražilice ne indeksiraju.
 https://:ime.bruno-dobric32.workers.dev/*
   X-Robots-Tag: noindex
+
+# Fontovi se ne mijenjaju, a slike rijetko: preglednik ih čuva u predmemoriji pa se stranica brže otvara pri ponovnom posjetu.
+/fontovi/*
+  Cache-Control: public, max-age=31536000, immutable
+/slike/*
+  Cache-Control: public, max-age=604800
