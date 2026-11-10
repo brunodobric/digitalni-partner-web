@@ -263,23 +263,55 @@ document.documentElement.classList.add("js-menu");
   </div>
 </section>
 
-<section id="usluge">
-  <div class="wrap split">
-    <div class="head">
-      <span class="label">Usluge</span>
-      <h2>Što točno dobijete i koliko stoji.</h2>
-      <p>Možete naručiti samo web stranicu ili uz nju i ostale usluge. Paketi su ispod, a sve cijene u cjeniku.</p>
-      <div class="btns"><a class="btn outline" href="cjenik.html">Pogledajte cjenik</a></div>
+<section id="usluge" class="dp-ik-sek">
+  <div class="wrap">
+    <div class="head dp-ik-sek__head">
+      <span class="label">Što nudimo</span>
+      <h2>Digitalni paket za uspjeh.</h2>
+      <p>Stranica, Google profil, održavanje, vidljivost na tražilicama i aplikacija rade zajedno. Ponudu smo podijelili u D pakete, od D starta do D premiuma, koji se razlikuju po opsegu.</p>
     </div>
-    <div class="svc-list">
-      <article class="svc"><span class="n">I.</span><h3>Web stranica po mjeri</h3><p>Usluge, cjenik, fotografije i kontakt s lokacijom i gumbom za poziv, a po potrebi i online rezervacija. 599 €, jednokratno.</p></article>
-      <article class="svc"><span class="n">II.</span><h3>Google poslovni profil</h3><p>Profil s pravim radnim vremenom, fotografijama, uslugama i poveznicom na stranicu. Postavljanje 199 €, održavanje 99 € mjesečno.</p></article>
-      <article class="svc"><span class="n">III.</span><h3>Održavanje, domena i hosting</h3><p>Brinemo se da stranica radi, a sitne izmjene poput novog cjenika unosimo mi. 49 € mjesečno.</p></article>
-      <article class="svc"><span class="n">IV.</span><h3>SEO i GEO optimizacija</h3><p>Da Vas pronađu Google i AI tražilice poput ChatGPT-a, primjerice za „frizer Trešnjevka”. 199 € mjesečno za svaku.</p></article>
-      <article class="svc"><span class="n">V.</span><h3>Mobilne aplikacije</h3><p>Kad Vam stranica nije dovoljna, aplikacija za iOS i Android. Od 4.999 €, jednokratno, a uz paket D premium od 2.999 €.</p></article>
-      <article class="svc" hidden data-skriveno="oglasi"><span class="n">VI.</span><h3>Google i Meta oglasi</h3><p>Kampanje na Googleu, Facebooku i Instagramu, uz Vaš budžet. Oglase izrađujemo od Vaših fotografija i snimki. Google oglasi 249 €, Meta oglasi 199 € mjesečno.</p></article>
-      <article class="svc" hidden data-skriveno="ai"><span class="n">VII.</span><h3>AI asistent</h3><p>Na web stranici ili na WhatsAppu odgovara na česta pitanja i zakazuje termine. Postavljanje od 299 €, održavanje 99 € mjesečno.</p></article>
-    </div>
+    <!-- PAKET: usluge u jednom redu, svaka s vlastitim crtežom (inline SVG u bojama brenda). Na mobitelu se red lista prstom. -->
+    <ol class="dp-niz" tabindex="0" aria-label="Usluge u paketu">
+      <li class="dp-st">
+        <svg class="dp-ik" viewBox="0 0 96 96" aria-hidden="true"><rect x="6" y="16" width="84" height="62" rx="3"/><path d="M6 27h84"/><circle cx="13" cy="21.5" r="1.4" class="f"/><circle cx="18.5" cy="21.5" r="1.4" class="f"/><circle cx="24" cy="21.5" r="1.4" class="f"/>
+<rect x="14" y="34" width="68" height="24" rx="1.5"/><path d="M20 42h30M20 48h22"/><rect x="20" y="52" width="14" height="3" class="g"/><path d="M14 66h18M14 71h12M58 66h24M58 71h18" class="t"/></svg>
+        <span class="n">I.</span>
+        <h3>Web stranica po mjeri</h3>
+        <p>Usluge, cjenik, fotografije, kontakt i gumb za poziv, a po potrebi i online rezervacija.</p>
+      </li>
+      <li class="dp-st">
+        <svg class="dp-ik" viewBox="0 0 96 96" aria-hidden="true"><rect x="26" y="6" width="44" height="84" rx="8"/><path d="M42 11h12"/><path d="M26 44h44"/><path d="M48 18c-5 0-8.5 3.6-8.5 8.2 0 5.8 8.5 13.3 8.5 13.3s8.5-7.5 8.5-13.3C56.5 21.6 53 18 48 18z" class="g"/><circle cx="48" cy="26.4" r="2.6" class="b"/>
+<path d="M33 52h22M33 58h14" /><path d="M33 64h10" class="gl"/><rect x="33" y="71" width="9" height="6" rx="3"/><rect x="44" y="71" width="9" height="6" rx="3"/><rect x="55" y="71" width="9" height="6" rx="3" class="f"/></svg>
+        <span class="n">II.</span>
+        <h3>Google poslovni profil</h3>
+        <p>Pravo radno vrijeme, fotografije i usluge, s poveznicom na Vašu stranicu.</p>
+      </li>
+      <li class="dp-st">
+        <svg class="dp-ik" viewBox="0 0 96 96" aria-hidden="true"><rect x="12" y="10" width="56" height="74" rx="2"/><path d="M20 22h24" /><path d="M20 34h18M20 46h18M20 58h18" /><path d="M42 34h10M42 58h10" class="t"/><path d="M42 46h10" class="gl"/><path d="M57 34h3M57 58h3"/>
+<path d="M58 72l24-24 6 6-24 24-8 2z" /><path d="M76 54l6 6"/><path d="M58 72l6 6" class="gl"/></svg>
+        <span class="n">III.</span>
+        <h3>Održavanje, domena i hosting</h3>
+        <p>Brinemo se da stranica radi, a novi cjenik ili radno vrijeme unosimo mi.</p>
+      </li>
+      <li class="dp-st">
+        <svg class="dp-ik" viewBox="0 0 96 96" aria-hidden="true"><rect x="8" y="10" width="80" height="16" rx="8"/><circle cx="20" cy="18" r="4"/><path d="M23 21l3 3"/><path d="M32 18h22"/>
+<path d="M12 36v14" class="gl"/><path d="M18 38h40M18 44h28M18 49h34" /><path d="M12 58h46M12 64h30" class="t"/>
+<path d="M50 70h36a3 3 0 013 3v12a3 3 0 01-3 3H62l-7 5v-5h-5a3 3 0 01-3-3V73a3 3 0 013-3z"/><path d="M54 77h26M54 82h16" class="t"/></svg>
+        <span class="n">IV.</span>
+        <h3>SEO i GEO optimizacija</h3>
+        <p>Da Vas pronađu Google i AI tražilice poput ChatGPT-a, primjerice za „frizer Trešnjevka”.</p>
+      </li>
+      <li class="dp-st">
+        <svg class="dp-ik" viewBox="0 0 96 96" aria-hidden="true"><rect x="26" y="6" width="44" height="84" rx="8"/><path d="M42 11h12"/><path d="M33 22h16"/><rect x="33" y="30" width="30" height="18" rx="3" class="f"/><path d="M37 36h12" class="w"/><path d="M37 42h18" class="w"/>
+<path d="M33 58h8M44 58h8" class="gl"/><path d="M55 58h8" class="t"/><rect x="33" y="74" width="30" height="8" rx="4"/></svg>
+        <span class="n">V.</span>
+        <h3>Mobilna aplikacija</h3>
+        <p>Aplikacija za iOS i Android, kad Vam stranica više nije dovoljna.</p>
+      </li>
+      <li class="dp-st" hidden data-skriveno="oglasi"><span class="n">VI.</span><h3>Google i Meta oglasi</h3><p>Kampanje na Googleu, Facebooku i Instagramu, izrađene od Vaših fotografija i snimki.</p></li>
+      <li class="dp-st" hidden data-skriveno="ai"><span class="n">VII.</span><h3>AI asistent</h3><p>Na web stranici ili na WhatsAppu odgovara na česta pitanja i zakazuje termine.</p></li>
+    </ol>
+    <div class="btns dp-ik-sek__btns"><a class="btn primary" href="#cijene">Pogledajte D pakete</a><a class="btn outline" href="usluge.html">Sve o uslugama</a></div>
   </div>
 </section>
 
