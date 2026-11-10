@@ -338,7 +338,7 @@ input[aria-invalid="true"],textarea[aria-invalid="true"]{border-bottom:2px solid
 /* O NAMA */
 .about-p{margin-top:28px;font:500 clamp(1.45rem,2.9vw,2.2rem)/1.32 var(--sans);letter-spacing:-.015em;max-width:26em}
 .facts{margin-top:clamp(48px,6vw,72px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;border-top:1px solid var(--linija);padding-top:32px}
-.facts h3{font-size:1.2rem;margin-bottom:8px}
+.facts h2{font-size:1.2rem;margin-bottom:8px}
 .facts p{color:var(--grafit)}
 @media(max-width:820px){.facts{grid-template-columns:1fr}}
 

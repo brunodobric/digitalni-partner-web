@@ -18,11 +18,38 @@
 <meta property="og:image" content="https://digitalnipartner.hr/slike/og-slika.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="Digitalni partner: web stranice, Google profil i mobilne aplikacije za poduzetnike">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="slike/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="slike/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="slike/apple-touch-icon.png">
 <link rel="preload" href="fontovi/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="stil.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Naslovna",
+     "item": "https://digitalnipartner.hr/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Pravne informacije",
+     "item": "https://digitalnipartner.hr/pravne-informacije"
+    }
+   ]
+  }
+ ]
+}
+</script>
 <script>
 document.documentElement.classList.add("js-menu");
 (function(){
@@ -44,9 +71,9 @@ document.documentElement.classList.add("js-menu");
 <a class="skip" href="#sadrzaj">Preskoči na sadržaj</a>
 <nav>
   <div class="wrap">
-    <a class="brand" href="index.html" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
+    <a class="brand" href="/" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
     <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
-    <div class="links" id="izbornik"><a class="home-link" href="index.html">Naslovna</a><a href="o-nama.html">O nama</a><a href="usluge.html">Usluge</a><a href="cjenik.html">Cjenik</a><a class="cta" href="kontakt.html">Kontakt</a></div>
+    <div class="links" id="izbornik"><a class="home-link" href="/">Naslovna</a><a href="/o-nama">O nama</a><a href="/usluge">Usluge</a><a href="/cjenik">Cjenik</a><a class="cta" href="/kontakt">Kontakt</a></div>
   </div>
 </nav>
 
@@ -78,7 +105,7 @@ document.documentElement.classList.add("js-menu");
         <p>Voditelj obrade je obrt naveden u podacima iznad. Za sve što se tiče Vaših podataka pišite na <a class="txt-link" href="mailto:info@digitalnipartner.hr">info@digitalnipartner.hr</a>.</p>
 
         <h3>Koje podatke prikupljamo</h3>
-        <p>Kroz obrazac na stranici <a class="txt-link" href="kontakt.html">Kontakt</a> prikupljamo ime i prezime, e-mail adresu, broj telefona ako ga upišete i sadržaj poruke. Druge podatke od Vas ne tražimo.</p>
+        <p>Kroz obrazac na stranici <a class="txt-link" href="/kontakt">Kontakt</a> prikupljamo ime i prezime, e-mail adresu, broj telefona ako ga upišete i sadržaj poruke. Druge podatke od Vas ne tražimo.</p>
         <p>Poslužitelj na kojem je stranica, kao i svaki drugi, bilježi tehničke podatke o posjetu: IP adresu, vrijeme i preglednik. Ti podaci služe za sigurnost i ispravan rad stranice.</p>
 
         <h3>Zašto i na kojoj osnovi</h3>
@@ -106,7 +133,7 @@ document.documentElement.classList.add("js-menu");
 <footer>
   <div class="wrap">
     <div class="f-brand"><span class="mono">dp</span><span>© <span id="y"></span> Digitalni partner</span></div>
-    <a class="f-link" href="pravne-informacije.html">Pravne informacije</a>
+    <a class="f-link" href="/pravne-informacije">Pravne informacije</a>
     <span class="f-sl">Digitalno. Po mjeri.</span>
   </div>
 </footer>
