@@ -3,23 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kontakt · Digitalni partner</title>
-<meta name="description" content="Pošaljite upit Digitalnom partneru: napišite čime se bavite i što Vam treba, a mi Vam se javljamo s prijedlogom.">
+<title>Kontakt i upit za web stranicu · Digitalni partner</title>
+<link rel="canonical" href="https://digitalnipartner.hr/kontakt">
+<meta name="description" content="Pošaljite upit za web stranicu, Google profil ili paket. Napišite čime se bavite i što Vam treba, a mi Vam se javljamo s prijedlogom. Upit Vas ne obvezuje.">
 <meta name="theme-color" content="#E7E4DE">
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="hr_HR">
 <meta property="og:site_name" content="Digitalni partner">
-<meta property="og:title" content="Kontakt · Digitalni partner">
-<meta property="og:description" content="Pošaljite upit Digitalnom partneru: napišite čime se bavite i što Vam treba, a mi Vam se javljamo s prijedlogom.">
-<meta property="og:image" content="slike/og-slika.png">
+<meta property="og:url" content="https://digitalnipartner.hr/kontakt">
+<meta property="og:title" content="Kontakt i upit za web stranicu · Digitalni partner">
+<meta property="og:description" content="Pošaljite upit za web stranicu, Google profil ili paket. Napišite čime se bavite i što Vam treba, a mi Vam se javljamo s prijedlogom. Upit Vas ne obvezuje.">
+<meta property="og:image" content="https://digitalnipartner.hr/slike/og-slika.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="Digitalni partner: web stranice, Google profil i mobilne aplikacije za poduzetnike">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="slike/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="slike/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="slike/apple-touch-icon.png">
 <link rel="preload" href="fontovi/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="stil.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Naslovna",
+     "item": "https://digitalnipartner.hr/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Kontakt",
+     "item": "https://digitalnipartner.hr/kontakt"
+    }
+   ]
+  }
+ ]
+}
+</script>
 <script>
 document.documentElement.classList.add("js-menu");
 (function(){
@@ -41,9 +70,9 @@ document.documentElement.classList.add("js-menu");
 <a class="skip" href="#sadrzaj">Preskoči na sadržaj</a>
 <nav>
   <div class="wrap">
-    <a class="brand" href="index.html" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
+    <a class="brand" href="/" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
     <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
-    <div class="links" id="izbornik"><a class="home-link" href="index.html">Naslovna</a><a href="o-nama.html">O nama</a><a href="usluge.html">Usluge</a><a href="cjenik.html">Cjenik</a><a class="cta on" aria-current="page" href="kontakt.html">Kontakt</a></div>
+    <div class="links" id="izbornik"><a class="home-link" href="/">Naslovna</a><a href="/o-nama">O nama</a><a href="/usluge">Usluge</a><a href="/cjenik">Cjenik</a><a class="cta on" aria-current="page" href="/kontakt">Kontakt</a></div>
   </div>
 </nav>
 
@@ -63,7 +92,7 @@ document.documentElement.classList.add("js-menu");
       <div class="field"><label for="poruka">Poruka</label><textarea id="poruka" name="poruka" aria-describedby="poruka-err" required></textarea><p class="err" id="poruka-err"></p></div>
       <button class="btn primary" type="submit">Pošaljite upit</button>
       <p id="msg" role="status"></p>
-      <p class="privacy-note">Podatke iz upita koristimo samo da Vam odgovorimo. Više u <a class="txt-link" href="pravne-informacije.html#privatnost">politici privatnosti</a>.</p>
+      <p class="privacy-note">Podatke iz upita koristimo samo da Vam odgovorimo. Više u <a class="txt-link" href="/pravne-informacije#privatnost">politici privatnosti</a>.</p>
     </form>
   </div>
 </section>
@@ -72,7 +101,7 @@ document.documentElement.classList.add("js-menu");
 <footer>
   <div class="wrap">
     <div class="f-brand"><span class="mono">dp</span><span>© <span id="y"></span> Digitalni partner</span></div>
-    <a class="f-link" href="pravne-informacije.html">Pravne informacije</a>
+    <a class="f-link" href="/pravne-informacije">Pravne informacije</a>
     <span class="f-sl">Digitalno. Po mjeri.</span>
   </div>
 </footer>

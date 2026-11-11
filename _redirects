@@ -1,0 +1,10 @@
+# Podstranice su privremeno skrivene (studeni 2026.): web je samo naslovnica. Datoteke su ostale u repozitoriju.
+# 302 jer je privremeno. Kako ih vratiti: SKRIVENE-USLUGE.md, odlomak "Skrivene podstranice".
+/usluge /#usluge 302
+/usluge.html /#usluge 302
+/cjenik /#cijene 302
+/cjenik.html /#cijene 302
+/o-nama / 302
+/o-nama.html / 302
+/kontakt /#kontakt 302
+/kontakt.html /#kontakt 302

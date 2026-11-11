@@ -11,55 +11,55 @@
   window.addEventListener("resize", update);
 })();
 
-// Karusel u heru: slajd se mijenja svakih 5 s (--slide-ms u CSS-u) i vrti se u krug.
-// Naslov, podnaslov, vizual i traka usluga mijenjaju se zajedno. Staje na gumb, dok je hero izvan ekrana,
+// Karusel u heru: svaki slajd je druga vrsta posla (salon, kozmetika, trener, kafić, apartman).
+// Svaki element s atributom data-i (fotografija, mobitel s profilom, naziv vrste posla) dobiva
+// klasu is-active kad je njegov slajd na redu; prethodni dobiva was-active dok se novi ne pojavi.
+// Slajd stoji --slide-ms (u stil.css) i vrti se u krug. Staje na gumb, dok je hero izvan ekrana,
 // dok je kartica u pozadini i dok je fokus tipkovnicom u heru. Uz "smanjeno kretanje" ne vrti se sam, ali se može listati.
 (function () {
-  const hero     = document.querySelector('.kar');
+  const hero = document.querySelector('.b-hero');
   if (!hero) return;
-  const slides   = [...hero.querySelectorAll('.slide')];
-  const titles   = [...hero.querySelectorAll('.kar__title')];
-  const leads    = [...hero.querySelectorAll('.kar__lead')];
-  const services = [...hero.querySelectorAll('.services li[data-for]')];
-  const dotsWrap = document.getElementById('dots');
-  const countNow = document.getElementById('countNow');
-  const stage    = document.getElementById('stage');
-
-  const DURATION = parseInt(getComputedStyle(hero).getPropertyValue('--slide-ms'), 10) || 5000;
+  // Skriveni elementi (atribut hidden, vidi SKRIVENE-USLUGE.md) ne ulaze u karusel
+  const items = [...hero.querySelectorAll('[data-i]:not([hidden])')];
+  const n = Math.max(...items.map(el => +el.dataset.i)) + 1;
+  const dotsWrap = hero.querySelector('.pk-dots');
+  const countNow = hero.querySelector('.pk-now');
+  const countAll = hero.querySelector('.pk-all');
+  const scena    = hero.querySelector('.b-scena');
+  const DURATION = parseInt(getComputedStyle(hero).getPropertyValue('--slide-ms'), 10) || 7000;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (countAll) countAll.textContent = String(n).padStart(2, '0');
 
-  let current = 0, timer = null, startedAt = 0, remaining = DURATION, paused = false;
+  let current = -1, timer = null, startedAt = 0, remaining = DURATION;
 
   // Crtice napretka (ujedno gumbi za odabir slajda)
-  const dots = slides.map((_, i) => {
+  const dots = Array.from({ length: n }, (_, i) => {
     const li = document.createElement('li');
     const b = document.createElement('button');
-    b.className = 'kar__dot';
     b.type = 'button';
     b.setAttribute('aria-label', 'Prikaži slajd ' + (i + 1));
     b.innerHTML = '<i></i>';
-    b.addEventListener('click', () => { goTo(i); if (paused) remaining = DURATION; else restart(); });
+    b.addEventListener('click', () => { goTo(i); if (reasons.size) remaining = DURATION; else schedule(DURATION); });
     li.appendChild(b); dotsWrap.appendChild(li);
     return b;
   });
 
-  function setActive(list, i) { list.forEach((el, n) => el.classList.toggle('is-active', n === i)); }
-
   function goTo(i) {
-    current = (i + slides.length) % slides.length;
-    setActive(slides, current);
-    setActive(titles, current);
-    setActive(leads, current);
-    services.forEach(li => li.classList.toggle('is-active', +li.dataset.for === current));
-    dots.forEach((d, n) => {
-      d.classList.toggle('is-done', n < current);
-      d.classList.remove('is-active');
-      d.setAttribute('aria-current', n === current ? 'true' : 'false');
+    const prev = current;
+    current = (i + n) % n;
+    items.forEach(el => {
+      const k = +el.dataset.i;
+      el.classList.toggle('is-active', k === current);
+      el.classList.toggle('was-active', k === prev && k !== current);
     });
-    // ponovno pokreni animaciju crtice na aktivnom slajdu
-    void dots[current].offsetWidth;
+    dots.forEach((d, k) => {
+      d.classList.toggle('is-done', k < current);
+      d.classList.remove('is-active');
+      d.setAttribute('aria-current', k === current ? 'true' : 'false');
+    });
+    void dots[current].offsetWidth;   // ponovno pokreni animaciju crtice
     dots[current].classList.add('is-active');
-    countNow.textContent = String(current + 1).padStart(2, '0');
+    if (countNow) countNow.textContent = String(current + 1).padStart(2, '0');
   }
 
   function schedule(ms) {
@@ -69,11 +69,9 @@
     remaining = ms;
     timer = setTimeout(() => { goTo(current + 1); schedule(DURATION); }, ms);
   }
-  function restart() { schedule(DURATION); }
 
-  // Karusel stoji iz više razloga odjednom (gumb, kartica u pozadini, hero izvan ekrana, fokus tipkovnicom).
-  // Vrti se tek kad nijedan razlog ne vrijedi, pa ga nijedan događaj ne može ostaviti zaglavljenog.
-  // Prelazak mišem namjerno NE zaustavlja karusel: vizual zauzima pola ekrana i miš je često na njemu.
+  // Karusel stoji iz više razloga odjednom; vrti se tek kad nijedan ne vrijedi.
+  // Prelazak mišem namjerno NE zaustavlja karusel: scena zauzima pola ekrana i miš je često na njoj.
   const reasons = new Set();
   function setReason(name, on, freshSlide) {
     const was = reasons.size > 0;
@@ -88,11 +86,10 @@
       if (freshSlide || remaining < 400) { goTo(current); schedule(DURATION); }  // crtica kreće ispočetka
       else schedule(remaining);
     }
-    paused = now;
   }
 
   // Gumb za zaustavljanje (pristupačnost: sadržaj koji se sam mijenja mora se moći zaustaviti)
-  const pauseBtn = hero.querySelector('.kar__pause');
+  const pauseBtn = hero.querySelector('.pk-pause');
   if (pauseBtn) {
     if (reduceMotion) pauseBtn.hidden = true;
     pauseBtn.addEventListener('click', () => {
@@ -103,10 +100,7 @@
     });
   }
 
-  // Kartica u pozadini
   document.addEventListener('visibilitychange', () => setReason('hidden', document.hidden));
-
-  // Hero izvan ekrana: kad se vrati, trenutni slajd dobiva punih 5 sekundi
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(e => setReason('offscreen', !e[0].isIntersecting, true), { threshold: 0.2 }).observe(hero);
   }
@@ -124,16 +118,26 @@
     if (e.key === 'ArrowLeft')  { goTo(current - 1); remaining = DURATION; }
   });
 
-  // Povlačenje prstom na mobitelu
+  // Povlačenje prstom po sceni na mobitelu
   let touchX = null;
-  stage.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
-  stage.addEventListener('touchend', e => {
+  scena.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  scena.addEventListener('touchend', e => {
     if (touchX === null) return;
     const dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 40) { goTo(current + (dx < 0 ? 1 : -1)); if (paused) remaining = DURATION; else restart(); }
+    if (Math.abs(dx) > 40) { goTo(current + (dx < 0 ? 1 : -1)); if (reasons.size) remaining = DURATION; else schedule(DURATION); }
     touchX = null;
   });
 
+  // Prvi slajd se prikaže odmah, bez prijelaza
+  hero.classList.add('pk-init');
   goTo(0);
   schedule(DURATION);
+  requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.remove('pk-init')));
+})();
+
+// Traka fotografija "Za koga radimo": popis se udvostruči da putuje bez prekida (uz smanjeno kretanje stoji i može se listati)
+(function () {
+  const red = document.querySelector('.b-film__red');
+  if (!red || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  [...red.children].forEach(li => { const k = li.cloneNode(true); k.setAttribute('aria-hidden', 'true'); red.appendChild(k); });
 })();
