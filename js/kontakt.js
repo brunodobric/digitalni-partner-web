@@ -8,6 +8,16 @@
   var f = document.getElementById("cform"), msg = document.getElementById("msg");
   var plan = new URLSearchParams(location.search).get("plan");
   if(plan && !f.poruka.value.trim()) f.poruka.value = "Zanima me: " + plan + ".";
+  // Gumbi "Odaberite D ..." na naslovnici vode na obrazac na istoj stranici: upisuju paket bez ponovnog učitavanja
+  document.querySelectorAll('a[href^="/?plan="]').forEach(function(a){
+    a.addEventListener("click", function(ev){
+      if(location.pathname !== "/") return;
+      ev.preventDefault();
+      f.poruka.value = "Zanima me: " + new URLSearchParams(a.search).get("plan") + ".";
+      document.getElementById("kontakt").scrollIntoView();
+      f.ime.focus({preventScroll:true});
+    });
+  });
 
   // Provjera po polju: poruka o grešci stoji ispod polja koje nije ispravno
   var PRAVILA = {

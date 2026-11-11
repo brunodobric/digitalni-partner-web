@@ -63,7 +63,7 @@ Digitalni partner izrađuje web stranice i mobilne aplikacije, postavlja Google 
     "@type": "ContactPoint",
     "contactType": "customer service",
     "email": "info@digitalnipartner.hr",
-    "url": "https://digitalnipartner.hr/kontakt",
+    "url": "https://digitalnipartner.hr/#kontakt",
     "availableLanguage": "hr"
    }
   },
@@ -103,7 +103,7 @@ document.documentElement.classList.add("js-menu");
   <div class="wrap">
     <a class="brand" href="/" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
     <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
-    <div class="links" id="izbornik"><a class="home-link on" aria-current="page" href="/">Naslovna</a><a href="/o-nama">O nama</a><a href="/usluge">Usluge</a><a href="/cjenik">Cjenik</a><a class="cta" href="/kontakt">Kontakt</a></div>
+    <div class="links" id="izbornik"><a class="home-link on" aria-current="page" href="/">Naslovna</a><a hidden data-skriveno="podstranice" href="/o-nama">O nama</a><a hidden data-skriveno="podstranice" href="/usluge">Usluge</a><a hidden data-skriveno="podstranice" href="/cjenik">Cjenik</a><a class="cta" hidden data-skriveno="podstranice" href="/kontakt">Kontakt</a><a data-privremeno="podstranice" href="/#usluge">Usluge</a><a data-privremeno="podstranice" href="/#cijene">Cjenik</a><a class="cta" data-privremeno="podstranice" href="/#kontakt">Kontakt</a></div>
   </div>
 </nav>
 
@@ -120,7 +120,7 @@ document.documentElement.classList.add("js-menu");
       <p class="label">Web stranice i Google profil za poduzetnike</p>
       <h1 class="b-h1">Neka Vas klijenti pronađu prije konkurencije.</h1>
       <p class="b-lead">Kad netko na Googleu traži frizera, trenera ili apartman u Vašem kraju, prvo treba naići na Vas. Za to se brinemo mi.</p>
-      <div class="btns"><a class="btn primary" href="/kontakt">Javite nam se</a><a class="b-vise" href="#cijene">Pogledajte pakete</a></div>
+      <div class="btns"><a class="btn primary" href="#kontakt">Javite nam se</a><a class="b-vise" href="#cijene">Pogledajte pakete</a></div>
     </div>
 
     <div class="b-desno">
@@ -292,7 +292,7 @@ document.documentElement.classList.add("js-menu");
       <li class="dp-st" hidden data-skriveno="oglasi"><span class="n">VI.</span><h3>Google i Meta oglasi</h3><p>Kampanje na Googleu, Facebooku i Instagramu, izrađene od Vaših fotografija i snimki.</p></li>
       <li class="dp-st" hidden data-skriveno="ai"><span class="n">VII.</span><h3>AI asistent</h3><p>Na web stranici ili na WhatsAppu odgovara na česta pitanja i zakazuje termine.</p></li>
     </ol>
-    <div class="btns dp-ik-sek__btns"><a class="btn primary" href="#cijene">Pogledajte D pakete</a><a class="btn outline" href="/usluge">Sve o uslugama</a></div>
+    <div class="btns dp-ik-sek__btns"><a class="btn primary" href="#cijene">Pogledajte D pakete</a><a class="btn outline" hidden data-skriveno="podstranice" href="/usluge">Sve o uslugama</a></div>
   </div>
 </section>
 
@@ -309,7 +309,7 @@ document.documentElement.classList.add("js-menu");
           <li>Održavanje web stranice, domena i hosting</li>
           <li>Google poslovni profil, postavljanje i održavanje</li>
         </ul>
-        <a class="btn line" href="/kontakt?plan=paket%20D%20start">Odaberite D start</a>
+        <a class="btn line" href="/?plan=paket%20D%20start#kontakt">Odaberite D start</a>
       </article>
       <article class="plan hot">
         <span class="tag">Preporučeno</span>
@@ -322,7 +322,7 @@ document.documentElement.classList.add("js-menu");
           <li>GEO optimizacija za AI tražilice</li>
           <li hidden data-skriveno="oglasi">Meta oglasi, mjesečno vođenje kampanje i izrada oglasa</li>
         </ul>
-        <a class="btn primary" href="/kontakt?plan=paket%20D%20plus">Odaberite D plus</a>
+        <a class="btn primary" href="/?plan=paket%20D%20plus#kontakt">Odaberite D plus</a>
       </article>
       <article class="plan">
         <h3>D premium</h3>
@@ -333,7 +333,7 @@ document.documentElement.classList.add("js-menu");
           <li>Mobilna aplikacija za iOS i Android od 2.999 € umjesto od 4.999 €, plaća se jednokratno uz paket</li>
           <li>Održavanje mobilne aplikacije i objava novih verzija u App Storeu i Google Playu</li>
         </ul>
-        <a class="btn line" href="/kontakt?plan=paket%20D%20premium">Odaberite D premium</a>
+        <a class="btn line" href="/?plan=paket%20D%20premium#kontakt">Odaberite D premium</a>
       </article>
       <!-- SKRIVENE USLUGE: stari D premium (oglasi i AI), čeka povratak tih usluga -->
       <article class="plan" hidden data-skriveno="oglasi ai">
@@ -346,10 +346,10 @@ document.documentElement.classList.add("js-menu");
           <li>AI asistent na WhatsAppu, postavljanje i održavanje</li>
           <li>AI asistent na web stranici, postavljanje i održavanje</li>
         </ul>
-        <a class="btn line" href="/kontakt?plan=paket%20D%20premium">Odaberite D premium</a>
+        <a class="btn line" href="/?plan=paket%20D%20premium#kontakt">Odaberite D premium</a>
       </article>
     </div>
-    <p class="once"><span hidden data-skriveno="oglasi">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti. Oglase izrađujemo od Vaših fotografija i snimki. </span>Samo web stranicu možete naručiti za 599 €, jednokratno.</p><div class="once-btn"><a class="btn line" href="/cjenik">Pogledajte potpuni cjenik</a></div>
+    <p class="once"><span hidden data-skriveno="oglasi">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti. Oglase izrađujemo od Vaših fotografija i snimki. </span>Samo web stranicu možete naručiti za 599 €, jednokratno.</p><div class="once-btn" hidden data-skriveno="podstranice"><a class="btn line" href="/cjenik">Pogledajte potpuni cjenik</a></div>
   </div>
 </section>
 
@@ -370,7 +370,7 @@ document.documentElement.classList.add("js-menu");
       <span class="label">Integracija AI agenata</span>
       <h2>Narudžbe iz maila u skladište, bez prepisivanja.</h2>
       <p>Ako Vam narudžbe stižu mailom, u PDF-u ili Excelu, AI agent ih čita, provjerava stanje na lageru i priprema nalog za skladište. Vaš djelatnik odobrava samo ono što je rizično.</p>
-      <div class="btns"><a class="btn primary" href="/kontakt">Javite nam se</a><a class="btn outline" href="/usluge">Saznajte više</a></div>
+      <div class="btns"><a class="btn primary" href="#kontakt">Javite nam se</a><a class="btn outline" hidden data-skriveno="podstranice" href="/usluge">Saznajte više</a></div>
     </div>
     <div class="svc-list">
       <article class="svc"><span class="n">I.</span><h3>Što radi agent</h3><p>Čita narudžbe, izvlači stavke, šifre i količine, provjerava lager i priprema nalog za skladište. Sve što napravi zapisuje u dnevnik.</p></article>

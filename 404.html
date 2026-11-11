@@ -35,7 +35,7 @@ document.documentElement.classList.add("js-menu");
   <div class="wrap">
     <a class="brand" href="/" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
     <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
-    <div class="links" id="izbornik"><a class="home-link" href="/">Naslovna</a><a href="/o-nama">O nama</a><a href="/usluge">Usluge</a><a href="/cjenik">Cjenik</a><a class="cta" href="/kontakt">Kontakt</a></div>
+    <div class="links" id="izbornik"><a class="home-link" href="/">Naslovna</a><a hidden data-skriveno="podstranice" href="/o-nama">O nama</a><a hidden data-skriveno="podstranice" href="/usluge">Usluge</a><a hidden data-skriveno="podstranice" href="/cjenik">Cjenik</a><a class="cta" hidden data-skriveno="podstranice" href="/kontakt">Kontakt</a><a data-privremeno="podstranice" href="/#usluge">Usluge</a><a data-privremeno="podstranice" href="/#cijene">Cjenik</a><a class="cta" data-privremeno="podstranice" href="/#kontakt">Kontakt</a></div>
   </div>
 </nav>
 
@@ -45,7 +45,7 @@ document.documentElement.classList.add("js-menu");
     <span class="label">Greška 404</span>
     <h1>Ove stranice nema.</h1>
     <p>Adresa je možda krivo upisana ili je stranica premještena. Na naslovnici su sve usluge, a u cjeniku sve cijene.</p>
-    <div class="btns" style="margin-top:32px"><a class="btn primary" href="/">Na naslovnicu</a><a class="btn outline" href="/cjenik">Pogledajte cjenik</a></div>
+    <div class="btns" style="margin-top:32px"><a class="btn primary" href="/">Na naslovnicu</a><a class="btn outline" href="/#cijene">Pogledajte pakete</a></div>
   </div>
 </header>
 </main>
