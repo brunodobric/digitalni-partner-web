@@ -2,7 +2,7 @@
 
 Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 iz prijedloga.
 
-- Adresa: https://dp-nadzor.bruno-dobric32.workers.dev (prijava jednokratnim kodom na Brunin mail, Cloudflare Access)
+- Adresa: https://nadzor.digitalnipartner.hr (rezervna: https://dp-nadzor.bruno-dobric32.workers.dev) (prijava jednokratnim kodom na Brunin mail, Cloudflare Access)
 - Objava: Cloudflare Workers Builds, korijenska mapa `nadzor/`, naredba `npx wrangler deploy`
 - Baza: Supabase projekt `dp-nadzor` (Frankfurt). Kuverta se čita iz projekta `MyWeddingInvite`.
 
