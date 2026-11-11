@@ -6,6 +6,7 @@
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "dp-nadzor",
   "main": "src/index.js",
+  "workers_dev": true,
   "preview_urls": false,
   "routes": [{ "pattern": "nadzor.digitalnipartner.hr", "custom_domain": true }],
   "compatibility_date": "2026-10-23",
