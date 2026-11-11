@@ -29,3 +29,21 @@ U cjeniku i na naslovnici je vidljiv novi D premium (899 € mjesečno, ugovor n
 
 - `slike/og-slika.png` (pregled kad se poveznica podijeli na Facebooku, WhatsAppu i sl.) više ne spominje oglase ni AI. Izvor je u zajedničkoj mapi projekta, `web/izvor/og/og-slika.html`; kad se usluge vrate, tamo promijeniti podnaslov i ponovno izraditi sliku (`node render.js izlaz.png`).
 - JSON-LD na `usluge.html` i `cjenik.html` (popis usluga s cijenama) sadrži samo vidljive usluge. Kad se oglasi ili AI vrate, dodati ih i tamo, s istim cijenama kao u cjeniku.
+
+## Skrivene podstranice (studeni 2026.)
+
+Web je trenutno samo naslovnica. Podstranice Usluge, Cjenik, O nama i Kontakt (`usluge.html`, `cjenik.html`, `o-nama.html`, `kontakt.html`) nisu obrisane, ali se ne mogu otvoriti: `_redirects` ih privremeno (302) šalje na naslovnicu, na odgovarajuću sekciju (`#usluge`, `#cijene`, `#kontakt`). Pravne informacije i stranica 404 ostale su dostupne.
+
+Označeno je isto kao kod skrivenih usluga, samo s vrijednošću `podstranice`:
+
+- `hidden data-skriveno="podstranice"`: poveznice na podstranice (izbornik na naslovnici, 404 i pravnim informacijama, gumbi „Sve o uslugama”, „Pogledajte potpuni cjenik” i „Saznajte više”).
+- `data-privremeno="podstranice"`: poveznice u izborniku koje vode na sekcije naslovnice.
+
+Pregled: `grep -n 'podstranice' *.html`
+
+Kako vratiti:
+
+1. Obrisati `_redirects` (ili retke za podstranice koje se vraćaju).
+2. U `index.html`, `404.html` i `pravne-informacije.html` ukloniti `hidden` s elemenata s `data-skriveno="podstranice"` i obrisati elemente s `data-privremeno="podstranice"`.
+3. Vratiti na `/kontakt`: gumbe „Javite nam se” i „Odaberite D ...” na naslovnici (sada `#kontakt` i `/?plan=...#kontakt`), `contactPoint.url` u JSON-LD-u na naslovnici i poveznicu u politici privatnosti (`pravne-informacije.html`). Na 404 vratiti gumb „Pogledajte cjenik” na `/cjenik`.
+4. Vratiti podstranice u `sitemap.xml`.
