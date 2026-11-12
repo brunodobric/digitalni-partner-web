@@ -70,6 +70,12 @@ button.gumb:hover{background:#0B2E28}
 footer .wrap{padding-top:4px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap:6px 24px}
 [hidden]{display:none!important}
 .prazno{color:var(--grafit);font-size:14px}
+.oznaka{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:1px 9px;line-height:1.6;white-space:nowrap}
+.oznaka.ok{color:var(--smaragd);background:var(--smaragd-svj)}
+.oznaka.ceka{color:var(--zlato-tamno);background:var(--zlato-svj)}
+.oznaka.lose{color:var(--crvena);background:var(--crvena-svj)}
+.filtri{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.jir{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--grafit);word-break:break-all}
 svg text{font-family:Manrope,sans-serif}
 @media (max-width:640px){.wrap{padding:0 16px}header .wrap{padding-top:8px;padding-bottom:8px}.sub{display:none}nav button{padding:0 10px}.panel,.zeleno>div,.kpi>div{padding:16px}}
 </style>
@@ -82,6 +88,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="usluge" aria-selected="false">Usluge</button>
     <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
     <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
+    <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
   </nav>
 </div></header>
 <div class="traka" id="traka" hidden><div class="wrap"><b>OGLEDNI PODACI</b><span>Brojevi s oznakom OGLEDNO nisu stvarni. Nestaju kad se spoji pravi izvor.</span></div></div>
@@ -115,10 +122,11 @@ function crtaj(){
   var imaOgl = D.prihod_godina_ogledno || D.klijenti.some(function(k){ return k.ogledno; }) || Object.keys(D.metrike).some(function(k){ return D.metrike[k].ogledno; });
   document.getElementById("traka").hidden = !imaOgl;
   document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); });
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
+  if (ekran === "racuni") veziRacune();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
   document.getElementById("osvjezeno").textContent = dijelovi.length ? "Zadnje osvježavanje · " + dijelovi.join(" · ") : "Prikupljači se još nisu pokrenuli.";
   document.getElementById("korisnik").textContent = D.korisnik ? "Prijavljen: " + D.korisnik : "";
@@ -269,9 +277,63 @@ function vjencanja(){
   return h;
 }
 
+// ---------- Računi ----------
+var R = null, rGreska = "", rFiltar = {godina: "", izvor: "", okolina: ""};
+var NACIN = {G: "gotovina", K: "kartica", T: "transakcijski račun", O: "ostalo"};
+function ucitajRacune(){
+  fetch("/api/racuni", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ R = j.racuni || []; rGreska = ""; if (rFiltar.okolina === "") rFiltar.okolina = R.some(function(x){ return x.okolina === "produkcija"; }) ? "produkcija" : "sve"; if (ekran === "racuni") crtaj(); })
+    .catch(function(err){ rGreska = err.message; if (ekran === "racuni") crtaj(); });
+}
+function stanjeRacuna(x){
+  if (x.stanje === "fiskaliziran") return '<span class="oznaka ok">fiskaliziran</span>';
+  if (x.stanje === "odbijen") return '<span class="oznaka lose">odbijen</span>';
+  return '<span class="oznaka ceka">čeka JIR</span>';
+}
+function vrijeme(t){ return t ? new Date(t).toLocaleString("hr-HR", {day:"numeric", month:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit"}) : "–"; }
+function racuni(){
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Fiskalizacija</p><h1>Računi</h1></div>';
+  if (rGreska) return h + '<section class="panel"><p class="prazno">Računi se nisu učitali (' + e(rGreska) + '). Osvježi stranicu za minutu.</p></section>';
+  if (!R) { ucitajRacune(); return h + '<section class="panel"><p class="prazno">Učitavam račune…</p></section>'; }
+  var godine = [], izvori = [];
+  R.forEach(function(x){ if (godine.indexOf(String(x.godina)) < 0) godine.push(String(x.godina)); if (izvori.indexOf(x.izvor) < 0) izvori.push(x.izvor); });
+  var lista = R.filter(function(x){
+    return (!rFiltar.godina || String(x.godina) === rFiltar.godina) && (!rFiltar.izvor || x.izvor === rFiltar.izvor) && (rFiltar.okolina === "sve" || x.okolina === rFiltar.okolina);
+  });
+  var mj = D.danas.slice(0,7), valjani = lista.filter(function(x){ return x.stanje !== "odbijen"; });
+  var ovajMj = valjani.filter(function(x){ return String(x.izdan).slice(0,7) === mj; });
+  var cekaju = lista.filter(function(x){ return x.stanje === "izdan"; }).length, odbijeni = lista.filter(function(x){ return x.stanje === "odbijen"; }).length;
+  h += '<section class="kpi"><div><span class="src">Računa u prikazu</span><span class="v num">' + br(lista.length) + '</span><span class="src">' + eur(zbroj(valjani, function(x){ return x.iznos; }), true) + ' ukupno</span></div>'
+    + '<div><span class="src">Ovaj mjesec</span><span class="v num">' + br(ovajMj.length) + '</span><span class="src">' + eur(zbroj(ovajMj, function(x){ return x.iznos; }), true) + '</span></div>'
+    + '<div><span class="src">Čekaju JIR</span><span class="v num' + (cekaju ? ' hitno' : '') + '">' + cekaju + '</span><span class="src">ponovno slanje ide samo, svakih 5 minuta</span></div>'
+    + '<div><span class="src">Odbijeni</span><span class="v num' + (odbijeni ? ' hitno' : '') + '">' + odbijeni + '</span><span class="src">Porezna ih nije primila</span></div></section>';
+  var opc = function(vr, lista, oznake){ return lista.map(function(v, i){ return '<option value="' + e(v) + '"' + (v === vr ? " selected" : "") + '>' + e(oznake ? oznake[i] : v) + '</option>'; }).join(""); };
+  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px"><h2>Svi računi</h2><form class="filtri" id="rfiltri">'
+    + '<label>Godina<select name="godina"><option value="">sve</option>' + opc(rFiltar.godina, godine) + '</select></label>'
+    + '<label>Izvor<select name="izvor"><option value="">svi</option>' + opc(rFiltar.izvor, izvori) + '</select></label>'
+    + '<label>Okolina<select name="okolina">' + opc(rFiltar.okolina, ["produkcija","test","sve"], ["pravi računi","testni (CIS test)","svi"]) + '</select></label></form></div>';
+  if (!lista.length) h += '<p class="prazno">' + (R.length ? "Nema računa za ovaj odabir." : "Još nema izdanih računa.") + '</p>';
+  else h += '<div class="skrol"><table class="num"><thead><tr><th>Broj</th><th>Izdan</th><th>Opis</th><th>Kupac</th><th>Izvor</th><th class="r">Iznos</th><th>Plaćanje</th><th>Stanje</th><th>JIR</th></tr></thead><tbody>'
+    + lista.map(function(x){
+      var pdf = x.stanje === "odbijen" ? "" : '<div style="font-weight:400;font-size:13px;margin-top:2px"><a href="/api/racun-pdf?izvor=' + encodeURIComponent(x.izvor) + '&id=' + encodeURIComponent(x.vanjski_id) + '" target="_blank" rel="noopener" aria-label="PDF računa ' + e(x.oznaka) + '">Otvori PDF</a></div>';
+      var gr = x.greska ? '<div class="src hitno" style="font-weight:400">' + e(JSON.stringify(x.greska).slice(0, 200)) + '</div>' : "";
+      return '<tr><td class="nw" style="font-weight:600">' + e(x.oznaka) + (x.okolina === "test" ? '<span class="og">TEST</span>' : "") + (x.storno ? '<span class="og">STORNO</span>' : "") + pdf + '</td>'
+        + '<td class="nw">' + vrijeme(x.izdan) + '</td><td style="min-width:160px">' + e(x.opis || "–") + '</td><td>' + e(x.kupac || "–") + '</td><td class="nw">' + e(x.izvor) + '</td>'
+        + '<td class="r nw">' + eur(x.iznos, true) + '</td><td class="nw">' + e(NACIN[x.nacin_placanja] || x.nacin_placanja) + '</td><td>' + stanjeRacuna(x) + gr + '</td>'
+        + '<td class="jir" style="min-width:150px">' + e(x.jir || "–") + '</td></tr>';
+    }).join("") + '</tbody></table></div>';
+  h += '<p class="src">Izvor: fiskalizacija u Supabaseu (shema fisk). Testni računi su poslani na CIS test i nisu valjani. PDF se radi u trenutku otvaranja.</p></section>';
+  return h;
+}
+function veziRacune(){
+  var f = document.getElementById("rfiltri");
+  if (!f) return;
+  f.addEventListener("change", function(){ rFiltar = {godina: f.godina.value, izvor: f.izvor.value, okolina: f.okolina.value}; crtaj(); });
+}
+
 document.querySelectorAll("nav button").forEach(function(b){ b.addEventListener("click", function(){ ekran = b.dataset.ekran; history.replaceState(null, "", "#" + ekran); if (D) crtaj(); window.scrollTo(0, 0); }); });
 ucitaj();
-setInterval(ucitaj, 10 * 60 * 1000);
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); }, 10 * 60 * 1000);
 })();
 </script>
 </body>
