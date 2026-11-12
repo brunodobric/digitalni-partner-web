@@ -671,7 +671,7 @@ document.getElementById("y").textContent = new Date().getFullYear();
 <script>
 // Najčešća pitanja: klik na "Najčešća pitanja" otvara popis pitanja, a klik na pitanje otvara samo njegov odgovor
 // (prethodno otvoreni odgovor se pritom zatvara). Otvaranje je animirano: stranica se na tom mjestu razmakne,
-// a sadržaj se otkriva od sredine prema gore i dolje. Zatvaranje ide obrnuto.
+// a sadržaj se otkriva odozgo prema dolje. Zatvaranje ide obrnuto.
 // Bez animacije ako korisnik ima isključene animacije. Poveznica /#pitanja otvara popis odmah.
 (function(){
   var mirno = matchMedia("(prefers-reduced-motion: reduce)"), E = "cubic-bezier(.65,0,.35,1)";
@@ -685,9 +685,9 @@ document.getElementById("y").textContent = new Date().getFullYear();
       if(cilj) d.open = true;
       var h = p.scrollHeight, t = Math.round(Math.min(900, 380 + h * .22));
       if(a1){ a1.cancel(); a2.cancel(); }
-      var rez = od ? (1 - od / h) * 50 : 50;
+      var rez = od ? (1 - od / h) * 100 : 100;
       a1 = p.animate([{height: od + "px"}, {height: (cilj ? h : 0) + "px"}], {duration: t, easing: E});
-      a2 = p.animate([{clipPath: "inset(" + rez + "% 0 " + rez + "% 0)"}, {clipPath: cilj ? "inset(0% 0 0% 0)" : "inset(50% 0 50% 0)"}], {duration: t, easing: E});
+      a2 = p.animate([{clipPath: "inset(0 0 " + rez + "% 0)"}, {clipPath: cilj ? "inset(0 0 0% 0)" : "inset(0 0 100% 0)"}], {duration: t, easing: E});
       d.classList.toggle("zatvara", !cilj);
       a1.onfinish = function(){ if(!cilj){ d.open = false; d.classList.remove("zatvara"); } a1 = a2 = null; };
     }
