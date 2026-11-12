@@ -321,7 +321,7 @@ footer{background:var(--oniks);color:var(--tekst-tam);font-size:.85rem}
 footer .wrap{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;justify-content:space-between;padding-block:32px calc(32px + env(safe-area-inset-bottom,0px))}
 footer .f-brand{display:flex;align-items:center;gap:14px}
 footer .mono{font-size:13px}
-footer .f-link{color:var(--tekst-tam);font-size:.78rem;transition:color .25s}
+footer .f-link{color:var(--tekst-tam);font-size:calc(.85rem - 1px);transition:color .25s}
 footer .f-link:hover{color:var(--kamen)}
 footer .f-link{text-underline-offset:4px;text-decoration-thickness:1px}
 footer .f-sl{font:600 .7rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
