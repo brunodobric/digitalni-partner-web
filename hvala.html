@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Upit je poslan · Digitalni partner</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#E7E4DE">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="/slike/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/slike/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/slike/favicon-48.png" sizes="48x48" type="image/png">
+<link rel="icon" href="/slike/favicon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/slike/apple-touch-icon.png">
+<link rel="preload" href="/fontovi/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/stil.css">
+<script>
+document.documentElement.classList.add("js-menu");
+(function(){
+  var n = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+  if(n && n.type === "back_forward") return;
+  var moved = false;
+  ["wheel","touchstart","keydown"].forEach(function(ev){ addEventListener(ev, function(){ moved = true; }, {once:true, passive:true}); });
+  function go(){
+    if(moved) return;
+    var t = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+    if(t) t.scrollIntoView({block:"start", behavior:"instant"}); else window.scrollTo(0,0);
+  }
+  document.addEventListener("DOMContentLoaded", go);
+  addEventListener("load", go);
+})();
+</script>
+<style>
+body{min-height:100vh;display:flex;flex-direction:column}main{flex:1}
+.hv{padding-block:calc(150px + env(safe-area-inset-top,0px)) clamp(80px,10vw,120px)}
+.hv h1{font-size:clamp(2.4rem,5.2vw,3.6rem);margin:22px 0 24px}
+.hv .lead{color:var(--grafit);max-width:28em}
+.hv .lead b{color:var(--oniks);font-weight:600;overflow-wrap:anywhere}
+.hv .btns{margin-top:36px}
+.hv .svc h3{font-size:1.25rem}
+.hv .mala{margin-top:28px;font-size:.92rem;color:var(--grafit)}
+</style>
+</head>
+<body>
+<a class="skip" href="#sadrzaj">Preskoči na sadržaj</a>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Digitalni partner, naslovna"><span class="mono">dp</span><span class="word"><b>digitalni</b>partner</span></a>
+    <button class="menu-btn" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="izbornik"><span></span><span></span><span></span></button>
+    <div class="links" id="izbornik"><a class="home-link" href="/">Naslovna</a><a hidden data-skriveno="podstranice" href="/o-nama">O nama</a><a hidden data-skriveno="podstranice" href="/usluge">Usluge</a><a hidden data-skriveno="podstranice" href="/cjenik">Cjenik</a><a class="cta" hidden data-skriveno="podstranice" href="/kontakt">Kontakt</a><a data-privremeno="podstranice" href="/#usluge">Usluge</a><a data-privremeno="podstranice" href="/#cijene">Cjenik</a><a class="cta" data-privremeno="podstranice" href="/#kontakt">Kontakt</a></div>
+  </div>
+</nav>
+
+<main id="sadrzaj" tabindex="-1">
+<section class="hv">
+  <div class="wrap split">
+    <div class="head">
+      <span class="label">Upit je poslan</span>
+      <h1>Hvala, Vaš upit je stigao.</h1>
+      <p class="lead">Javit ćemo Vam se na <b data-email>e-mail adresu koju ste upisali</b>.</p>
+      <div class="btns"><a class="btn primary" href="/">Na naslovnicu</a></div>
+    </div>
+    <div>
+      <div class="svc-list">
+        <article class="svc"><span class="n">I.</span><h3>Odgovor mailom</h3><p>Stiže s adrese info@digitalnipartner.hr. Ako ga ne vidite u pristigloj pošti, pogledajte mapu Neželjena pošta.</p></article>
+        <article class="svc"><span class="n">II.</span><h3>Kratak upitnik</h3><p>U odgovoru je poveznica na upitnik o Vašem poslu: što radite, tko su Vam klijenti i što želite na stranici. Ispunjava se online.</p></article>
+        <article class="svc"><span class="n">III.</span><h3>Razgovor, ako želite</h3><p>Po želji razgovaramo 30 minuta telefonom ili videopozivom. Upit Vas ni na što ne obvezuje.</p></article>
+      </div>
+      <p class="mala">Krivo ste upisali adresu ili ste nešto zaboravili? Pišite na <a class="txt-link" href="mailto:info@digitalnipartner.hr">info@digitalnipartner.hr</a>.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-brand"><span class="mono">dp</span><span>© <span id="y"></span> Digitalni partner</span></div>
+    <a class="f-link" href="/pravne-informacije">Pravne informacije</a>
+    <span class="f-sl">Digitalno. Po mjeri.</span>
+  </div>
+</footer>
+<script>
+document.getElementById("y").textContent = new Date().getFullYear();
+// Izbornik na mobitelu: gumb s tri crte otvara i zatvara popis, klik na poveznicu ili Esc ga zatvara
+(function(){
+  var nav = document.querySelector("nav"), btn = nav.querySelector(".menu-btn");
+  function set(open){ nav.classList.toggle("open", open); btn.setAttribute("aria-expanded", open); }
+  btn.addEventListener("click", function(){ set(!nav.classList.contains("open")); });
+  nav.querySelectorAll(".links a").forEach(function(a){ a.addEventListener("click", function(){ set(false); }); });
+  addEventListener("keydown", function(e){ if(e.key === "Escape") set(false); });
+  addEventListener("resize", function(){ if(innerWidth > 860) set(false); });
+})();
+</script>
+<script>
+// Adresa iz obrasca: js/kontakt.js je sprema u sessionStorage samo za ovaj prikaz, pa je ovdje odmah brišemo.
+// Ako je nema (stranica otvorena izravno), ostaje opći tekst.
+(function(){
+  var e = null;
+  try { e = sessionStorage.getItem("dp-upit-email"); sessionStorage.removeItem("dp-upit-email"); } catch(x){}
+  if(e){ document.querySelectorAll("[data-email]").forEach(function(el){ el.textContent = e; }); }
+})();
+</script>
+</body>
+</html>

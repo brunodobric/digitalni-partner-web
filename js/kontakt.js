@@ -1,10 +1,10 @@
 // Obrazac za upit.
 // FORM_ENDPOINT: upit ide u Worker dashboarda (dp-nadzor), koji ga sprema u bazu i prikazuje u lijevku prodaje.
-// Ako slanje ne uspije, posjetitelj vidi adresu na koju može pisati izravno. Prazna adresa vraća stari način
+// Nakon uspješnog slanja otvara se /hvala. Ako slanje ne uspije, posjetitelj vidi adresu na koju može pisati izravno. Prazna adresa vraća stari način
 // (upit se šalje preko programa za e-poštu).
 (function(){
   var FORM_ENDPOINT = "https://dp-nadzor.bruno-dobric32.workers.dev/upit";
-  var CONTACT_EMAIL = atob("YnJ1bm8uZG9icmljMzJAZ21haWwuY29t");
+  var CONTACT_EMAIL = "info@digitalnipartner.hr";
   var f = document.getElementById("cform"), msg = document.getElementById("msg");
   var plan = new URLSearchParams(location.search).get("plan");
   if(plan && !f.poruka.value.trim()) f.poruka.value = "Zanima me: " + plan + ".";
@@ -54,7 +54,14 @@
     if(FORM_ENDPOINT){
       msg.textContent = "Šaljemo upit…";
       fetch(FORM_ENDPOINT, {method:"POST", body:new FormData(f), headers:{Accept:"application/json"}})
-        .then(function(r){ if(!r.ok) throw r; f.reset(); msg.textContent = "Hvala, upit je poslan. Javit ćemo Vam se na upisanu adresu."; })
+        .then(function(r){
+          if(!r.ok) throw r;
+          // Uspjeh: otvara se stranica zahvale /hvala (noindex, nije u izborniku). Upisanu adresu prikazuje samo ona,
+          // a iz sessionStorage je briše čim je pročita. Posjeti na /hvala u Web Analytics = broj poslanih upita.
+          try { sessionStorage.setItem("dp-upit-email", f.email.value.trim()); } catch(x){}
+          msg.textContent = "Hvala, upit je poslan.";
+          window.location.href = "/hvala";
+        })
         .catch(fallback);
       return;
     }

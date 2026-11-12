@@ -13,3 +13,9 @@ https://:ime.bruno-dobric32.workers.dev/*
   Content-Type: text/plain; charset=utf-8
 /llms.txt
   Content-Type: text/plain; charset=utf-8
+
+# Stranica zahvale nakon slanja upita: ne ide u tražilice. U robots.txt nije zabranjena jer tada Google ne bi vidio noindex.
+/hvala
+  X-Robots-Tag: noindex, nofollow
+/hvala.html
+  X-Robots-Tag: noindex, nofollow
