@@ -1,4 +1,28 @@
+# Digitalni partner: web je javan i otvoren svim tražilicama i AI alatima.
+# Pravilo za sve robote vrijedi i za one koji nisu navedeni.
 User-agent: *
+Allow: /
+
+# AI tražilice i dohvaćanje stranice kad korisnik pita AI (ChatGPT, Perplexity, Claude, Copilot, Googleovi AI pregledi).
+# Navedeni su izričito da se vidi da su dopušteni, ako se pravilo iznad ikad promijeni.
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Applebot
+Allow: /
+
+# Roboti za treniranje AI modela. Dopušteni su jer obrt želi da AI alati znaju za njega.
+# Ako se to promijeni, ovdje "Allow: /" zamijeniti s "Disallow: /". Na vidljivost u tražilicama to ne utječe.
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
 Allow: /
 
 Sitemap: https://digitalnipartner.hr/sitemap.xml

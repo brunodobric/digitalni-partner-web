@@ -1,0 +1,90 @@
+# Digitalni partner
+
+> Digitalni partner je obrt iz Zagreba koji izrađuje web stranice i mobilne aplikacije za poduzetnike u uslužnim djelatnostima: frizerske i kozmetičke salone, salone za masažu, osobne trenere, kafiće, restorane i apartmane. Uz stranicu postavlja i održava Google poslovni profil te radi SEO i GEO optimizaciju.
+
+Web je na hrvatskom jeziku. Sve cijene su u eurima. Obrt nije u sustavu PDV-a, pa na cijene ne dolazi PDV.
+
+## Osnovni podaci
+
+- Naziv: Digitalni partner, obrt za digitalne usluge
+- Sjedište: Zagreb, Hrvatska
+- Područje rada: cijela Hrvatska
+- E-mail: info@digitalnipartner.hr
+- Web: https://digitalnipartner.hr/
+- Instagram: https://www.instagram.com/digitalnipartner/
+- Facebook: https://www.facebook.com/profile.php?id=61595629497300
+
+## Usluge
+
+- Izrada web stranice po mjeri: usluge, cjenik, fotografije, kontakt i gumb za poziv, po potrebi i online rezervacija.
+- Google poslovni profil: postavljanje i održavanje (radno vrijeme, fotografije, usluge, poveznica na stranicu).
+- Održavanje web stranice, domena i hosting: izmjene poput novog cjenika ili radnog vremena unosi Digitalni partner.
+- SEO i GEO optimizacija: vidljivost na Googleu i u AI tražilicama poput ChatGPT-a.
+- Mobilna aplikacija za iOS i Android.
+
+## Paketi (mjesečno)
+
+| Paket | Cijena | Što uključuje | Najkraći ugovor |
+|---|---|---|---|
+| D start | 249 € mjesečno | Web stranica do 5 podstranica, održavanje, domena i hosting, Google poslovni profil | 3 mjeseca |
+| D plus | 499 € mjesečno | Sve iz D start, dvije dodatne podstranice, SEO optimizacija, GEO optimizacija za AI tražilice | 3 mjeseca |
+| D premium | 899 € mjesečno | Sve iz D plus, još dvije dodatne podstranice, održavanje mobilne aplikacije i objava novih verzija u App Storeu i Google Playu; izrada aplikacije uz paket od 2.999 € umjesto od 4.999 € | 6 mjeseci |
+
+## Jednokratno
+
+- Samo web stranica: 599 €, jednokratno (bez hostinga i održavanja).
+- Samo mobilna aplikacija za iOS i Android: od 4.999 €, jednokratno.
+
+## Kako izgleda suradnja
+
+1. Upitnik i, po želji, razgovor od 30 minuta o poslu, ciljevima i željama.
+2. Izrada: dizajn i razvoj uz povratne informacije klijenta.
+3. Podrška: objava, edukacija i održavanje.
+
+Od upitnika do objavljene stranice prođu oko dva tjedna.
+
+## Česta pitanja
+
+### Koliko košta izrada web stranice?
+
+Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o stranici i nakon objave, paket D start košta 249 € mjesečno i uz stranicu do 5 podstranica uključuje održavanje, domenu, hosting i Google poslovni profil.
+
+### Koliko traje izrada stranice?
+
+Oko dva tjedna od upitnika do objavljene stranice. U tom vremenu stranicu vidite prije objave i javljate nam što treba promijeniti.
+
+### Po čemu se razlikuju paketi D start, D plus i D premium?
+
+D start (249 € mjesečno) obuhvaća web stranicu do 5 podstranica, održavanje, domenu, hosting i Google poslovni profil. D plus (499 € mjesečno) dodaje dvije podstranice, SEO optimizaciju i GEO optimizaciju za AI tražilice. D premium (899 € mjesečno) dodaje još dvije podstranice i održavanje mobilne aplikacije, a samu aplikaciju uz njega plaćate od 2.999 € umjesto od 4.999 €.
+
+### Na koliko se dugo ugovara paket?
+
+D start i D plus ugovaraju se na najmanje 3 mjeseca, a D premium na najmanje 6 mjeseci.
+
+### Jesu li cijene s PDV-om?
+
+Obrt nije u sustavu PDV-a, pa na navedene cijene ne dolazi PDV.
+
+### Što je GEO optimizacija?
+
+GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u paket D plus.
+
+### Mogu li naručiti samo mobilnu aplikaciju?
+
+Možete. Aplikacija za iOS i Android stoji od 4.999 €, jednokratno. Uz paket D premium plaćate je od 2.999 €.
+
+### Radite li samo s poduzetnicima iz Zagreba?
+
+Ne. Obrt je u Zagrebu, a radimo s poduzetnicima iz cijele Hrvatske. Upitnik se ispunjava online, a razgovor vodimo telefonom ili videopozivom.
+
+### Kako počinje suradnja?
+
+Pošaljete upit preko obrasca na ovoj stranici ili na info@digitalnipartner.hr. Zatim ispunite kratak upitnik, a po želji razgovaramo 30 minuta o Vašem poslu i ciljevima. Upit Vas ni na što ne obvezuje.
+
+## Stranice
+
+- [Naslovnica](https://digitalnipartner.hr/): usluge, paketi s cijenama, način rada, česta pitanja i obrazac za upit
+- [Paketi i cijene](https://digitalnipartner.hr/#cijene)
+- [Česta pitanja](https://digitalnipartner.hr/#pitanja)
+- [Kontakt i obrazac za upit](https://digitalnipartner.hr/#kontakt)
+- [Pravne informacije](https://digitalnipartner.hr/pravne-informacije): podaci o obrtu i politika privatnosti
