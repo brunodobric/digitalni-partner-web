@@ -7,3 +7,9 @@ https://:ime.bruno-dobric32.workers.dev/*
   Cache-Control: public, max-age=31536000, immutable
 /slike/*
   Cache-Control: public, max-age=604800
+
+# robots.txt i llms.txt su na hrvatskom: kodna stranica UTF-8 da se č, ć, ž, š i đ ispravno prikažu.
+/robots.txt
+  Content-Type: text/plain; charset=utf-8
+/llms.txt
+  Content-Type: text/plain; charset=utf-8

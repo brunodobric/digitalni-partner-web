@@ -359,3 +359,18 @@ footer .f-sl{font:600 .7rem var(--sans);letter-spacing:.12em;text-transform:uppe
 }
 @media(max-width:560px){.dp-niz{grid-auto-columns:72vw}.dp-ik-sek__head{text-align:left;justify-items:start}.dp-ik-sek__btns{justify-content:flex-start}}
 @media(prefers-reduced-motion:reduce){.dp-ik{transition:none}}
+
+/* ČESTA PITANJA (naslovnica): pitanja se otvaraju klikom, odgovori su u HTML-u pa ih tražilice i AI alati čitaju i kad su zatvoreni */
+.faq .split{align-items:start}
+.faq__uvod{color:var(--grafit);max-width:32em}
+.faq__lista{border-top:1px solid var(--linija)}
+.faq__q{border-bottom:1px solid var(--linija)}
+.faq__q summary{display:flex;justify-content:space-between;align-items:baseline;gap:24px;padding:24px 0;cursor:pointer;list-style:none}
+.faq__q summary::-webkit-details-marker{display:none}
+.faq__q summary h3{font-size:1.2rem;letter-spacing:-.015em}
+.faq__q summary::after{content:"+";flex:none;font:400 1.5rem/1 var(--sans);color:var(--smaragd);transition:transform .2s}
+.faq__q[open] summary::after{transform:rotate(45deg)}
+.faq__q summary:hover h3{color:var(--smaragd)}
+.faq__q p{padding:0 48px 28px 0;color:var(--grafit);max-width:38em}
+.faq + .final,.faq + section[hidden] + .final{border-top:1px solid var(--linija)}
+@media(max-width:600px){.faq__q p{padding-right:0}}
