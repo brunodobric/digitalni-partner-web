@@ -12,6 +12,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | --- | --- |
 | Worker: stranica, API, prijem upita, dnevni prikupljači | `src/index.js` |
 | Stranica dashboarda | `src/stranica.html` |
+| Ikona za oznaku i početni zaslon (180 × 180, znak „dp” manji, ispod natpis „nadzor”) | `src/apple-touch-icon.png` |
 | Shema baze dashboarda | `sql/01-nadzor-shema.sql` |
 | Funkcija za brojeve iz Kuverte | `sql/02-kuverta-statistika.sql` |
 | Ogledni podaci | `sql/03-ogledni-podaci.sql` |

@@ -12,6 +12,7 @@
 // Baza se zove samo preko funkcija u Supabaseu koje provjeravaju NADZOR_KLJUC (vidi nadzor/sql).
 
 import STRANICA from "./stranica.html";
+import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
 
 export default {
   async fetch(req, env, ctx) {
@@ -22,6 +23,9 @@ export default {
       const korisnik = await provjeriAccess(req, env);
       if (!korisnik) return new Response("Potrebna je prijava.", { status: 403 });
 
+      if (req.method === "GET" && url.pathname === "/apple-touch-icon.png") {
+        return new Response(IKONA, { headers: { "content-type": "image/png", "cache-control": "private, max-age=604800" } });
+      }
       if (req.method === "GET" && url.pathname === "/") {
         return new Response(STRANICA, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", ...SIGURNOSNA_ZAGLAVLJA } });
       }
