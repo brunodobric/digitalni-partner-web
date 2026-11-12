@@ -6,8 +6,7 @@ Web je na hrvatskom jeziku. Sve cijene su u eurima. Obrt nije u sustavu PDV-a, p
 
 ## Osnovni podaci
 
-- Naziv: Digitalni partner, obrt za digitalne usluge, vl. Bruno Dobrić
-- Vlasnik: Bruno Dobrić
+- Naziv: Digitalni partner, obrt za digitalne usluge
 - Sjedište: Zagreb, Hrvatska
 - Područje rada: cijela Hrvatska
 - E-mail: info@digitalnipartner.hr
