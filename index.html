@@ -563,55 +563,25 @@ document.documentElement.classList.add("js-menu");
       <div class="step"><h3>Izrada</h3><p>Dizajniramo i razvijamo rješenje uz Vaše povratne informacije.</p></div>
       <div class="step"><h3>Podrška</h3><p>Objavljujemo, educiramo i ostajemo uz Vas.</p></div>
     </div>
-  </div>
-</section>
-
-<!-- ČESTA PITANJA (GEO): isti tekst je u JSON-LD-u (FAQPage) u zaglavlju i u llms.txt. Kad mijenjate odgovor, promijenite ga na sva tri mjesta. -->
-<section class="faq" id="pitanja" aria-labelledby="pitanja-naslov">
-  <div class="wrap split">
-    <div class="head">
-      <span class="label">Česta pitanja</span>
-      <h2 id="pitanja-naslov">Što nas klijenti najčešće pitaju.</h2>
-      <p class="faq__uvod">Digitalni partner je obrt iz Zagreba koji izrađuje web stranice i mobilne aplikacije za poduzetnike u uslužnim djelatnostima: frizerske i kozmetičke salone, salone za masažu, osobne trenere, kafiće, restorane i apartmane. Uz stranicu postavljamo i održavamo Google poslovni profil te radimo SEO i GEO optimizaciju.</p>
-    </div>
-    <div class="faq__lista">
-      <details class="faq__q">
-        <summary><h3>Koliko košta izrada web stranice?</h3></summary>
-        <p>Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o stranici i nakon objave, paket D start košta 249 € mjesečno i uz stranicu do 5 podstranica uključuje održavanje, domenu, hosting i Google poslovni profil.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Koliko traje izrada stranice?</h3></summary>
-        <p>Oko dva tjedna od upitnika do objavljene stranice. U tom vremenu stranicu vidite prije objave i javljate nam što treba promijeniti.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Po čemu se razlikuju paketi D start, D plus i D premium?</h3></summary>
-        <p>D start (249 € mjesečno) obuhvaća web stranicu do 5 podstranica, održavanje, domenu, hosting i Google poslovni profil. D plus (499 € mjesečno) dodaje dvije podstranice, SEO optimizaciju i GEO optimizaciju za AI tražilice. D premium (899 € mjesečno) dodaje još dvije podstranice i održavanje mobilne aplikacije, a samu aplikaciju uz njega plaćate od 2.999 € umjesto od 4.999 €.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Na koliko se dugo ugovara paket?</h3></summary>
-        <p>D start i D plus ugovaraju se na najmanje 3 mjeseca, a D premium na najmanje 6 mjeseci.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Jesu li cijene s PDV-om?</h3></summary>
-        <p>Obrt nije u sustavu PDV-a, pa na navedene cijene ne dolazi PDV.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Što je GEO optimizacija?</h3></summary>
-        <p>GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u paket D plus.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Mogu li naručiti samo mobilnu aplikaciju?</h3></summary>
-        <p>Možete. Aplikacija za iOS i Android stoji od 4.999 €, jednokratno. Uz paket D premium plaćate je od 2.999 €.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Radite li samo s poduzetnicima iz Zagreba?</h3></summary>
-        <p>Ne. Obrt je u Zagrebu, a radimo s poduzetnicima iz cijele Hrvatske. Upitnik se ispunjava online, a razgovor vodimo telefonom ili videopozivom.</p>
-      </details>
-      <details class="faq__q">
-        <summary><h3>Kako počinje suradnja?</h3></summary>
-        <p>Pošaljete upit preko obrasca na ovoj stranici ili na info@digitalnipartner.hr. Zatim ispunite kratak upitnik, a po želji razgovaramo 30 minuta o Vašem poslu i ciljevima. Upit Vas ni na što ne obvezuje.</p>
-      </details>
-    </div>
+    <!-- ČESTA PITANJA (GEO): zatvorena dok se ne klikne, ali tekst je u HTML-u pa ga tražilice i AI alati čitaju.
+         Isti tekst je u JSON-LD-u (FAQPage) u zaglavlju i u llms.txt. Kad mijenjate odgovor, promijenite ga na sva tri mjesta. -->
+    <details class="faq" id="pitanja">
+      <summary><span>Najčešća pitanja</span></summary>
+      <div class="faq__in">
+        <p class="faq__uvod">Digitalni partner je obrt iz Zagreba koji izrađuje web stranice i mobilne aplikacije za poduzetnike u uslužnim djelatnostima: frizerske i kozmetičke salone, salone za masažu, osobne trenere, kafiće, restorane i apartmane. Uz stranicu postavljamo i održavamo Google poslovni profil te radimo SEO i GEO optimizaciju.</p>
+        <div class="faq__lista">
+          <div class="faq__q"><h3>Koliko košta izrada web stranice?</h3><p>Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o stranici i nakon objave, paket D start košta 249 € mjesečno i uz stranicu do 5 podstranica uključuje održavanje, domenu, hosting i Google poslovni profil.</p></div>
+          <div class="faq__q"><h3>Koliko traje izrada stranice?</h3><p>Oko dva tjedna od upitnika do objavljene stranice. U tom vremenu stranicu vidite prije objave i javljate nam što treba promijeniti.</p></div>
+          <div class="faq__q"><h3>Po čemu se razlikuju paketi D start, D plus i D premium?</h3><p>D start (249 € mjesečno) obuhvaća web stranicu do 5 podstranica, održavanje, domenu, hosting i Google poslovni profil. D plus (499 € mjesečno) dodaje dvije podstranice, SEO optimizaciju i GEO optimizaciju za AI tražilice. D premium (899 € mjesečno) dodaje još dvije podstranice i održavanje mobilne aplikacije, a samu aplikaciju uz njega plaćate od 2.999 € umjesto od 4.999 €.</p></div>
+          <div class="faq__q"><h3>Na koliko se dugo ugovara paket?</h3><p>D start i D plus ugovaraju se na najmanje 3 mjeseca, a D premium na najmanje 6 mjeseci.</p></div>
+          <div class="faq__q"><h3>Jesu li cijene s PDV-om?</h3><p>Obrt nije u sustavu PDV-a, pa na navedene cijene ne dolazi PDV.</p></div>
+          <div class="faq__q"><h3>Što je GEO optimizacija?</h3><p>GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u paket D plus.</p></div>
+          <div class="faq__q"><h3>Mogu li naručiti samo mobilnu aplikaciju?</h3><p>Možete. Aplikacija za iOS i Android stoji od 4.999 €, jednokratno. Uz paket D premium plaćate je od 2.999 €.</p></div>
+          <div class="faq__q"><h3>Radite li samo s poduzetnicima iz Zagreba?</h3><p>Ne. Obrt je u Zagrebu, a radimo s poduzetnicima iz cijele Hrvatske. Upitnik se ispunjava online, a razgovor vodimo telefonom ili videopozivom.</p></div>
+          <div class="faq__q"><h3>Kako počinje suradnja?</h3><p>Pošaljete upit preko obrasca na ovoj stranici ili na info@digitalnipartner.hr. Zatim ispunite kratak upitnik, a po želji razgovaramo 30 minuta o Vašem poslu i ciljevima. Upit Vas ni na što ne obvezuje.</p></div>
+        </div>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -669,6 +639,14 @@ document.getElementById("y").textContent = new Date().getFullYear();
   nav.querySelectorAll(".links a").forEach(function(a){ a.addEventListener("click", function(){ set(false); }); });
   addEventListener("keydown", function(e){ if(e.key === "Escape") set(false); });
   addEventListener("resize", function(){ if(innerWidth > 860) set(false); });
+})();
+</script>
+<script>
+// Najčešća pitanja: poveznica /#pitanja otvara zatvoreni dio
+(function(){
+  var d = document.getElementById("pitanja");
+  function open(){ if(location.hash === "#pitanja"){ d.open = true; d.scrollIntoView({block:"start"}); } }
+  open(); addEventListener("hashchange", open);
 })();
 </script>
 <script src="js/naslovnica.js"></script>
