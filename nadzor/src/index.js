@@ -2,10 +2,13 @@
 // - GET /            stranica dashboarda (samo uz prijavu kroz Cloudflare Access)
 // - GET /api/podaci  svi brojevi za dashboard (Access)
 // - POST /api/trosak, POST /api/upit-status  ručni unos (Access)
+// - GET /api/racuni  računi iz fiskalizacije (Access)
+// - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
 // - POST /upit       javni prijem upita s kontakt obrasca na webu (bez prijave, samo s dopuštene adrese)
 // - cron u 5:00 UTC  (6:00 zimi, 7:00 ljeti po hrvatskom vremenu) skuplja podatke iz izvora
 //
-// Tajne (wrangler secret put): NADZOR_KLJUC, a po potrebi CF_API_TOKEN i RESEND_KEY.
+// Tajne (wrangler secret put): NADZOR_KLJUC, a po potrebi CF_API_TOKEN, RESEND_KEY
+// i FISK_TOKEN (FISK_CITANJE_TOKEN servisa fisk-racun, smije samo čitati račune).
 // Baza se zove samo preko funkcija u Supabaseu koje provjeravaju NADZOR_KLJUC (vidi nadzor/sql).
 
 import STRANICA from "./stranica.html";
@@ -42,6 +45,11 @@ export default {
         await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_upit_status", { p_kljuc: env.NADZOR_KLJUC, p_id: Number(b.id), p_status: b.status });
         return json({ ok: true });
       }
+      if (req.method === "GET" && url.pathname === "/api/racuni") {
+        const racuni = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_racuni", { p_kljuc: env.NADZOR_KLJUC });
+        return json({ racuni });
+      }
+      if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
       return new Response("Nema te stranice.", { status: 404 });
     } catch (e) {
       console.error(e);
@@ -74,6 +82,34 @@ async function rpc(base, key, fn, args) {
   const t = await r.text();
   if (!r.ok) throw new Error((fn) + ": " + (r.status) + " " + (t.slice(0, 300)));
   return t ? JSON.parse(t) : null;
+}
+
+// ---------- PDF računa (servis fisk-racun u Supabaseu) ----------
+
+async function pdfRacuna(url, env) {
+  const izvor = url.searchParams.get("izvor") || "";
+  const vanjskiId = url.searchParams.get("id") || "";
+  if (!izvor || !vanjskiId || izvor.length > 200 || vanjskiId.length > 200) return json({ greska: "Nedostaju izvor i id." }, 400);
+  if (!env.FISK_TOKEN) return new Response("PDF nije postavljen: nedostaje tajna FISK_TOKEN.", { status: 503 });
+  const r = await fetch(env.FISK_URL || (env.SUPABASE_URL + "/functions/v1/fisk-racun"), {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-fisk-token": env.FISK_TOKEN },
+    body: JSON.stringify({ radnja: "pdf", izvor, vanjskiId }),
+  });
+  if (!r.ok || !(r.headers.get("content-type") || "").startsWith("application/pdf")) {
+    const t = await r.text();
+    let poruka = "PDF se nije mogao napraviti (" + r.status + ").";
+    try { poruka = JSON.parse(t).greska || poruka; } catch (_) {}
+    return new Response(poruka, { status: r.status === 404 || r.status === 409 ? r.status : 502, headers: { "content-type": "text/plain; charset=utf-8" } });
+  }
+  return new Response(r.body, {
+    headers: {
+      "content-type": "application/pdf",
+      "content-disposition": r.headers.get("content-disposition") || "inline",
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+    },
+  });
 }
 
 // ---------- Javni prijem upita s weba ----------

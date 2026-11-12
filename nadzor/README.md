@@ -15,6 +15,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Shema baze dashboarda | `sql/01-nadzor-shema.sql` |
 | Funkcija za brojeve iz Kuverte | `sql/02-kuverta-statistika.sql` |
 | Ogledni podaci | `sql/03-ogledni-podaci.sql` |
+| Popis računa iz fiskalizacije (ekran Računi) | `sql/04-racuni.sql` |
 
 Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U bazama je spremljen samo njegov SHA-256 sažetak. Tablice imaju uključen RLS bez pravila, pa ih javni ključ ne može čitati izravno.
 
@@ -25,6 +26,9 @@ Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U 
 | `NADZOR_KLJUC` | Pristup funkcijama u obje baze | da (postavljeno) |
 | `CF_API_TOKEN` | Broj zahtjeva na web i Kuvertu (Cloudflare GraphQL, dozvola Account Analytics: Read) | ne |
 | `RESEND_KEY`, `OBAVIJEST_NA` | Mail o svakom novom upitu s weba | ne |
+| `FISK_TOKEN` | PDF računa na ekranu Računi. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun) | ne, bez nje popis radi, a PDF ne |
+
+Ekran Računi čita tablicu `fisk.racuni` (isti Supabase projekt) preko funkcije `nadzor_racuni`, a PDF traži od Edge funkcije `fisk-racun` (repozitorij financijski-softver). Adresa funkcije je `SUPABASE_URL/functions/v1/fisk-racun`, a može se promijeniti varijablom `FISK_URL`.
 
 Postavljanje: `npx wrangler secret put IME` iz mape `nadzor/`.
 
