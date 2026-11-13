@@ -49,10 +49,10 @@ Izvod u formatu CAMT.053 (ISO 20022, XML) preuzme se iz internetskog bankarstva 
 
 ### Izvodi mailom
 
-PBZ šalje dnevni izvod na `izvodi@digitalnipartner.hr`. Cloudflare Email Routing tu adresu šalje Workeru dp-nadzor (Email Routing → Routing rules → Send to a Worker), a Worker (`email` u `src/index.js`):
+PBZ šalje dnevni izvod na `izvodi@digitalnipartner.hr`, sandučić u Zohu (MX domene je na Zohu). Zoho ga prosljeđuje na `izvodi@banka.digitalnipartner.hr`. Taj poddomen ima Cloudflare Email Routing (MX samo za `banka.`, pa ostala pošta ostaje na Zohu), a pravilo ga šalje Workeru dp-nadzor. Worker (`email` u `src/index.js`):
 
 1. po potrebi proslijedi mail na `IZVODI_PROSLIJEDI`, da izvod ostane i u pošti,
-2. provjeri pošiljatelja (`IZVODI_POSILJATELJI`) i da je izvod za račun iz `IZVODI_IBAN`,
+2. provjeri pošiljatelja (`IZVODI_POSILJATELJI`, u omotnici ili u zaglavlju From, jer Zoho kod prosljeđivanja mijenja omotnicu) i da je izvod za račun iz `IZVODI_IBAN`,
 3. uveze svaki XML ili ZIP privitak, isto kao ručni uvoz,
 4. upiše ishod kao „izvodi-mail” (vidi se u dnu dashboarda), a kad nešto ne uspije, pošalje obavijest na `OBAVIJEST_NA` (ako je postavljen `RESEND_KEY`).
 

@@ -229,7 +229,11 @@ async function primiMail(poruka, env) {
     await zapisi(false, t);
     return await javi(t);
   }
-  if (!posiljateljDopusten(od, popis(env.IZVODI_POSILJATELJI))) return await zapisi(false, "Mail od " + od + " nije uvezen: pošiljatelj nije na popisu IZVODI_POSILJATELJI.");
+  // Kod prosljeđivanja (npr. iz Zoha) omotnica nosi adresu sandučića koji prosljeđuje,
+  // a zaglavlje From ostaje banka, pa vrijedi ako se bilo koja od njih poklapa.
+  const odZaglavlje = ((poruka.headers.get("from") || "").match(/[^\s<>"]+@[^\s<>"]+/) || [""])[0].toLowerCase();
+  const dopusteni = popis(env.IZVODI_POSILJATELJI);
+  if (!posiljateljDopusten(od, dopusteni) && !posiljateljDopusten(odZaglavlje, dopusteni)) return await zapisi(false, "Mail od " + od + " nije uvezen: pošiljatelj nije na popisu IZVODI_POSILJATELJI.");
   if (!raw) {
     const t = "Mail od " + od + " je veći od 25 MB, pa nije uvezen.";
     await zapisi(false, t);
