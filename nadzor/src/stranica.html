@@ -78,13 +78,30 @@ footer .wrap{padding-top:4px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap
 .filtri{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
 .jir{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--grafit);word-break:break-all}
 svg text{font-family:Manrope,sans-serif}
+.izb,.ekran-m{display:none}
 @media (max-width:640px){.wrap{padding:0 16px}header .wrap{padding-top:8px;padding-bottom:8px}.sub{display:none}nav button{padding:0 10px}.panel,.zeleno>div,.kpi>div{padding:16px}}
+/* Mobitel: ekrani se otvaraju iz izbornika (tipka s tri crte gore desno), a uz logo piše na kojem si ekranu */
+@media (max-width:640px){
+  header .wrap{flex-wrap:nowrap;min-height:56px}
+  .ekran-m{display:block;font-size:13px;color:rgba(231,228,222,.75);padding-left:12px;border-left:1px solid rgba(231,228,222,.3)}
+  .izb{display:grid;place-content:center;gap:5px;width:44px;height:44px;margin-right:-10px;padding:0;border:0;border-radius:8px;background:none;cursor:pointer}
+  .izb span{display:block;width:22px;height:2px;border-radius:1px;background:var(--kamen);transition:transform .2s,opacity .15s}
+  header.otvoren .izb span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  header.otvoren .izb span:nth-child(2){opacity:0}
+  header.otvoren .izb span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;background:var(--smaragd);border-top:1px solid rgba(231,228,222,.15);padding:8px 16px 16px;box-shadow:0 12px 24px rgba(11,11,12,.18)}
+  header.otvoren nav{display:flex}
+  nav button{text-align:left;font-size:16px;min-height:48px;padding:0 12px}
+  nav button[aria-selected=true]::after{left:12px;right:auto;width:24px;bottom:8px}
+}
+@media (prefers-reduced-motion:reduce){.izb span{transition:none}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><div class="mono">dp</div><div class="word"><b>digitalni</b>partner</div><div class="sub">nadzor poslovanja</div></div>
-  <nav role="tablist" aria-label="Ekrani">
+  <div class="brand"><div class="mono">dp</div><div class="word"><b>digitalni</b>partner</div><div class="sub">nadzor poslovanja</div><div class="ekran-m" id="ekran-m"></div></div>
+  <button class="izb" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="ekrani"><span></span><span></span><span></span></button>
+  <nav role="tablist" aria-label="Ekrani" id="ekrani">
     <button role="tab" data-ekran="pregled" aria-selected="true">Pregled</button>
     <button role="tab" data-ekran="usluge" aria-selected="false">Usluge</button>
     <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
@@ -120,10 +137,15 @@ function ucitaj(){
     .catch(function(err){ document.getElementById("sadrzaj").innerHTML = '<p class="prazno">Podaci se nisu učitali (' + e(err.message) + '). Osvježi stranicu za minutu.</p>'; });
 }
 
+// Označi odabrani ekran u izborniku i upiši njegov naziv uz logo (vidi se samo na mobitelu)
+function oznaci(){
+  document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); if (b.dataset.ekran === ekran) document.getElementById("ekran-m").textContent = b.textContent; });
+}
+
 function crtaj(){
   var imaOgl = D.prihod_godina_ogledno || D.klijenti.some(function(k){ return k.ogledno; }) || Object.keys(D.metrike).some(function(k){ return D.metrike[k].ogledno; });
   document.getElementById("traka").hidden = !imaOgl;
-  document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); });
+  oznaci();
   var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
@@ -478,7 +500,15 @@ function veziBanku(){
   });
 }
 
-document.querySelectorAll("nav button").forEach(function(b){ b.addEventListener("click", function(){ ekran = b.dataset.ekran; history.replaceState(null, "", "#" + ekran); if (D) crtaj(); window.scrollTo(0, 0); }); });
+document.querySelectorAll("nav button").forEach(function(b){ b.addEventListener("click", function(){ ekran = b.dataset.ekran; history.replaceState(null, "", "#" + ekran); izbornik(false); oznaci(); if (D) crtaj(); window.scrollTo(0, 0); }); });
+// Izbornik na mobitelu: tipka s tri crte otvara i zatvara popis ekrana; zatvara ga i odabir ekrana, Esc ili klik izvan zaglavlja
+var zaglavlje = document.querySelector("header"), izb = zaglavlje.querySelector(".izb");
+function izbornik(otvori){ zaglavlje.classList.toggle("otvoren", otvori); izb.setAttribute("aria-expanded", otvori ? "true" : "false"); }
+izb.addEventListener("click", function(){ izbornik(!zaglavlje.classList.contains("otvoren")); });
+document.addEventListener("keydown", function(ev){ if (ev.key === "Escape" && zaglavlje.classList.contains("otvoren")) { izbornik(false); izb.focus(); } });
+document.addEventListener("click", function(ev){ if (!zaglavlje.contains(ev.target)) izbornik(false); });
+addEventListener("resize", function(){ if (innerWidth > 640) izbornik(false); });
+oznaci();
 ucitaj();
 setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); }, 10 * 60 * 1000);
 })();
