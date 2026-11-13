@@ -277,6 +277,31 @@ function vjencanja(){
   h += '<section class="panel"><h2>Vjenčanja po mjesecima, idućih 12 mjeseci</h2><svg viewBox="0 0 720 230" role="img" aria-label="Broj vjenčanja po mjesecu" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="200" y2="200" stroke="rgba(11,11,12,.14)"/>' + s + '</svg><p class="src">Izvor: datum vjenčanja na pozivnicama i rasporedima. Stvarni podaci iz baze MyWeddingInvite.</p></section>';
   var id = k.iduca || [];
   h += '<section class="panel"><h2>Iduća vjenčanja</h2>' + (id.length ? '<div class="skrol"><table class="num"><thead><tr><th>Datum</th><th>Objavljena</th><th class="r">Potvrde</th><th class="r">Gostiju dolazi</th><th>Album</th><th class="r">Stolova</th></tr></thead><tbody>' + id.map(function(v){ return '<tr><td class="nw" style="font-weight:600">' + datum(v.datum) + '</td><td>' + (v.objavljena ? "da" : "ne") + '</td><td class="r">' + v.potvrde + '</td><td class="r">' + v.dolazi + '</td><td>' + (v.ima_album ? "da" : "ne") + '</td><td class="r">' + v.stolovi + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Nema pozivnica s datumom u budućnosti.</p>') + '<p class="src">Imena parova i gostiju se ne prenose u dashboard, samo brojevi.</p></section>';
+  h += korisniciKuverte();
+  return h;
+}
+
+// ---------- Korisnici Kuverte (na ekranu Kuverta) ----------
+var K = null, kGreska = "";
+function ucitajKorisnike(){
+  fetch("/api/korisnici", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ K = j.korisnici || []; kGreska = ""; if (ekran === "vjencanja") crtaj(); })
+    .catch(function(err){ kGreska = err.message; if (ekran === "vjencanja") crtaj(); });
+}
+function korisniciKuverte(){
+  var h = '<section class="panel"><h2>Registrirani korisnici</h2>';
+  if (kGreska) return h + '<p class="prazno">Korisnici se nisu učitali (' + e(kGreska) + '). Osvježi stranicu za minutu.</p></section>';
+  if (!K) { ucitajKorisnike(); return h + '<p class="prazno">Učitavam korisnike…</p></section>'; }
+  if (!K.length) return h + '<p class="prazno">Još nema registriranih korisnika.</p></section>';
+  var od30 = Date.now() - 30 * 864e5;
+  var novi = K.filter(function(u){ return new Date(u.registriran).getTime() >= od30; }).length;
+  var aktivni = K.filter(function(u){ return u.zadnja_prijava && new Date(u.zadnja_prijava).getTime() >= od30; }).length;
+  var platili = K.filter(function(u){ return Number(u.placeno) > 0; }).length;
+  function usl(u){ return [u.pozivnica && "pozivnica", u.album && "album", u.raspored && "raspored"].filter(Boolean).join(", ") || "–"; }
+  h += '<p class="num" style="font-size:14px"><b>' + br(K.length) + '</b> ukupno · <b>' + br(novi) + '</b> novih u zadnjih 30 dana · <b>' + br(aktivni) + '</b> prijavljenih u zadnjih 30 dana · <b>' + br(platili) + '</b> platilo</p>';
+  h += '<div class="skrol"><table class="num"><thead><tr><th>E-mail</th><th>Registriran</th><th>Zadnja prijava</th><th>Potvrđen</th><th>Napravio</th><th class="r">Plaćeno</th></tr></thead><tbody>'
+    + K.map(function(u){ return '<tr><td class="nw" style="font-weight:600">' + e(u.email || "–") + '</td><td class="nw">' + vrijeme(u.registriran) + '</td><td class="nw">' + (u.zadnja_prijava ? vrijeme(u.zadnja_prijava) : "nikad") + '</td><td>' + (u.potvrden ? "da" : "ne") + '</td><td>' + e(usl(u)) + '</td><td class="r nw">' + (Number(u.placeno) > 0 ? eur(u.placeno, true) : "–") + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Izvor: Supabase Authentication projekta MyWeddingInvite, najnoviji prvi. Plaćeno je zbroj uplata preko Stripea bez testnih.</p></section>';
   return h;
 }
 

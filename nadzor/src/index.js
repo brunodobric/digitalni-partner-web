@@ -3,6 +3,7 @@
 // - GET /api/podaci  svi brojevi za dashboard (Access)
 // - POST /api/trosak, POST /api/upit-status  ručni unos (Access)
 // - GET /api/racuni  računi iz fiskalizacije (Access)
+// - GET /api/korisnici  registrirani korisnici Kuverte: e-mail, registracija, zadnja prijava (Access)
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
 // - POST /api/izvod  uvoz jednog izvoda CAMT.053 (XML u tijelu zahtjeva) (Access)
@@ -55,6 +56,10 @@ export default {
       if (req.method === "GET" && url.pathname === "/api/racuni") {
         const racuni = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_racuni", { p_kljuc: env.NADZOR_KLJUC });
         return json({ racuni });
+      }
+      if (req.method === "GET" && url.pathname === "/api/korisnici") {
+        const korisnici = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_korisnici", { p_kljuc: env.NADZOR_KLJUC });
+        return json({ korisnici });
       }
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
       if (req.method === "GET" && url.pathname === "/api/banka") {

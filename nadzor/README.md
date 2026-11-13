@@ -17,6 +17,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Funkcija za brojeve iz Kuverte | `sql/02-kuverta-statistika.sql` |
 | Ogledni podaci | `sql/03-ogledni-podaci.sql` |
 | Popis računa iz fiskalizacije (ekran Računi) | `sql/04-racuni.sql` |
+| Registrirani korisnici Kuverte (ekran Kuverta), pokreće se u projektu MyWeddingInvite | `sql/06-kuverta-korisnici.sql` |
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
 | Testovi čitača s izmišljenim izvodima | `test/` (`node --test nadzor/test/camt.test.mjs`) |
