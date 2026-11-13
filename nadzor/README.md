@@ -20,7 +20,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
 | Privici iz maila (MIME) i XML iz ZIP-a | `src/mail.js` |
-| Testovi s izmišljenim izvodima | `test/` (`node --test nadzor/test/`) |
+| Testovi s izmišljenim izvodima | `test/` (`node --test nadzor/test/*.test.mjs`) |
 
 Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U bazama je spremljen samo njegov SHA-256 sažetak. Tablice imaju uključen RLS bez pravila, pa ih javni ključ ne može čitati izravno.
 
