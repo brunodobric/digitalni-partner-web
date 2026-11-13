@@ -7,6 +7,7 @@
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
 // - POST /api/izvod  uvoz jednog izvoda CAMT.053 (XML u tijelu zahtjeva) (Access)
 // - POST /upit       javni prijem upita s kontakt obrasca na webu (bez prijave, samo s dopuštene adrese)
+// - email            izvodi CAMT.053 iz maila banke (Cloudflare Email Routing), vidi primiMail
 // - cron u 5:00 UTC  (6:00 zimi, 7:00 ljeti po hrvatskom vremenu) skuplja podatke iz izvora
 //
 // Tajne (wrangler secret put): NADZOR_KLJUC, a po potrebi CF_API_TOKEN, RESEND_KEY
@@ -16,6 +17,7 @@
 import STRANICA from "./stranica.html";
 import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
 import { citajCamt053 } from "./camt.js";
+import { jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
 
 export default {
   async fetch(req, env, ctx) {
@@ -70,6 +72,15 @@ export default {
 
   async scheduled(event, env, ctx) {
     ctx.waitUntil(prikupi(env));
+  },
+
+  // Izvodi iz banke stižu mailom (Cloudflare Email Routing usmjeri adresu na ovaj Worker).
+  async email(poruka, env) {
+    try {
+      await primiMail(poruka, env);
+    } catch (e) {
+      console.error("izvodi-mail", e);
+    }
   },
 };
 
@@ -127,33 +138,145 @@ async function pdfRacuna(url, env) {
 
 const NAJVECI_IZVOD = 5 * 1024 * 1024;
 
+// Greška u samoj datoteci (nije izvod, krivi IBAN...), za razliku od greške baze ili mreže.
+class GreskaIzvoda extends Error {}
+
+// Uvozi jednu datoteku: XML izvod ili ZIP s XML izvodima. dopusteniIban (niz) ograničava račune.
+async function uveziDatoteku(env, bajtovi, naziv, dopusteniIban) {
+  if (!bajtovi.length) throw new GreskaIzvoda("Datoteka je prazna.");
+  if (jeZip(bajtovi)) {
+    let xmlovi;
+    try {
+      xmlovi = await xmlIzZipa(bajtovi);
+    } catch (e) {
+      throw new GreskaIzvoda(String(e.message || e));
+    }
+    if (!xmlovi.length) throw new GreskaIzvoda("U ZIP-u nema XML datoteke.");
+    const zbroj = { uvezeni: [], preskoceni: [], neuskladeni: [] };
+    for (const x of xmlovi) {
+      const r = await uveziDatoteku(env, x.bajtovi, naziv + " / " + x.naziv, dopusteniIban);
+      for (const k in zbroj) zbroj[k].push(...r[k]);
+    }
+    return zbroj;
+  }
+  if (bajtovi.length > NAJVECI_IZVOD) throw new GreskaIzvoda("Datoteka je veća od 5 MB.");
+  let xml;
+  try {
+    xml = new TextDecoder("utf-8", { fatal: true }).decode(bajtovi);
+  } catch (_) {
+    throw new GreskaIzvoda("Datoteka nije u kodiranju UTF-8, pa nije izvod CAMT.053.");
+  }
+  let izvodi;
+  try {
+    izvodi = citajCamt053(xml);
+  } catch (e) {
+    throw new GreskaIzvoda(String(e.message || e));
+  }
+  if (dopusteniIban) {
+    const tudi = izvodi.filter((i) => !dopusteniIban.includes(i.iban)).map((i) => i.iban);
+    if (tudi.length) throw new GreskaIzvoda("Izvod je za račun koji nije na popisu IZVODI_IBAN: " + tudi.join(", "));
+  }
+  const sazetak = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bajtovi))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const ishod = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_izvod_uvoz", { p_kljuc: env.NADZOR_KLJUC, p_naziv: naziv.slice(0, 200), p_sazetak: sazetak, p_xml: xml, p_izvodi: izvodi });
+  return { uvezeni: ishod.uvezeni, preskoceni: ishod.preskoceni, neuskladeni: izvodi.filter((i) => i.uskladeno === false).map((i) => i.oznaka) };
+}
+
 async function uvezIzvod(req, env) {
   // application/xml nije "jednostavna" vrsta za CORS, pa tuđa stranica ne može poslati izvod u ime prijavljenog.
   if (!(req.headers.get("content-type") || "").startsWith("application/xml")) return json({ greska: "Izvod se šalje kao application/xml." }, 415);
   const duljina = Number(req.headers.get("content-length") || 0);
   if (duljina > NAJVECI_IZVOD) return json({ greska: "Datoteka je veća od 5 MB." }, 413);
   const bajtovi = new Uint8Array(await req.arrayBuffer());
-  if (!bajtovi.length) return json({ greska: "Datoteka je prazna." }, 400);
   if (bajtovi.length > NAJVECI_IZVOD) return json({ greska: "Datoteka je veća od 5 MB." }, 413);
-  if (bajtovi[0] === 0x50 && bajtovi[1] === 0x4b) return json({ greska: "Ovo je ZIP. Raspakiraj ga i uvezi XML datoteke iz njega." }, 400);
-  let xml;
-  try {
-    xml = new TextDecoder("utf-8", { fatal: true }).decode(bajtovi);
-  } catch (_) {
-    return json({ greska: "Datoteka nije u kodiranju UTF-8, pa nije izvod CAMT.053." }, 400);
-  }
-  let izvodi;
-  try {
-    izvodi = citajCamt053(xml);
-  } catch (e) {
-    return json({ greska: String(e.message || e) }, 400);
-  }
-  const sazetak = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bajtovi))].map((b) => b.toString(16).padStart(2, "0")).join("");
   let naziv = "";
-  try { naziv = decodeURIComponent(req.headers.get("x-naziv") || "").slice(0, 200); } catch (_) {}
-  const ishod = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_izvod_uvoz", { p_kljuc: env.NADZOR_KLJUC, p_naziv: naziv, p_sazetak: sazetak, p_xml: xml, p_izvodi: izvodi });
-  const neuskladeni = izvodi.filter((i) => i.uskladeno === false).map((i) => i.oznaka);
-  return json({ ...ishod, neuskladeni });
+  try { naziv = decodeURIComponent(req.headers.get("x-naziv") || ""); } catch (_) {}
+  try {
+    return json(await uveziDatoteku(env, bajtovi, naziv, null));
+  } catch (e) {
+    if (e instanceof GreskaIzvoda) return json({ greska: e.message }, 400);
+    throw e;
+  }
+}
+
+// ---------- Izvodi stižu mailom (Cloudflare Email Routing -> ovaj Worker) ----------
+// IZVODI_IBAN (obavezno): IBAN-i za koje se izvodi primaju, odvojeni zarezom.
+// IZVODI_POSILJATELJI (preporučeno): adrese ili domene pošiljatelja, npr. "@pbz.hr".
+// IZVODI_PROSLIJEDI (neobavezno): potvrđena adresa u Email Routingu na koju se mail proslijedi.
+
+const NAJVECI_MAIL = 25 * 1024 * 1024;
+
+function popis(v) {
+  return String(v || "").split(",").map((x) => x.trim()).filter(Boolean);
+}
+
+async function primiMail(poruka, env) {
+  const od = String(poruka.from || "").toLowerCase();
+  const zapisi = (uspjeh, tekst) =>
+    rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_zapis", { p_kljuc: env.NADZOR_KLJUC, p_izvor: "izvodi-mail", p_uspjeh: uspjeh, p_poruka: tekst }).catch(console.error);
+  const javi = (tekst) => env.RESEND_KEY && env.OBAVIJEST_NA ? posaljiMail(env, "Izvod iz banke nije uvezen", tekst) : null;
+
+  const raw = poruka.rawSize > NAJVECI_MAIL ? null : new Uint8Array(await new Response(poruka.raw).arrayBuffer());
+  if (env.IZVODI_PROSLIJEDI) {
+    try {
+      await poruka.forward(env.IZVODI_PROSLIJEDI);
+    } catch (e) {
+      console.error("proslijedi", e);
+    }
+  }
+  const ibani = popis(env.IZVODI_IBAN).map((i) => i.replace(/\s+/g, "").toUpperCase());
+  if (!ibani.length) {
+    const t = "Mail od " + od + " nije uvezen: u Workeru dp-nadzor nije postavljena tajna IZVODI_IBAN.";
+    await zapisi(false, t);
+    return await javi(t);
+  }
+  // Kod prosljeđivanja (npr. iz Zoha) omotnica nosi adresu sandučića koji prosljeđuje,
+  // a zaglavlje From ostaje banka, pa vrijedi ako se bilo koja od njih poklapa.
+  const odZaglavlje = ((poruka.headers.get("from") || "").match(/[^\s<>"]+@[^\s<>"]+/) || [""])[0].toLowerCase();
+  const dopusteni = popis(env.IZVODI_POSILJATELJI);
+  if (!posiljateljDopusten(od, dopusteni) && !posiljateljDopusten(odZaglavlje, dopusteni)) return await zapisi(false, "Mail od " + od + " nije uvezen: pošiljatelj nije na popisu IZVODI_POSILJATELJI.");
+  if (!raw) {
+    const t = "Mail od " + od + " je veći od 25 MB, pa nije uvezen.";
+    await zapisi(false, t);
+    return await javi(t);
+  }
+
+  const datoteke = privitci(raw).filter((p) => /\.(xml|zip)$/i.test(p.naziv) || /(^|\/)(xml|zip|x-zip-compressed)$/.test(p.vrsta));
+  if (!datoteke.length) {
+    const t = "Mail od " + od + " (" + (poruka.headers.get("subject") || "bez naslova") + ") nema XML ni ZIP privitka.";
+    await zapisi(false, t);
+    return await javi(t);
+  }
+  const uvezeni = [], preskoceni = [], neuskladeni = [], greske = [];
+  for (const d of datoteke) {
+    try {
+      const r = await uveziDatoteku(env, d.bajtovi, "mail: " + d.naziv, ibani);
+      uvezeni.push(...r.uvezeni);
+      preskoceni.push(...r.preskoceni);
+      neuskladeni.push(...r.neuskladeni);
+    } catch (e) {
+      greske.push(d.naziv + ": " + String(e.message || e));
+    }
+  }
+  const t = [
+    uvezeni.length ? "uvezeno izvoda: " + uvezeni.length : "",
+    preskoceni.length ? "već uvezeno: " + preskoceni.length : "",
+    neuskladeni.length ? "ne slaže se: " + neuskladeni.join(", ") : "",
+    greske.length ? "greške: " + greske.join("; ") : "",
+  ].filter(Boolean).join(", ");
+  await zapisi(!greske.length && !neuskladeni.length, t);
+  if (greske.length || neuskladeni.length) await javi("Mail od " + od + ": " + t + "\n\nIzvod možeš uvesti i ručno na ekranu Banka u dashboardu.");
+}
+
+async function posaljiMail(env, naslov, tekst) {
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { authorization: "Bearer " + env.RESEND_KEY, "content-type": "application/json" },
+      body: JSON.stringify({ from: env.OBAVIJEST_OD || "Digitalni partner <onboarding@resend.dev>", to: [env.OBAVIJEST_NA], subject: naslov, text: tekst }),
+    });
+  } catch (e) {
+    console.error("obavijest", e);
+  }
 }
 
 // ---------- Javni prijem upita s weba ----------

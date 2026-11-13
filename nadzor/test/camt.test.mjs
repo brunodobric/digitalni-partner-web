@@ -1,4 +1,4 @@
-// Pokretanje: node --test nadzor/test (iz korijena repozitorija)
+// Pokretanje: node --test nadzor/test/*.test.mjs (iz korijena repozitorija)
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";

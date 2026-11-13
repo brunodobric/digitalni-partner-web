@@ -395,8 +395,8 @@ function banka(){
   return h;
 }
 function uvozIzvoda(){
-  return '<section class="panel"><h2>Uvoz izvoda</h2><p class="src">Iz internetskog bankarstva preuzmi izvod u formatu <b>CAMT.053</b> (XML, ISO 20022). Može više datoteka odjednom, a izvod koji je već uvezen se preskače.</p>'
-    + '<form class="filtri" id="izvod"><label>Datoteke izvoda<input name="datoteke" type="file" accept=".xml,application/xml,text/xml" multiple required></label><button class="gumb" type="submit">Uvezi</button></form><p class="src" id="izvod-poruka" role="status" style="white-space:pre-line">' + e(bPoruka) + '</p></section>';
+  return '<section class="panel"><h2>Uvoz izvoda</h2><p class="src">Izvodi koji stižu mailom uvoze se sami (vidi „izvodi-mail” u dnu stranice). Ručno: izvod u formatu <b>CAMT.053</b> (XML ili ZIP s XML-ovima). Može više datoteka odjednom, a izvod koji je već uvezen se preskače.</p>'
+    + '<form class="filtri" id="izvod"><label>Datoteke izvoda<input name="datoteke" type="file" accept=".xml,.zip,application/xml,text/xml,application/zip" multiple required></label><button class="gumb" type="submit">Uvezi</button></form><p class="src" id="izvod-poruka" role="status" style="white-space:pre-line">' + e(bPoruka) + '</p></section>';
 }
 function grafSalda(niz, val){
   if (!niz.length) return '<p class="prazno">Nema izvoda u zadnjih 13 mjeseci.</p>';
