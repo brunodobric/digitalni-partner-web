@@ -2,6 +2,7 @@
 // - GET /            stranica dashboarda (samo uz prijavu kroz Cloudflare Access)
 // - GET /api/podaci  svi brojevi za dashboard (Access)
 // - POST /api/trosak, POST /api/upit-status  ručni unos (Access)
+// - POST /api/trosak-obrisi  brisanje jednog troška po id-u (Access)
 // - GET /api/racuni  računi iz fiskalizacije (Access)
 // - GET /api/korisnici  registrirani korisnici Kuverte: e-mail, registracija, zadnja prijava (Access)
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
@@ -48,6 +49,14 @@ export default {
         if (!b.opis || !(iznos >= 0) || !/^\d{4}-\d{2}-\d{2}$/.test(b.datum || "")) return json({ greska: "Provjerite datum, opis i iznos." }, 400);
         const id = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_trosak", { p_kljuc: env.NADZOR_KLJUC, p_datum: b.datum, p_opis: String(b.opis).slice(0, 200), p_iznos: iznos, p_linija: b.linija || "obrt" });
         return json({ id });
+      }
+      if (req.method === "POST" && url.pathname === "/api/trosak-obrisi") {
+        const b = await req.json();
+        const id = Number(b.id);
+        if (!Number.isInteger(id) || id <= 0) return json({ greska: "Nepoznat trošak." }, 400);
+        const obrisan = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_trosak_obrisi", { p_kljuc: env.NADZOR_KLJUC, p_id: id });
+        if (!obrisan) return json({ greska: "Trošak više ne postoji. Osvježi stranicu." }, 404);
+        return json({ ok: true });
       }
       if (req.method === "POST" && url.pathname === "/api/upit-status") {
         const b = await req.json();
