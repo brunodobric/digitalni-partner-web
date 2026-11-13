@@ -13,6 +13,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Worker: stranica, API, prijem upita, dnevni prikupljači | `src/index.js` |
 | Stranica dashboarda | `src/stranica.html` |
 | Ikona za oznaku i početni zaslon (180 × 180, znak „dp” manji, ispod natpis „nadzor”) | `src/apple-touch-icon.png` |
+| Logo na ekranu za prijavu (Cloudflare Access), javno na webu jer se prijava otvara prije Workera | `../slike/nadzor-prijava.png` |
 | Shema baze dashboarda | `sql/01-nadzor-shema.sql` |
 | Funkcija za brojeve iz Kuverte | `sql/02-kuverta-statistika.sql` |
 | Ogledni podaci | `sql/03-ogledni-podaci.sql` |
@@ -66,3 +67,17 @@ Svi ogledni redovi imaju `ogledno = true` i na dashboardu nose oznaku OGLEDNO. K
 ```sql
 select public.nadzor_obrisi_ogledno('<NADZOR_KLJUC>', 'usluge');  -- ili 'aplikacije', 'vjencanja', 'obrt', 'sve'
 ```
+
+## Ekran za prijavu
+
+Prijavu prikazuje Cloudflare Access, ne Worker. Na besplatnom Zero Trust planu mijenjaju se samo logo, boje i tekst iznad i ispod obrasca (Zero Trust > Reusable components > Custom pages > Access login page, ili API `PUT /accounts/{id}/access/organizations`, polje `login_design`):
+
+| Polje | Vrijednost |
+| --- | --- |
+| Logo | `https://digitalnipartner.hr/slike/nadzor-prijava.png` (isti znak kao ikona za oznaku) |
+| Pozadina | `#E7E4DE` (kamen) |
+| Boja teksta | `#0F3B33` (smaragd) |
+| Naslov | Nadzor poslovanja |
+| Podnožje | Kod za prijavu stiže mailom, samo na odobrene adrese. Ako ga nema, pogledaj i neželjenu poštu. |
+
+Obrazac u sredini (font, gumb, tekst na engleskom) ostaje Cloudflareov. Potpuno vlastiti HTML prijave traži plan Pay-as-you-go.
