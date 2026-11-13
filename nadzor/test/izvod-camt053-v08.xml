@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Izmišljen izvod za testove (verzija .001.08, s prefiksom imenskog prostora). -->
+<c:Document xmlns:c="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">
+  <c:BkToCstmrStmt>
+    <c:GrpHdr><c:MsgId>X</c:MsgId><c:CreDtTm>2026-11-01T06:00:00+01:00</c:CreDtTm></c:GrpHdr>
+    <c:Stmt>
+      <c:Id>STMT-0001</c:Id>
+      <c:ElctrncSeqNb>1</c:ElctrncSeqNb>
+      <c:Acct>
+        <c:Id><c:IBAN>HR9824020061100000001</c:IBAN></c:Id>
+        <c:Ccy>EUR</c:Ccy>
+        <c:Ownr><c:Nm>Primjer d.o.o.</c:Nm></c:Ownr>
+        <c:Svcr><c:FinInstnId><c:BICFI>TESTHR22</c:BICFI></c:FinInstnId></c:Svcr>
+      </c:Acct>
+      <c:Bal>
+        <c:Tp><c:CdOrPrtry><c:Cd>PRCD</c:Cd></c:CdOrPrtry></c:Tp>
+        <c:Amt Ccy="EUR">20.00</c:Amt><c:CdtDbtInd>DBIT</c:CdtDbtInd>
+        <c:Dt><c:Dt>2026-10-31</c:Dt></c:Dt>
+      </c:Bal>
+      <c:Bal>
+        <c:Tp><c:CdOrPrtry><c:Cd>CLBD</c:Cd></c:CdOrPrtry></c:Tp>
+        <c:Amt Ccy="EUR">80.00</c:Amt><c:CdtDbtInd>CRDT</c:CdtDbtInd>
+        <c:Dt><c:DtTm>2026-11-01T23:59:59+01:00</c:DtTm></c:Dt>
+      </c:Bal>
+      <c:Ntry>
+        <c:Amt Ccy="EUR">100</c:Amt>
+        <c:CdtDbtInd>CRDT</c:CdtDbtInd>
+        <c:Sts><c:Cd>BOOK</c:Cd></c:Sts>
+        <c:BookgDt><c:Dt>2026-11-01</c:Dt></c:BookgDt>
+        <c:ValDt><c:Dt>2026-11-01</c:Dt></c:ValDt>
+        <c:AcctSvcrRef>R-1</c:AcctSvcrRef>
+        <c:NtryDtls>
+          <c:TxDtls>
+            <c:RltdPties><c:Dbtr><c:Pty><c:Nm>Ana Anić</c:Nm></c:Pty></c:Dbtr></c:RltdPties>
+            <c:RmtInf><c:Ustrd>Račun 7/WEB/1</c:Ustrd></c:RmtInf>
+          </c:TxDtls>
+          <c:TxDtls>
+            <c:RltdPties><c:Dbtr><c:Pty><c:Nm>Marko Marić</c:Nm></c:Pty></c:Dbtr></c:RltdPties>
+          </c:TxDtls>
+        </c:NtryDtls>
+      </c:Ntry>
+    </c:Stmt>
+  </c:BkToCstmrStmt>
+</c:Document>
