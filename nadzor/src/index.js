@@ -4,6 +4,8 @@
 // - POST /api/trosak, POST /api/upit-status  ručni unos (Access)
 // - GET /api/racuni  računi iz fiskalizacije (Access)
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
+// - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
+// - POST /api/izvod  uvoz jednog izvoda CAMT.053 (XML u tijelu zahtjeva) (Access)
 // - POST /upit       javni prijem upita s kontakt obrasca na webu (bez prijave, samo s dopuštene adrese)
 // - cron u 5:00 UTC  (6:00 zimi, 7:00 ljeti po hrvatskom vremenu) skuplja podatke iz izvora
 //
@@ -13,6 +15,7 @@
 
 import STRANICA from "./stranica.html";
 import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
+import { citajCamt053 } from "./camt.js";
 
 export default {
   async fetch(req, env, ctx) {
@@ -54,6 +57,10 @@ export default {
         return json({ racuni });
       }
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
+      if (req.method === "GET" && url.pathname === "/api/banka") {
+        return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_banka", { p_kljuc: env.NADZOR_KLJUC }));
+      }
+      if (req.method === "POST" && url.pathname === "/api/izvod") return await uvezIzvod(req, env);
       return new Response("Nema te stranice.", { status: 404 });
     } catch (e) {
       console.error(e);
@@ -114,6 +121,39 @@ async function pdfRacuna(url, env) {
       "x-content-type-options": "nosniff",
     },
   });
+}
+
+// ---------- Uvoz bankovnog izvoda (CAMT.053) ----------
+
+const NAJVECI_IZVOD = 5 * 1024 * 1024;
+
+async function uvezIzvod(req, env) {
+  // application/xml nije "jednostavna" vrsta za CORS, pa tuđa stranica ne može poslati izvod u ime prijavljenog.
+  if (!(req.headers.get("content-type") || "").startsWith("application/xml")) return json({ greska: "Izvod se šalje kao application/xml." }, 415);
+  const duljina = Number(req.headers.get("content-length") || 0);
+  if (duljina > NAJVECI_IZVOD) return json({ greska: "Datoteka je veća od 5 MB." }, 413);
+  const bajtovi = new Uint8Array(await req.arrayBuffer());
+  if (!bajtovi.length) return json({ greska: "Datoteka je prazna." }, 400);
+  if (bajtovi.length > NAJVECI_IZVOD) return json({ greska: "Datoteka je veća od 5 MB." }, 413);
+  if (bajtovi[0] === 0x50 && bajtovi[1] === 0x4b) return json({ greska: "Ovo je ZIP. Raspakiraj ga i uvezi XML datoteke iz njega." }, 400);
+  let xml;
+  try {
+    xml = new TextDecoder("utf-8", { fatal: true }).decode(bajtovi);
+  } catch (_) {
+    return json({ greska: "Datoteka nije u kodiranju UTF-8, pa nije izvod CAMT.053." }, 400);
+  }
+  let izvodi;
+  try {
+    izvodi = citajCamt053(xml);
+  } catch (e) {
+    return json({ greska: String(e.message || e) }, 400);
+  }
+  const sazetak = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bajtovi))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  let naziv = "";
+  try { naziv = decodeURIComponent(req.headers.get("x-naziv") || "").slice(0, 200); } catch (_) {}
+  const ishod = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_izvod_uvoz", { p_kljuc: env.NADZOR_KLJUC, p_naziv: naziv, p_sazetak: sazetak, p_xml: xml, p_izvodi: izvodi });
+  const neuskladeni = izvodi.filter((i) => i.uskladeno === false).map((i) => i.oznaka);
+  return json({ ...ishod, neuskladeni });
 }
 
 // ---------- Javni prijem upita s weba ----------

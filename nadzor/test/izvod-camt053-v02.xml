@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Izmišljen izvod za testove: IBAN, imena i iznosi nisu stvarni. -->
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BkToCstmrStmt>
+    <GrpHdr>
+      <MsgId>IZV-2026-11-12</MsgId>
+      <CreDtTm>2026-11-13T05:10:00</CreDtTm>
+    </GrpHdr>
+    <Stmt>
+      <Id>HR1210010051863000160-2026-221</Id>
+      <ElctrncSeqNb>221</ElctrncSeqNb>
+      <LglSeqNb>221</LglSeqNb>
+      <CreDtTm>2026-11-13T05:10:00</CreDtTm>
+      <FrToDt><FrDtTm>2026-11-12T00:00:00</FrDtTm><ToDtTm>2026-11-12T23:59:59</ToDtTm></FrToDt>
+      <Acct>
+        <Id><IBAN>HR1210010051863000160</IBAN></Id>
+        <Ccy>EUR</Ccy>
+        <Ownr><Nm>PRIMJER OBRT, VL. IVO IVIĆ</Nm></Ownr>
+        <Svcr><FinInstnId><BIC>TESTHR2X</BIC></FinInstnId></Svcr>
+      </Acct>
+      <Bal>
+        <Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp>
+        <Amt Ccy="EUR">1250.40</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Dt><Dt>2026-11-12</Dt></Dt>
+      </Bal>
+      <Bal>
+        <Tp><CdOrPrtry><Cd>CLBD</Cd></CdOrPrtry></Tp>
+        <Amt Ccy="EUR">1386.15</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Dt><Dt>2026-11-12</Dt></Dt>
+      </Bal>
+      <Bal>
+        <Tp><CdOrPrtry><Cd>CLAV</Cd></CdOrPrtry></Tp>
+        <Amt Ccy="EUR">1386.15</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Dt><Dt>2026-11-12</Dt></Dt>
+      </Bal>
+      <Ntry>
+        <NtryRef>1</NtryRef>
+        <Amt Ccy="EUR">171.35</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt><Dt>2026-11-12</Dt></BookgDt>
+        <ValDt><Dt>2026-11-12</Dt></ValDt>
+        <AcctSvcrRef>2026111200001</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <Refs><EndToEndId>po_1QxTest</EndToEndId></Refs>
+          <RltdPties>
+            <Dbtr><Nm>STRIPE TECHNOLOGY EUROPE LTD</Nm></Dbtr>
+            <DbtrAcct><Id><IBAN>IE00TEST00000000000000</IBAN></Id></DbtrAcct>
+          </RltdPties>
+          <RmtInf><Ustrd>STRIPE PAYOUT</Ustrd></RmtInf>
+        </TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <NtryRef>2</NtryRef>
+        <Amt Ccy="EUR">35.60</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt><Dt>2026-11-12</Dt></BookgDt>
+        <ValDt><Dt>2026-11-12</Dt></ValDt>
+        <AcctSvcrRef>2026111200002</AcctSvcrRef>
+        <NtryDtls><TxDtls>
+          <RltdPties>
+            <Cdtr><Nm>HRVATSKI ZAVOD ZA MIROVINSKO &amp; OSIGURANJE</Nm></Cdtr>
+            <CdtrAcct><Id><IBAN>HR1210010051863000160</IBAN></Id></CdtrAcct>
+          </RltdPties>
+          <RmtInf>
+            <Ustrd>Doprinosi za 10/2026</Ustrd>
+            <Strd><CdtrRefInf><Ref>HR68 8133-12345678901</Ref></CdtrRefInf></Strd>
+          </RmtInf>
+        </TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="EUR">9.99</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>PDNG</Sts>
+        <BookgDt><Dt>2026-11-13</Dt></BookgDt>
+        <AddtlNtryInf><![CDATA[Rezervacija <kartica>]]></AddtlNtryInf>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

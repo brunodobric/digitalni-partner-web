@@ -90,6 +90,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
     <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
     <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
+    <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
   </nav>
 </div></header>
 <div class="traka" id="traka" hidden><div class="wrap"><b>OGLEDNI PODACI</b><span>Brojevi s oznakom OGLEDNO nisu stvarni. Nestaju kad se spoji pravi izvor.</span></div></div>
@@ -123,11 +124,12 @@ function crtaj(){
   var imaOgl = D.prihod_godina_ogledno || D.klijenti.some(function(k){ return k.ogledno; }) || Object.keys(D.metrike).some(function(k){ return D.metrike[k].ogledno; });
   document.getElementById("traka").hidden = !imaOgl;
   document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); });
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
   if (ekran === "racuni") veziRacune();
+  if (ekran === "banka") veziBanku();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
   document.getElementById("osvjezeno").textContent = dijelovi.length ? "Zadnje osvježavanje · " + dijelovi.join(" · ") : "Prikupljači se još nisu pokrenuli.";
   document.getElementById("korisnik").textContent = D.korisnik ? "Prijavljen: " + D.korisnik : "";
@@ -332,9 +334,128 @@ function veziRacune(){
   f.addEventListener("change", function(){ rFiltar = {godina: f.godina.value, izvor: f.izvor.value, okolina: f.okolina.value}; crtaj(); });
 }
 
+// ---------- Banka (izvodi CAMT.053) ----------
+var B = null, bGreska = "", bFiltar = {iban: "", smjer: "", mjesec: null}, bPoruka = "", bSviIzvodi = false;
+function ucitajBanku(){
+  fetch("/api/banka", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ B = j; bGreska = ""; if (!B.racuni.some(function(x){ return x.iban === bFiltar.iban; })) bFiltar.iban = B.racuni.length ? B.racuni[0].iban : ""; if (ekran === "banka") crtaj(); })
+    .catch(function(err){ bGreska = err.message; if (ekran === "banka") crtaj(); });
+}
+function iznosC(c, valuta){ var s = (Number(c || 0) / 100).toLocaleString("hr-HR", {minimumFractionDigits: 2, maximumFractionDigits: 2}); return s + (valuta && valuta !== "EUR" ? " " + valuta : " €"); }
+function promjenaC(c, valuta){ return (c > 0 ? "+" : (c < 0 ? "−" : "")) + iznosC(Math.abs(c), valuta); }
+function ibanF(i){ return String(i || "").replace(/(.{4})/g, "$1 ").trim(); }
+function datumG(d){ return d ? datum(d) + " " + String(d).slice(0,4) + "." : "–"; }
+function banka(){
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Banka · izvodi CAMT.053</p><h1>Stanje računa</h1></div>';
+  if (bGreska) return h + '<section class="panel"><p class="prazno">Izvodi se nisu učitali (' + e(bGreska) + '). Osvježi stranicu za minutu.</p></section>' + uvozIzvoda();
+  if (!B) { ucitajBanku(); return h + '<section class="panel"><p class="prazno">Učitavam izvode…</p></section>'; }
+  if (!B.racuni.length) return h + '<section class="panel"><p class="prazno">Još nema uvezenih izvoda. Preuzmi izvod u formatu CAMT.053 (XML) iz internetskog bankarstva i uvezi ga ispod. Stanje računa, promet i kretanje salda pojavit će se ovdje.</p></section>' + uvozIzvoda();
+  var r = B.racuni.filter(function(x){ return x.iban === bFiltar.iban; })[0] || B.racuni[0], val = r.valuta;
+  var st = B.stavke.filter(function(x){ return x.iban === r.iban; }), mj = D.danas.slice(0,7);
+  var knj = st.filter(function(x){ return x.status === "BOOK" && String(x.knjizeno).slice(0,7) === mj; });
+  var pr = knj.filter(function(x){ return x.iznos_centi > 0; }), od = knj.filter(function(x){ return x.iznos_centi < 0; });
+  var star = -dana(r.stanje_datum), stari = star > 7;
+  if (B.racuni.length > 1) h += '<form class="filtri" id="bracun"><label>Račun<select name="iban">' + B.racuni.map(function(x){ return '<option value="' + e(x.iban) + '"' + (x.iban === r.iban ? " selected" : "") + '>' + e(ibanF(x.iban)) + (x.vlasnik ? " · " + e(x.vlasnik) : "") + '</option>'; }).join("") + '</select></label></form>';
+  h += '<section class="kpi">'
+    + '<div><span class="src">Stanje na računu</span><span class="v num">' + iznosC(r.stanje_centi, val) + '</span><span class="src">' + e(ibanF(r.iban)) + '<br>izvod ' + (r.redni_broj ? "br. " + e(r.redni_broj) + " " : "") + 'na dan ' + datumG(r.stanje_datum) + (r.raspolozivo_centi != null && r.raspolozivo_centi !== r.stanje_centi ? "<br>raspoloživo " + iznosC(r.raspolozivo_centi, val) : "") + '</span></div>'
+    + '<div><span class="src">Priljevi ovaj mjesec</span><span class="v num">' + iznosC(zbroj(pr, function(x){ return x.iznos_centi; }), val) + '</span><span class="src">' + pr.length + ' uplata</span></div>'
+    + '<div><span class="src">Odljevi ovaj mjesec</span><span class="v num">' + iznosC(-zbroj(od, function(x){ return x.iznos_centi; }), val) + '</span><span class="src">' + od.length + ' isplata</span></div>'
+    + '<div><span class="src">Zadnji izvod</span><span class="v num' + (stari ? ' hitno' : '') + '">' + (star <= 0 ? "danas" : (star === 1 ? "jučer" : "prije " + star + " dana")) + '</span><span class="src">' + (stari ? "Stanje možda nije točno. Uvezi novije izvode." : "Stanje je završno stanje s tog izvoda.") + '</span></div></section>';
+  h += uvozIzvoda();
+  h += '<section class="panel"><h2>Stanje kroz vrijeme</h2>' + grafSalda(B.salda.filter(function(x){ return x[0] === r.iban; }), val) + '<p class="src">Završno stanje sa svakog uvezenog izvoda, zadnjih 13 mjeseci. Dani bez izvoda preuzimaju stanje prethodnog.</p></section>';
+
+  var mjeseci = [];
+  st.forEach(function(x){ var m = String(x.knjizeno).slice(0,7); if (mjeseci.indexOf(m) < 0) mjeseci.push(m); });
+  if (bFiltar.mjesec === null || (bFiltar.mjesec && mjeseci.indexOf(bFiltar.mjesec) < 0)) bFiltar.mjesec = mjeseci[0] || "";
+  var lista = st.filter(function(x){ return (!bFiltar.mjesec || String(x.knjizeno).slice(0,7) === bFiltar.mjesec) && (!bFiltar.smjer || (bFiltar.smjer === "+" ? x.iznos_centi > 0 : x.iznos_centi < 0)); });
+  var prikaz = lista.slice(0, 300);
+  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px"><h2>Promet</h2><form class="filtri" id="bfiltri">'
+    + '<label>Mjesec<select name="mjesec"><option value="">svi</option>' + mjeseci.map(function(m){ return '<option value="' + m + '"' + (m === bFiltar.mjesec ? " selected" : "") + '>' + MJ[Number(m.slice(5,7)) - 1] + ' ' + m.slice(0,4) + '.</option>'; }).join("") + '</select></label>'
+    + '<label>Smjer<select name="smjer">' + [["", "sve"], ["+", "priljevi"], ["-", "odljevi"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === bFiltar.smjer ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label></form></div>';
+  if (!prikaz.length) h += '<p class="prazno">' + (st.length ? "Nema prometa za ovaj odabir." : "Uvezeni izvodi nemaju stavki.") + '</p>';
+  else h += '<div class="skrol"><table class="num"><thead><tr><th>Knjiženo</th><th>Druga strana</th><th>Opis</th><th>Poziv na broj</th><th class="r">Iznos</th><th>Izvod</th></tr></thead><tbody>'
+    + prikaz.map(function(x){
+      var oznake = (/stripe/i.test((x.protustrana || "") + " " + (x.opis || "")) ? '<span class="og">STRIPE</span>' : "") + (x.status !== "BOOK" ? '<span class="og">NA ČEKANJU</span>' : "") + (x.storno ? '<span class="og">STORNO</span>' : "") + (x.broj_transakcija > 1 ? '<span class="og">' + x.broj_transakcija + ' TRANSAKCIJA</span>' : "");
+      return '<tr><td class="nw">' + datumG(x.knjizeno) + '</td><td style="min-width:160px;font-weight:600">' + e(x.protustrana || "–") + oznake + (x.protustrana_iban ? '<div class="jir">' + e(ibanF(x.protustrana_iban)) + '</div>' : "") + '</td>'
+        + '<td style="min-width:200px">' + e(x.opis || "–") + '</td><td class="jir">' + e(x.poziv_na_broj || "–") + '</td>'
+        + '<td class="r nw" style="font-weight:600;' + (x.iznos_centi > 0 ? "color:var(--smaragd)" : "") + (x.status !== "BOOK" ? ";opacity:.6" : "") + '">' + promjenaC(x.iznos_centi, x.valuta) + '</td><td class="nw src">' + e(x.izvod) + '</td></tr>';
+    }).join("") + '</tbody></table></div>';
+  if (lista.length > prikaz.length) h += '<p class="src">Prikazano prvih ' + prikaz.length + ' od ' + lista.length + ' stavki. Suzi odabir mjesecom.</p>';
+  h += '</section>';
+
+  var sviIz = B.izvodi.filter(function(x){ return x.iban === r.iban; }), iz = bSviIzvodi ? sviIz : sviIz.slice(0, 10);
+  h += '<section class="panel"><h2>Uvezeni izvodi</h2><div class="skrol"><table class="num"><thead><tr><th>Izvod</th><th>Razdoblje</th><th class="r">Početno</th><th class="r">Promet</th><th class="r">Završno</th><th class="r">Stavki</th><th>Provjera</th><th>Datoteka</th></tr></thead><tbody>'
+    + iz.map(function(x){
+      var pr = x.pocetno_centi == null ? null : x.zavrsno_centi - x.pocetno_centi;
+      var pv = x.uskladeno === true ? '<span class="oznaka ok">usklađen</span>' : (x.uskladeno === false ? '<span class="oznaka lose">ne slaže se</span>' : '<span class="oznaka ceka">bez početnog</span>');
+      return '<tr><td class="nw" style="font-weight:600">' + e(x.redni_broj ? "br. " + x.redni_broj : x.oznaka) + '</td><td class="nw">' + (x.od && x.od !== x.do ? datum(x.od) + " – " : "") + datumG(x.do || x.zavrsno_datum) + '</td>'
+        + '<td class="r nw">' + (x.pocetno_centi == null ? "–" : iznosC(x.pocetno_centi, x.valuta)) + '</td><td class="r nw">' + (pr == null ? "–" : promjenaC(pr, x.valuta)) + '</td><td class="r nw" style="font-weight:600">' + iznosC(x.zavrsno_centi, x.valuta) + '</td>'
+        + '<td class="r">' + x.stavki + '</td><td>' + pv + '</td><td class="src" style="word-break:break-all">' + e(x.datoteka || "–") + '<br>uvezen ' + vrijeme(x.uvezeno) + '</td></tr>';
+    }).join("") + '</tbody></table></div>' + (sviIz.length > iz.length ? '<p><button class="gumb" type="button" id="svi-izvodi" style="background:var(--kamen-svj);color:var(--oniks)">Prikaži svih ' + sviIz.length + '</button></p>' : "") + '<p class="src">Provjera: početno stanje i knjiženi promet moraju dati završno stanje. Ako se ne slaže, izvod je nepotpun ili ga banka drukčije zbraja.</p></section>';
+  return h;
+}
+function uvozIzvoda(){
+  return '<section class="panel"><h2>Uvoz izvoda</h2><p class="src">Iz internetskog bankarstva preuzmi izvod u formatu <b>CAMT.053</b> (XML, ISO 20022). Može više datoteka odjednom, a izvod koji je već uvezen se preskače.</p>'
+    + '<form class="filtri" id="izvod"><label>Datoteke izvoda<input name="datoteke" type="file" accept=".xml,application/xml,text/xml" multiple required></label><button class="gumb" type="submit">Uvezi</button></form><p class="src" id="izvod-poruka" role="status" style="white-space:pre-line">' + e(bPoruka) + '</p></section>';
+}
+function grafSalda(niz, val){
+  if (!niz.length) return '<p class="prazno">Nema izvoda u zadnjih 13 mjeseci.</p>';
+  if (niz.length < 2) return '<p class="prazno">Graf se pojavi kad budu uvezena barem dva izvoda.</p>';
+  var t = niz.map(function(x){ return new Date(x[1]).getTime(); }), v = niz.map(function(x){ return x[2] / 100; });
+  var t0 = t[0], t1 = Math.max(t[t.length - 1], new Date(D.danas).getTime()), raspon = Math.max(1, t1 - t0);
+  var lo = Math.min(0, Math.min.apply(null, v)), hi = Math.max.apply(null, v);
+  var korak = Math.pow(10, Math.floor(Math.log10(Math.max(1, hi - lo)))); if ((hi - lo) / korak < 3) korak /= 2; if ((hi - lo) / korak > 6) korak *= 2;
+  lo = Math.floor(lo / korak) * korak; hi = Math.max(lo + korak, Math.ceil(hi / korak) * korak);
+  var L = 64, R = 704, T = 16, Bd = 200;
+  function X(x){ return L + (x - t0) / raspon * (R - L); } function Y(y){ return Bd - (y - lo) / (hi - lo) * (Bd - T); }
+  var s = "";
+  for (var g = lo; g <= hi + korak / 2; g += korak){ s += '<line x1="' + L + '" x2="' + R + '" y1="' + Y(g) + '" y2="' + Y(g) + '" stroke="rgba(11,11,12,' + (g === 0 ? ".25" : ".08") + ')"/><text x="' + (L - 8) + '" y="' + (Y(g) + 4) + '" text-anchor="end" font-size="11.5" fill="#5E6266">' + (Math.abs(g) >= 1000 ? (g / 1000).toLocaleString("hr-HR", {maximumFractionDigits: 1}) + "k" : g.toLocaleString("hr-HR")) + '</text>'; }
+  var d = "M" + X(t[0]) + " " + Y(v[0]);
+  for (var i = 1; i < t.length; i++) d += " H" + X(t[i]) + " V" + Y(v[i]);
+  d += " H" + X(t1);
+  s += '<path d="' + d + ' V' + Y(Math.max(lo, 0)) + ' H' + X(t[0]) + ' Z" fill="rgba(15,59,51,.07)"/><path d="' + d + '" fill="none" stroke="#0F3B33" stroke-width="2"/>';
+  niz.forEach(function(x, i){ s += '<circle cx="' + X(t[i]) + '" cy="' + Y(v[i]) + '" r="3" fill="#0F3B33"><title>' + datumG(x[1]) + ': ' + iznosC(x[2], val) + '</title></circle>'; });
+  var mjOznake = [], m0 = new Date(t0); m0 = new Date(m0.getFullYear(), m0.getMonth() + 1, 1);
+  for (var m = m0; m.getTime() <= t1; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) mjOznake.push(m);
+  var svaki = Math.ceil(mjOznake.length / 7);
+  mjOznake.forEach(function(m, i){ if (i % svaki) return; s += '<text x="' + X(m.getTime()) + '" y="222" text-anchor="middle" font-size="12" fill="#5E6266">' + MJK[m.getMonth()] + '</text>'; });
+  s += '<text x="' + R + '" y="' + (Y(v[v.length - 1]) - 10) + '" text-anchor="end" font-size="12" font-weight="600" fill="#0B0B0C">' + iznosC(niz[niz.length - 1][2], val) + '</text>';
+  return '<svg viewBox="0 0 720 230" role="img" aria-label="Stanje računa po danima, zadnje ' + iznosC(niz[niz.length - 1][2], val) + '" style="width:100%;height:auto;display:block">' + s + '</svg>';
+}
+function veziBanku(){
+  var fr = document.getElementById("bracun");
+  if (fr) fr.addEventListener("change", function(){ bFiltar = {iban: fr.iban.value, smjer: "", mjesec: null}; crtaj(); });
+  var si = document.getElementById("svi-izvodi");
+  if (si) si.addEventListener("click", function(){ bSviIzvodi = true; crtaj(); });
+  var ff = document.getElementById("bfiltri");
+  if (ff) ff.addEventListener("change", function(){ bFiltar.mjesec = ff.mjesec.value; bFiltar.smjer = ff.smjer.value; crtaj(); });
+  var f = document.getElementById("izvod"), por = document.getElementById("izvod-poruka");
+  if (!f) return;
+  f.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var dat = Array.prototype.slice.call(f.datoteke.files), redovi = [];
+    if (!dat.length) return;
+    f.querySelector("button").disabled = true; por.textContent = "Uvozim " + dat.length + (dat.length === 1 ? " datoteku…" : " datoteka…");
+    dat.reduce(function(p, d){
+      return p.then(function(){
+        return fetch("/api/izvod", {method: "POST", credentials: "same-origin", headers: {"content-type": "application/xml", "x-naziv": encodeURIComponent(d.name)}, body: d})
+          .then(function(r){ return r.json().then(function(j){ if (!r.ok) throw new Error(j.greska || r.status); return j; }); })
+          .then(function(j){
+            var t = [];
+            if (j.uvezeni.length) t.push("uvezeno izvoda: " + j.uvezeni.length);
+            if (j.preskoceni.length) t.push("već uvezeno: " + j.preskoceni.length);
+            if (j.neuskladeni.length) t.push("ne slaže se: " + j.neuskladeni.join(", "));
+            redovi.push(d.name + ": " + t.join(", ") + ".");
+          })
+          .catch(function(err){ redovi.push(d.name + ": nije uvezeno. " + err.message); });
+      });
+    }, Promise.resolve()).then(function(){ bPoruka = redovi.join("\n"); B = null; ucitajBanku(); });
+  });
+}
+
 document.querySelectorAll("nav button").forEach(function(b){ b.addEventListener("click", function(){ ekran = b.dataset.ekran; history.replaceState(null, "", "#" + ekran); if (D) crtaj(); window.scrollTo(0, 0); }); });
 ucitaj();
-setInterval(function(){ ucitaj(); if (R) ucitajRacune(); }, 10 * 60 * 1000);
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); }, 10 * 60 * 1000);
 })();
 </script>
 </body>
