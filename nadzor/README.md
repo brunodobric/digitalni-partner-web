@@ -19,7 +19,8 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Popis računa iz fiskalizacije (ekran Računi) | `sql/04-racuni.sql` |
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
-| Testovi čitača s izmišljenim izvodima | `test/` (`node --test nadzor/test/camt.test.mjs`) |
+| Privici iz maila (MIME) i XML iz ZIP-a | `src/mail.js` |
+| Testovi s izmišljenim izvodima | `test/` (`node --test nadzor/test/`) |
 
 Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U bazama je spremljen samo njegov SHA-256 sažetak. Tablice imaju uključen RLS bez pravila, pa ih javni ključ ne može čitati izravno.
 
@@ -30,6 +31,9 @@ Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U 
 | `NADZOR_KLJUC` | Pristup funkcijama u obje baze | da (postavljeno) |
 | `CF_API_TOKEN` | Broj zahtjeva na web i Kuvertu (Cloudflare GraphQL, dozvola Account Analytics: Read) | ne |
 | `RESEND_KEY`, `OBAVIJEST_NA` | Mail o svakom novom upitu s weba | ne |
+| `IZVODI_IBAN` | IBAN-i (odvojeni zarezom) za koje se primaju izvodi mailom. Bez nje se mail ne uvozi | za uvoz mailom |
+| `IZVODI_POSILJATELJI` | Adrese ili domene pošiljatelja izvoda, npr. `@pbz.hr`. Prazno pušta svakoga | preporučeno |
+| `IZVODI_PROSLIJEDI` | Adresa na koju se mail s izvodom proslijedi nakon uvoza (mora biti potvrđena u Email Routingu) | ne |
 | `FISK_TOKEN` | PDF računa na ekranu Računi. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun) | ne, bez nje popis radi, a PDF ne |
 
 Ekran Računi čita tablicu `fisk.racuni` (isti Supabase projekt) preko funkcije `nadzor_racuni`, a PDF traži od Edge funkcije `fisk-racun` (repozitorij financijski-softver). Adresa funkcije je `SUPABASE_URL/functions/v1/fisk-racun`, a može se promijeniti varijablom `FISK_URL`.
@@ -41,7 +45,16 @@ Izvod u formatu CAMT.053 (ISO 20022, XML) preuzme se iz internetskog bankarstva 
 - Stanje računa je završno stanje (CLBD) najnovijeg izvoda za taj IBAN; raspoloživo stanje (CLAV) se pokaže ako ga banka pošalje.
 - Svaki izvod se provjeri: početno stanje (OPBD, inače PRCD) + knjiženi promet mora dati završno. Ako se ne slaže, izvod je označen.
 - Stavke na čekanju (PDNG) se prikazuju, ali ne ulaze u zbroj. Isplate sa Stripea dobiju oznaku STRIPE.
-- CAMT.052 i CAMT.054 se odbijaju s porukom, kao i ZIP (treba ga raspakirati).
+- CAMT.052 i CAMT.054 se odbijaju s porukom. ZIP se raspakira i uvezu se XML datoteke iz njega.
+
+### Izvodi mailom
+
+PBZ šalje dnevni izvod na `izvodi@digitalnipartner.hr`. Cloudflare Email Routing tu adresu šalje Workeru dp-nadzor (Email Routing → Routing rules → Send to a Worker), a Worker (`email` u `src/index.js`):
+
+1. po potrebi proslijedi mail na `IZVODI_PROSLIJEDI`, da izvod ostane i u pošti,
+2. provjeri pošiljatelja (`IZVODI_POSILJATELJI`) i da je izvod za račun iz `IZVODI_IBAN`,
+3. uveze svaki XML ili ZIP privitak, isto kao ručni uvoz,
+4. upiše ishod kao „izvodi-mail” (vidi se u dnu dashboarda), a kad nešto ne uspije, pošalje obavijest na `OBAVIJEST_NA` (ako je postavljen `RESEND_KEY`).
 
 Postavljanje: `npx wrangler secret put IME` iz mape `nadzor/`.
 
