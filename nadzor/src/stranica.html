@@ -68,7 +68,14 @@ input,select{font:inherit;font-size:14px;padding:8px 10px;border:1px solid #D4D1
 button.gumb{font:600 14px Manrope,sans-serif;background:var(--smaragd);color:#fff;border:0;border-radius:8px;padding:0 18px;min-height:40px;cursor:pointer}
 button.gumb:hover{background:#0B2E28}
 button.tiho{font:600 13px Manrope,sans-serif;background:none;color:var(--grafit);border:1px solid var(--linija);border-radius:8px;padding:0 12px;min-height:32px;cursor:pointer}
-button.tiho:hover{color:var(--crvena);border-color:#E7C3BC;background:var(--crvena-svj)}
+button.tiho:hover{color:var(--oniks);background:var(--pozadina)}
+.gumbi{display:flex;gap:8px}.gumbi .gumb{flex:1;white-space:nowrap}
+@media (max-width:640px){.gumbi{grid-column:1/-1}}
+button.uredi{flex:none;width:40px;height:40px;display:grid;place-items:center;padding:0;border:1px solid #D4D1CB;border-radius:8px;background:#fff;color:var(--smaragd);cursor:pointer}
+button.uredi:hover{background:var(--smaragd-svj)}
+button.uredi[aria-pressed=true]{background:var(--smaragd);border-color:var(--smaragd);color:#fff}
+button.minus{width:28px;height:28px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:var(--crvena);color:#fff;cursor:pointer}
+button.minus:hover{background:#82291C}
 button.gumb.opasno{background:var(--crvena);min-height:36px}button.gumb.opasno:hover{background:#82291C}
 tr.potvrda td{background:var(--crvena-svj);padding:12px 14px}
 .potvrda-tekst{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;font-size:14px}
@@ -123,7 +130,7 @@ svg text{font-family:Manrope,sans-serif}
 <script>
 (function(){
 "use strict";
-var D = null, ekran = (location.hash || "#pregled").slice(1);
+var uredjivanje = false, D = null, ekran = (location.hash || "#pregled").slice(1);
 var MJ = ["siječanj","veljača","ožujak","travanj","svibanj","lipanj","srpanj","kolovoz","rujan","listopad","studeni","prosinac"];
 var MJK = ["Sij","Velj","Ožu","Tra","Svi","Lip","Srp","Kol","Ruj","Lis","Stu","Pro"];
 var PRAG = 60000;
@@ -201,8 +208,8 @@ function pregled(){
 
   var tr = D.troskovi_ovaj_mjesec, tu = zbroj(tr, function(x){ return x.iznos; });
   h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px"><h2>Troškovi ovog mjeseca' + og(tr.some(function(x){ return x.ogledno; })) + '</h2><span class="num" style="font-weight:600">' + eur(tu, true) + ' · dobit ' + eur(u - tu, true) + '</span></div>'
-    + (tr.length ? '<div class="skrol"><table class="num"><tbody>' + tr.map(function(x){ return '<tr data-trosak="' + x.id + '"><td>' + e(x.opis) + og(x.ogledno) + '</td><td class="src">' + e(x.linija) + '</td><td class="nw">' + datum(x.datum) + '</td><td class="r nw">' + eur(x.iznos, true) + '</td><td class="r" style="padding-right:0;width:1%"><button type="button" class="tiho" data-makni="' + x.id + '" aria-label="Makni trošak ' + e(x.opis) + '">Makni</button></td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Ovaj mjesec još nema upisanih troškova.</p>')
-    + '<form class="unos" id="trosak"><label>Datum<input name="datum" type="date" required value="' + D.danas + '"></label><label>Opis<input name="opis" required maxlength="200" placeholder="npr. domena"></label><label>Iznos (€)<input name="iznos" type="number" step="0.01" min="0" required></label><label>Linija<select name="linija"><option value="obrt">Obrt</option><option value="usluge">Usluge</option><option value="aplikacije">Aplikacije</option><option value="vjencanja">Kuverta</option></select></label><button class="gumb" type="submit">Dodaj trošak</button></form><p class="src" id="trosak-poruka" role="status"></p></section>';
+    + (tr.length ? '<div class="skrol"><table class="num"><tbody>' + tr.map(function(x){ return '<tr data-trosak="' + x.id + '"><td>' + e(x.opis) + og(x.ogledno) + '</td><td class="src">' + e(x.linija) + '</td><td class="nw">' + datum(x.datum) + '</td><td class="r nw">' + eur(x.iznos, true) + '</td>' + (uredjivanje ? '<td class="r" style="padding-right:0;width:1%"><button type="button" class="minus" data-makni="' + x.id + '" aria-label="Obriši trošak ' + e(x.opis) + '"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="5" width="10" height="2" rx="1" fill="currentColor"/></svg></button></td>' : '') + '</tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Ovaj mjesec još nema upisanih troškova.</p>')
+    + '<form class="unos" id="trosak"><label>Datum<input name="datum" type="date" required value="' + D.danas + '"></label><label>Opis<input name="opis" required maxlength="200" placeholder="npr. domena"></label><label>Iznos (€)<input name="iznos" type="number" step="0.01" min="0" required></label><label>Linija<select name="linija"><option value="obrt">Obrt</option><option value="usluge">Usluge</option><option value="aplikacije">Aplikacije</option><option value="vjencanja">Kuverta</option></select></label><div class="gumbi"><button class="gumb" type="submit">Dodaj trošak</button><button class="uredi" type="button" id="uredi-troskove" aria-pressed="' + (uredjivanje ? "true" : "false") + '" aria-label="Uredi troškove" title="Uredi troškove"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button></div></form><p class="src" id="trosak-poruka" role="status"></p></section>';
   return h;
 }
 
@@ -244,7 +251,8 @@ function vezi(){
   pokazi(m.length - 1);
   document.querySelectorAll(".hit").forEach(function(r){ r.addEventListener("mouseenter", function(){ pokazi(+r.dataset.i); }); r.addEventListener("focus", function(){ pokazi(+r.dataset.i); }); });
   var f = document.getElementById("trosak"), por = document.getElementById("trosak-poruka");
-  // Brisanje troška: tipka Makni otvara potvrdu u istom retku, briše se tek na Obriši
+  // Brisanje troška: olovka uključi uređivanje (minus uz svaki trošak), minus otvara potvrdu u retku, briše se tek na Obriši
+  document.getElementById("uredi-troskove").addEventListener("click", function(){ uredjivanje = !uredjivanje; crtaj(); document.getElementById("uredi-troskove").focus(); });
   var tablica = f.parentNode.querySelector("table");
   if (tablica) tablica.addEventListener("click", function(ev){
     var b = ev.target.closest("button"); if (!b) return;
