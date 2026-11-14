@@ -1,6 +1,7 @@
 // Worker dashboarda (dp-nadzor). Objava: npx wrangler deploy (iz mape nadzor/).
 // Javne vrijednosti su ovdje; tajne se postavljaju s "npx wrangler secret put":
-//   NADZOR_KLJUC (obavezno), CF_API_TOKEN (Cloudflare analitika), RESEND_KEY i OBAVIJEST_NA (mail o novom upitu)
+//   NADZOR_KLJUC (obavezno), CF_API_TOKEN (Cloudflare analitika), RESEND_KEY i OBAVIJEST_NA (mail o upitu i upozorenja)
+//   FISK_CITANJE_TOKEN (PDF računa i provjera certifikata, ključ servisa fisk-racun samo za čitanje)
 //   IZVODI_IBAN, IZVODI_POSILJATELJI, IZVODI_PROSLIJEDI (izvodi iz banke mailom, vidi README)
 // Mail: Zoho prosljeđuje izvodi@digitalnipartner.hr na izvodi@banka.digitalnipartner.hr, a Email Routing to šalje ovom Workeru (handler email).
 // Pristup: Cloudflare Access (tim soft-cloud-4728) pušta samo Brunin mail; /upit je javan za obrazac na webu.
@@ -13,7 +14,8 @@
   "routes": [{ "pattern": "nadzor.digitalnipartner.hr", "custom_domain": true }],
   "compatibility_date": "2026-10-23",
   "rules": [{ "type": "Text", "globs": ["**/*.html"], "fallthrough": true }, { "type": "Data", "globs": ["**/*.png"], "fallthrough": true }],
-  "triggers": { "crons": ["0 5 * * *"] },
+  // 0 5 * * *: jutarnje prikupljanje pa upozorenja; 15 * * * *: upozorenja svaki sat (src/index.js, scheduled).
+  "triggers": { "crons": ["0 5 * * *", "15 * * * *"] },
   "observability": { "enabled": true },
   "vars": {
     "SUPABASE_URL": "https://uzdqbuzgvtqfglujhgrm.supabase.co",

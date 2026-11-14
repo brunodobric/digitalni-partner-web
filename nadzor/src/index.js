@@ -7,19 +7,24 @@
 // - GET /api/korisnici  registrirani korisnici Kuverte: e-mail, registracija, zadnja prijava (Access)
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
+// - GET /api/knjige?godina=…&okolina=…  knjiga prometa (KPR) i podaci za PO-SD (Access)
+// - POST /api/kpr-stavka  uključi ili isključi stavku izvoda iz KPR-a (Access)
 // - POST /api/izvod  uvoz jednog izvoda CAMT.053 (XML u tijelu zahtjeva) (Access)
 // - POST /upit       javni prijem upita s kontakt obrasca na webu (bez prijave, samo s dopuštene adrese)
 // - email            izvodi CAMT.053 iz maila banke (Cloudflare Email Routing), vidi primiMail
 // - cron u 5:00 UTC  (6:00 zimi, 7:00 ljeti po hrvatskom vremenu) skuplja podatke iz izvora
+// - cron svaki sat   provjerava upozorenja i šalje mail za svako novo (vidi provjeriUpozorenja)
 //
 // Tajne (wrangler secret put): NADZOR_KLJUC, a po potrebi CF_API_TOKEN, RESEND_KEY
-// i FISK_TOKEN (FISK_CITANJE_TOKEN servisa fisk-racun, smije samo čitati račune).
+// i FISK_CITANJE_TOKEN (ista vrijednost kao istoimena tajna servisa fisk-racun, smije samo čitati;
+// stari naziv FISK_TOKEN još radi kao rezerva).
 // Baza se zove samo preko funkcija u Supabaseu koje provjeravaju NADZOR_KLJUC (vidi nadzor/sql).
 
 import STRANICA from "./stranica.html";
 import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
 import { citajCamt053 } from "./camt.js";
 import { jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
+import { DOMENA_NADZORA, sastaviUpozorenja } from "./upozorenja.js";
 
 export default {
   async fetch(req, env, ctx) {
@@ -77,6 +82,20 @@ export default {
         return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_banka", { p_kljuc: env.NADZOR_KLJUC }));
       }
       if (req.method === "POST" && url.pathname === "/api/izvod") return await uvezIzvod(req, env);
+      if (req.method === "GET" && url.pathname === "/api/knjige") {
+        const godina = Number(url.searchParams.get("godina")) || new Date().getUTCFullYear();
+        const okolina = ["produkcija", "test", "sve"].includes(url.searchParams.get("okolina")) ? url.searchParams.get("okolina") : "produkcija";
+        if (godina < 2000 || godina > 2100) return json({ greska: "Neispravna godina." }, 400);
+        return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_knjige", { p_kljuc: env.NADZOR_KLJUC, p_godina: godina, p_okolina: okolina }));
+      }
+      if (req.method === "POST" && url.pathname === "/api/kpr-stavka") {
+        const b = await req.json();
+        const id = Number(b.id);
+        if (!Number.isInteger(id) || id <= 0 || ![true, false, null].includes(b.kpr)) return json({ greska: "Neispravna stavka." }, 400);
+        const ok = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_kpr_stavka", { p_kljuc: env.NADZOR_KLJUC, p_id: id, p_kpr: b.kpr });
+        if (!ok) return json({ greska: "Stavka više ne postoji. Osvježi stranicu." }, 404);
+        return json({ ok: true });
+      }
       return new Response("Nema te stranice.", { status: 404 });
     } catch (e) {
       console.error(e);
@@ -85,7 +104,8 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(prikupi(env));
+    // Jutarnji cron skuplja brojke pa provjerava upozorenja; satni samo provjerava.
+    ctx.waitUntil((event.cron === JUTARNJI_CRON ? prikupi(env) : Promise.resolve()).then(() => provjeriUpozorenja(env)));
   },
 
   // Izvodi iz banke stižu mailom (Cloudflare Email Routing usmjeri adresu na ovaj Worker).
@@ -97,6 +117,8 @@ export default {
     }
   },
 };
+
+const JUTARNJI_CRON = "0 5 * * *";
 
 const SIGURNOSNA_ZAGLAVLJA = {
   "x-frame-options": "DENY",
@@ -122,16 +144,25 @@ async function rpc(base, key, fn, args) {
 
 // ---------- PDF računa (servis fisk-racun u Supabaseu) ----------
 
+// Ključ samo za čitanje (PDF, stanje, zdravlje). FISK_TOKEN je stari naziv iste tajne.
+function fiskToken(env) {
+  return env.FISK_CITANJE_TOKEN || env.FISK_TOKEN || "";
+}
+
+function fisk(env, tijelo) {
+  return fetch(env.FISK_URL || (env.SUPABASE_URL + "/functions/v1/fisk-racun"), {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-fisk-token": fiskToken(env) },
+    body: JSON.stringify(tijelo),
+  });
+}
+
 async function pdfRacuna(url, env) {
   const izvor = url.searchParams.get("izvor") || "";
   const vanjskiId = url.searchParams.get("id") || "";
   if (!izvor || !vanjskiId || izvor.length > 200 || vanjskiId.length > 200) return json({ greska: "Nedostaju izvor i id." }, 400);
-  if (!env.FISK_TOKEN) return new Response("PDF nije postavljen: nedostaje tajna FISK_TOKEN.", { status: 503 });
-  const r = await fetch(env.FISK_URL || (env.SUPABASE_URL + "/functions/v1/fisk-racun"), {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-fisk-token": env.FISK_TOKEN },
-    body: JSON.stringify({ radnja: "pdf", izvor, vanjskiId }),
-  });
+  if (!fiskToken(env)) return new Response("PDF nije postavljen: nedostaje tajna FISK_CITANJE_TOKEN.", { status: 503 });
+  const r = await fisk(env, { radnja: "pdf", izvor, vanjskiId });
   if (!r.ok || !(r.headers.get("content-type") || "").startsWith("application/pdf")) {
     const t = await r.text();
     let poruka = "PDF se nije mogao napraviti (" + r.status + ").";
@@ -283,13 +314,16 @@ async function primiMail(poruka, env) {
 
 async function posaljiMail(env, naslov, tekst) {
   try {
-    await fetch("https://api.resend.com/emails", {
+    const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { authorization: "Bearer " + env.RESEND_KEY, "content-type": "application/json" },
       body: JSON.stringify({ from: env.OBAVIJEST_OD || "Digitalni partner <onboarding@resend.dev>", to: [env.OBAVIJEST_NA], subject: naslov, text: tekst }),
     });
+    if (!r.ok) console.error("obavijest", r.status, (await r.text()).slice(0, 300));
+    return r.ok;
   } catch (e) {
     console.error("obavijest", e);
+    return false;
   }
 }
 
@@ -410,5 +444,39 @@ async function prikupi(env) {
     } catch (e) {
       await zapis("cloudflare", false, String(e.message || e));
     }
+  }
+}
+
+// ---------- Upozorenja mailom ----------
+
+async function provjeriUpozorenja(env) {
+  if (!env.RESEND_KEY || !env.OBAVIJEST_NA) return;
+  try {
+    const danas = new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Zagreb" });
+    const stanje = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_upozorenja", { p_kljuc: env.NADZOR_KLJUC });
+    let zdravlje = null;
+    if (fiskToken(env)) {
+      try {
+        const r = await fisk(env, { radnja: "zdravlje" });
+        const j = await r.json().catch(() => ({}));
+        // Stara verzija servisa nema radnju "zdravlje" (400): to nije kvar, samo se preskoči.
+        zdravlje = r.ok ? j : (r.status === 400 ? null : { greska: "HTTP " + r.status + (j.greska ? ", " + j.greska : "") });
+      } catch (e) {
+        zdravlje = { greska: String(e.message || e) };
+      }
+    }
+    const sva = sastaviUpozorenja(stanje, zdravlje, danas);
+    if (!sva.length) return;
+    const nova = new Set(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_obavijesti_nove", { p_kljuc: env.NADZOR_KLJUC, p_kljucevi: sva.map((x) => x.kljuc) }) || []);
+    const zaSlanje = sva.filter((x) => nova.has(x.kljuc));
+    if (!zaSlanje.length) return;
+    const tekst = zaSlanje.map((x) => "• " + x.tekst + "\n  " + DOMENA_NADZORA + "/#" + x.ekran).join("\n\n")
+      + "\n\nSvako upozorenje stiže samo jednom. Nadzor provjerava svaki sat.";
+    const naslov = zaSlanje.length === 1 ? "Nadzor: " + zaSlanje[0].tekst.slice(0, 70) : "Nadzor: " + zaSlanje.length + " upozorenja";
+    if (await posaljiMail(env, naslov, tekst)) {
+      await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_obavijesti_poslane", { p_kljuc: env.NADZOR_KLJUC, p_kljucevi: zaSlanje.map((x) => x.kljuc) });
+    }
+  } catch (e) {
+    console.error("upozorenja", e);
   }
 }

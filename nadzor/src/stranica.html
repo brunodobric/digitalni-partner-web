@@ -89,6 +89,7 @@ footer .wrap{padding-top:4px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap
 .oznaka.ceka{color:var(--zlato-tamno);background:var(--zlato-svj)}
 .oznaka.lose{color:var(--crvena);background:var(--crvena-svj)}
 .filtri{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.kpr-zbroj td{font-weight:700;border-top:1px solid var(--linija)}
 .jir{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--grafit);word-break:break-all}
 svg text{font-family:Manrope,sans-serif}
 .izb,.ekran-m{display:none}
@@ -121,6 +122,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
     <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
     <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
+    <button role="tab" data-ekran="knjige" aria-selected="false">Knjige</button>
   </nav>
 </div></header>
 <div class="traka" id="traka" hidden><div class="wrap"><b>OGLEDNI PODACI</b><span>Brojevi s oznakom OGLEDNO nisu stvarni. Nestaju kad se spoji pravi izvor.</span></div></div>
@@ -159,12 +161,13 @@ function crtaj(){
   var imaOgl = D.prihod_godina_ogledno || D.klijenti.some(function(k){ return k.ogledno; }) || Object.keys(D.metrike).some(function(k){ return D.metrike[k].ogledno; });
   document.getElementById("traka").hidden = !imaOgl;
   oznaci();
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
   if (ekran === "racuni") veziRacune();
   if (ekran === "banka") veziBanku();
+  if (ekran === "knjige") veziKnjige();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
   document.getElementById("osvjezeno").textContent = dijelovi.length ? "Zadnje osvježavanje · " + dijelovi.join(" · ") : "Prikupljači se još nisu pokrenuli.";
   document.getElementById("korisnik").textContent = D.korisnik ? "Prijavljen: " + D.korisnik : "";
@@ -534,6 +537,100 @@ function veziBanku(){
   });
 }
 
+// ---------- Knjige (KPR i PO-SD) ----------
+// Paušalni razredi od 1. 1. 2024. (godišnji primici do iznosa → godišnji paušalni dohodak). Provjeriti s knjigovođom.
+var RAZREDI = [[11300, 1695], [15300, 2295], [19900, 2985], [30600, 4590], [40000, 6000], [50000, 7500], [60000, 9000]];
+var KN = null, knGreska = "", knFiltar = {godina: Number(new Date().getFullYear()), okolina: "produkcija"}, knPoruka = "";
+function ucitajKnjige(){
+  fetch("/api/knjige?godina=" + knFiltar.godina + "&okolina=" + knFiltar.okolina, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ KN = j; knGreska = ""; if (ekran === "knjige") crtaj(); })
+    .catch(function(err){ knGreska = err.message; if (ekran === "knjige") crtaj(); });
+}
+function uKpr(b){ return b.kpr === null || b.kpr === undefined ? !b.stripe : b.kpr; }
+// Redovi knjige prometa: računi po načinu plaćanja i priljevi na račun koji ulaze u KPR, po datumu.
+function redoviKpr(){
+  var r = KN.racuni.map(function(x){
+    var c = Number(x.iznos_centi);
+    return {datum: x.datum, sort: x.izdan, dokument: "Račun " + x.broj, opis: (x.opis || "") + (x.storno ? " (storno)" : ""), test: x.okolina === "test", g: x.nacin === "G" ? c : 0, k: x.nacin === "K" ? c : 0, t: (x.nacin === "T" || x.nacin === "O") ? c : 0};
+  });
+  KN.banka.filter(uKpr).forEach(function(b){
+    r.push({datum: b.datum, sort: b.datum + "T23:59", dokument: "Izvod " + (b.izvod || ""), opis: [b.protustrana, b.opis, b.poziv_na_broj].filter(Boolean).join(", "), test: false, g: 0, k: 0, t: Number(b.iznos_centi)});
+  });
+  r.sort(function(a, b){ return a.sort < b.sort ? -1 : (a.sort > b.sort ? 1 : 0); });
+  r.forEach(function(x, i){ x.rb = i + 1; x.u = x.g + x.k + x.t; });
+  return r;
+}
+function razred(eura){ for (var i = 0; i < RAZREDI.length; i++) if (eura <= RAZREDI[i][0]) return {n: i + 1, do: RAZREDI[i][0], od: i ? RAZREDI[i - 1][0] : 0, dohodak: RAZREDI[i][1]}; return null; }
+function knjige(){
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Paušalni obrt</p><h1>Knjiga prometa i PO-SD</h1></div>';
+  if (knGreska) return h + '<section class="panel"><p class="prazno">Knjige se nisu učitale (' + e(knGreska) + '). Osvježi stranicu za minutu.</p></section>';
+  if (!KN) { ucitajKnjige(); return h + '<section class="panel"><p class="prazno">Učitavam knjigu prometa…</p></section>'; }
+  var red = redoviKpr(), zG = zbroj(red, function(x){ return x.g; }), zK = zbroj(red, function(x){ return x.k; }), zT = zbroj(red, function(x){ return x.t; }), zU = zG + zK + zT;
+  var eura = zU / 100, rz = razred(eura), god = KN.godina, tekuca = god === Number(D.danas.slice(0,4));
+  h += '<form class="filtri" id="knfiltri"><label>Godina<select name="godina">' + KN.godine.map(function(g){ return '<option' + (g === god ? " selected" : "") + '>' + g + '</option>'; }).join("") + '</select></label>'
+    + '<label>Računi<select name="okolina">' + [["produkcija","pravi računi"],["test","testni (CIS test)"],["sve","svi"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === knFiltar.okolina ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label></form>';
+  if (knFiltar.okolina !== "produkcija") h += '<div class="stavka"><b>TESTNI RAČUNI U PRIKAZU</b><span style="font-size:14px">Testni računi nisu pravi promet. Za knjigovođu i PO-SD odaberi „pravi računi”.</span></div>';
+  h += '<section class="kpi"><div><span class="src">Primici ' + god + '.</span><span class="v num">' + iznosC(zU) + '</span><span class="src">' + red.length + ' stavki u knjizi prometa</span></div>'
+    + '<div><span class="src">Gotovina i kartice</span><span class="v num">' + iznosC(zG + zK) + '</span><span class="src">gotovina ' + iznosC(zG) + ', kartice ' + iznosC(zK) + '</span></div>'
+    + '<div><span class="src">Na transakcijski račun</span><span class="v num">' + iznosC(zT) + '</span><span class="src">uplate s izvoda, bez Stripea</span></div>'
+    + '<div><span class="src">Razred paušala</span><span class="v num' + (rz ? "" : " hitno") + '">' + (rz ? rz.n + '.' : "iznad limita") + '</span><span class="src">' + (rz ? "primici do " + eur(rz.do) : "primici veći od 60.000 €") + '</span></div></section>';
+
+  var preostalo = 60000 - eura, udio = Math.min(100, eura / 60000 * 100);
+  h += '<section class="panel"><h2>PO-SD za ' + god + '.' + (tekuca ? ' (do danas)' : '') + '</h2><div class="skrol"><table class="num"><tbody>'
+    + '<tr><td>Primici u gotovini i karticama</td><td class="r nw">' + iznosC(zG + zK) + '</td></tr>'
+    + '<tr><td>Primici na transakcijski račun</td><td class="r nw">' + iznosC(zT) + '</td></tr>'
+    + '<tr class="kpr-zbroj"><td>Ukupno primici</td><td class="r nw">' + iznosC(zU) + '</td></tr>'
+    + '<tr><td>Razred</td><td class="r nw">' + (rz ? rz.n + ". (" + eur(rz.od) + " do " + eur(rz.do) + ")" : "iznad 60.000 €, paušal više nije moguć") + '</td></tr>'
+    + '<tr><td>Godišnji paušalni dohodak</td><td class="r nw">' + (rz ? eur(rz.dohodak, true) : "–") + '</td></tr>'
+    + '</tbody></table></div>'
+    + '<div style="display:flex;flex-direction:column;gap:8px"><div class="bar" role="img" aria-label="' + Math.round(udio) + ' % limita od 60.000 €"><i style="width:' + udio.toFixed(1) + '%;' + (udio > 85 ? "background:var(--crvena)" : "") + '"></i></div><span class="src">' + Math.round(udio) + ' % limita od 60.000 €' + (preostalo > 0 ? ", ostaje " + eur(preostalo) : "") + '.</span></div>'
+    + (KN.odbijeni ? '<p class="src hitno">' + KN.odbijeni + ' računa koje je Porezna odbila nisu u zbroju. Pogledaj ekran Računi.</p>' : '')
+    + '<p class="src">Porez na dohodak je paušalni dohodak puta stopa grada ili općine prebivališta, plaća se tromjesečno. Razredi su oni koji vrijede od 2024. Iznose i razred prije predaje PO-SD-a potvrdi s knjigovođom.</p></section>';
+
+  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px"><h2>Knjiga prometa (KPR) ' + god + '.</h2><button class="gumb" type="button" id="kpr-csv"' + (red.length ? "" : " disabled") + '>Preuzmi za Excel (CSV)</button></div>';
+  if (!red.length) h += '<p class="prazno">Za ' + god + '. još nema prometa: ni izdanih računa ni uplata na račun.</p>';
+  else h += '<div class="skrol"><table class="num"><thead><tr><th>Rb.</th><th>Datum</th><th>Dokument</th><th>Opis</th><th class="r">Gotovina</th><th class="r">Kartice</th><th class="r">Transakcijski račun</th><th class="r">Ukupno</th></tr></thead><tbody>'
+    + red.map(function(x){ return '<tr><td>' + x.rb + '</td><td class="nw">' + datumG(x.datum) + '</td><td class="nw" style="font-weight:600">' + e(x.dokument) + (x.test ? '<span class="og">TEST</span>' : '') + '</td><td style="min-width:200px">' + e(x.opis || "–") + '</td><td class="r nw">' + (x.g ? iznosC(x.g) : "") + '</td><td class="r nw">' + (x.k ? iznosC(x.k) : "") + '</td><td class="r nw">' + (x.t ? iznosC(x.t) : "") + '</td><td class="r nw">' + iznosC(x.u) + '</td></tr>'; }).join("")
+    + '<tr class="kpr-zbroj"><td colspan="4">Ukupno</td><td class="r nw">' + iznosC(zG) + '</td><td class="r nw">' + iznosC(zK) + '</td><td class="r nw">' + iznosC(zT) + '</td><td class="r nw">' + iznosC(zU) + '</td></tr></tbody></table></div>';
+  h += '<p class="src">Računi plaćeni karticom ulaze na dan izdavanja. Stripe ih kasnije isplaćuje skupno na račun, pa se te isplate ne broje drugi put. Ako je račun plaćen virmanom, a njegova uplata je i na izvodu, isključi uplatu ispod da se ne zbroji dvaput.</p></section>';
+
+  var bk = KN.banka;
+  h += '<section class="panel"><h2>Uplate na račun ' + god + '.</h2>';
+  if (!bk.length) h += '<p class="prazno">Nema uvezenih uplata za ' + god + '. Uplate dolaze iz izvoda na ekranu Banka.</p>';
+  else h += '<div class="skrol"><table class="num"><thead><tr><th>Knjiženo</th><th>Uplatitelj</th><th>Opis</th><th class="r">Iznos</th><th>U knjizi prometa</th></tr></thead><tbody>'
+    + bk.map(function(b){
+      var izbor = b.kpr === null || b.kpr === undefined ? "" : (b.kpr ? "da" : "ne");
+      return '<tr><td class="nw">' + datumG(b.datum) + '</td><td style="font-weight:600;min-width:160px">' + e(b.protustrana || "–") + (b.stripe ? '<span class="og">STRIPE</span>' : '') + '</td><td style="min-width:180px">' + e([b.opis, b.poziv_na_broj].filter(Boolean).join(", ") || "–") + '</td><td class="r nw">' + iznosC(b.iznos_centi) + '</td>'
+        + '<td><select data-kpr="' + b.id + '" aria-label="U knjizi prometa: ' + e(b.protustrana || "uplata") + '">'
+        + '<option value=""' + (izbor === "" ? " selected" : "") + '>' + (b.stripe ? "ne (Stripe)" : "da (zadano)") + '</option><option value="da"' + (izbor === "da" ? " selected" : "") + '>da</option><option value="ne"' + (izbor === "ne" ? " selected" : "") + '>ne</option></select></td></tr>';
+    }).join("") + '</tbody></table></div>';
+  h += '<p class="src" id="kpr-poruka" role="status">' + e(knPoruka) + '</p><p class="src">Isključi uplate koje nisu prihod, npr. vlastiti polog ili povrat novca. Odluka se pamti.</p></section>';
+  return h;
+}
+function csvKpr(){
+  var red = redoviKpr(), b = function(c){ return c ? (c / 100).toFixed(2).replace(".", ",") : ""; }, q = function(t){ return '"' + String(t == null ? "" : t).replace(/"/g, '""') + '"'; };
+  var linije = [["Rb.", "Datum", "Dokument", "Opis", "Gotovina", "Kartice", "Transakcijski račun", "Ukupno"].map(q).join(";")];
+  red.forEach(function(x){ linije.push([x.rb, q(datumG(x.datum)), q(x.dokument + (x.test ? " (TEST)" : "")), q(x.opis), b(x.g), b(x.k), b(x.t), b(x.u)].join(";")); });
+  linije.push(["", "", q("Ukupno"), "", b(zbroj(red, function(x){ return x.g; })), b(zbroj(red, function(x){ return x.k; })), b(zbroj(red, function(x){ return x.t; })), b(zbroj(red, function(x){ return x.u; }))].join(";"));
+  var blob = new Blob(["﻿" + linije.join("\r\n")], {type: "text/csv;charset=utf-8"}), a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "knjiga-prometa-" + KN.godina + (knFiltar.okolina === "produkcija" ? "" : "-" + knFiltar.okolina) + ".csv";
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+function veziKnjige(){
+  var f = document.getElementById("knfiltri");
+  if (f) f.addEventListener("change", function(){ knFiltar = {godina: Number(f.godina.value), okolina: f.okolina.value}; KN = null; knPoruka = ""; crtaj(); });
+  var c = document.getElementById("kpr-csv");
+  if (c) c.addEventListener("click", csvKpr);
+  document.querySelectorAll("select[data-kpr]").forEach(function(s){ s.addEventListener("change", function(){
+    var v = s.value === "" ? null : s.value === "da";
+    s.disabled = true;
+    fetch("/api/kpr-stavka", {method: "POST", credentials: "same-origin", headers: {"content-type": "application/json"}, body: JSON.stringify({id: Number(s.dataset.kpr), kpr: v})})
+      .then(function(r){ return r.json().then(function(j){ if (!r.ok) throw new Error(j.greska || r.status); }); })
+      .then(function(){ knPoruka = "Spremljeno."; ucitajKnjige(); })
+      .catch(function(err){ s.disabled = false; knPoruka = "Nije spremljeno: " + err.message; var p = document.getElementById("kpr-poruka"); if (p) p.textContent = knPoruka; });
+  }); });
+}
+
 document.querySelectorAll("nav button").forEach(function(b){ b.addEventListener("click", function(){ ekran = b.dataset.ekran; history.replaceState(null, "", "#" + ekran); izbornik(false); oznaci(); if (D) crtaj(); window.scrollTo(0, 0); }); });
 // Izbornik na mobitelu: tipka s tri crte otvara i zatvara popis ekrana; zatvara ga i odabir ekrana, Esc ili klik izvan zaglavlja
 var zaglavlje = document.querySelector("header"), izb = zaglavlje.querySelector(".izb");
@@ -544,7 +641,7 @@ document.addEventListener("click", function(ev){ if (!zaglavlje.contains(ev.targ
 addEventListener("resize", function(){ if (innerWidth > 640) izbornik(false); });
 oznaci();
 ucitaj();
-setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); }, 10 * 60 * 1000);
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); }, 10 * 60 * 1000);
 })();
 </script>
 </body>

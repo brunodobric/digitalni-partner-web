@@ -23,6 +23,8 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
 | Brisanje troška (olovka uz Dodaj trošak, pa minus uz trošak i potvrda) | `sql/07-brisanje-troska.sql` |
 | Privici iz maila (MIME) i XML iz ZIP-a | `src/mail.js` |
+| Upozorenja mailom (sastavljanje) i njihove funkcije u bazi | `src/upozorenja.js`, `sql/08-upozorenja.sql` |
+| Knjiga prometa (KPR) i PO-SD (ekran Knjige) | `sql/09-knjige.sql` |
 | Testovi s izmišljenim izvodima | `test/` (`node --test nadzor/test/*.test.mjs`) |
 
 Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U bazama je spremljen samo njegov SHA-256 sažetak. Tablice imaju uključen RLS bez pravila, pa ih javni ključ ne može čitati izravno.
@@ -33,11 +35,11 @@ Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U 
 | --- | --- | --- |
 | `NADZOR_KLJUC` | Pristup funkcijama u obje baze | da (postavljeno) |
 | `CF_API_TOKEN` | Broj zahtjeva na web i Kuvertu (Cloudflare GraphQL, dozvola Account Analytics: Read) | ne |
-| `RESEND_KEY`, `OBAVIJEST_NA` | Mail o svakom novom upitu s weba | ne |
+| `RESEND_KEY`, `OBAVIJEST_NA` | Mail o svakom novom upitu s weba i upozorenja | ne |
 | `IZVODI_IBAN` | IBAN-i (odvojeni zarezom) za koje se primaju izvodi mailom. Bez nje se mail ne uvozi | za uvoz mailom |
 | `IZVODI_POSILJATELJI` | Adrese ili domene pošiljatelja izvoda, npr. `@pbz.hr`. Prazno pušta svakoga | preporučeno |
 | `IZVODI_PROSLIJEDI` | Adresa na koju se mail s izvodom proslijedi nakon uvoza (mora biti potvrđena u Email Routingu) | ne |
-| `FISK_TOKEN` | PDF računa na ekranu Računi. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun) | ne, bez nje popis radi, a PDF ne |
+| `FISK_CITANJE_TOKEN` | PDF računa na ekranu Računi i provjera isteka certifikata. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun). Stari naziv `FISK_TOKEN` radi kao rezerva | ne, bez nje popis radi, a PDF ne |
 
 Ekran Računi čita tablicu `fisk.racuni` (isti Supabase projekt) preko funkcije `nadzor_racuni`, a PDF traži od Edge funkcije `fisk-racun` (repozitorij financijski-softver). Adresa funkcije je `SUPABASE_URL/functions/v1/fisk-racun`, a može se promijeniti varijablom `FISK_URL`.
 
@@ -60,6 +62,25 @@ PBZ šalje dnevni izvod na `izvodi@digitalnipartner.hr`, sandučić u Zohu (MX d
 4. upiše ishod kao „izvodi-mail” (vidi se u dnu dashboarda), a kad nešto ne uspije, pošalje obavijest na `OBAVIJEST_NA` (ako je postavljen `RESEND_KEY`).
 
 Postavljanje: `npx wrangler secret put IME` iz mape `nadzor/`.
+
+## Upozorenja mailom
+
+Svaki sat (cron `15 * * * *`, i nakon jutarnjeg prikupljanja) Worker provjeri stanje i pošalje jedan mail na `OBAVIJEST_NA` za sve što je novo:
+
+- račun čeka JIR dulje od 2 sata, ili ga je Porezna odbila,
+- ručno uvezen izvod se ne slaže (za izvode iz maila to javlja već uvoz),
+- za račun nema novog izvoda 3 radna dana,
+- jutarnje prikupljanje nije uspjelo,
+- FINA certifikat istječe za 30 dana, za 7 dana i kad istekne (radnja `zdravlje` servisa fisk-racun),
+- servis fisk-racun ne odgovara (najviše jednom dnevno).
+
+Svako upozorenje ima svoj ključ u tablici `obavijesti` i stiže samo jednom. Ključ se upiše tek kad Resend primi mail, pa se neposlano upozorenje pokuša ponovno idući sat.
+
+## Ekran Knjige (KPR i PO-SD)
+
+Knjiga prometa slaže se iz fiskaliziranih računa (gotovina, kartice) i priljeva s uvezenih izvoda (transakcijski račun). Isplate sa Stripea se po zadanom ne broje, jer su te uplate već u knjizi kao računi plaćeni karticom. Svaku uplatu s izvoda može se ručno uključiti ili isključiti (stupac `izvod_stavke.kpr`). Odbijeni računi nisu u zbroju.
+
+PO-SD dio pokazuje primitke po vrsti, razred i godišnji paušalni dohodak prema razredima koji vrijede od 2024. (`RAZREDI` u `src/stranica.html`). Knjiga se preuzima kao CSV za Excel (točka-zarez, decimalni zarez). Iznose prije predaje potvrditi s knjigovođom.
 
 ## Ogledni podaci
 
