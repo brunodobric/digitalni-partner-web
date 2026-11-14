@@ -73,7 +73,10 @@ Svaki sat (cron `15 * * * *`, i nakon jutarnjeg prikupljanja) Worker provjeri st
 - za račun nema novog izvoda 3 radna dana,
 - jutarnje prikupljanje nije uspjelo,
 - FINA certifikat istječe za 30 dana, za 7 dana i kad istekne (radnja `zdravlje` servisa fisk-racun),
-- servis fisk-racun ne odgovara (najviše jednom dnevno).
+- servis fisk-racun ne odgovara (najviše jednom dnevno),
+- primici ove godine (kao na ekranu Knjige) prijeđu granicu razreda paušala, 54.000 € ili limit od 60.000 € (`sql/10-obavijesti.sql`).
+
+Ekran **Obavijesti** pokazuje sve obavijesti mailom, kada se šalju, jesu li uključene i što je zadnje poslano. Popis je u `src/upozorenja.js` (`POPIS_OBAVIJESTI`).
 
 Svako upozorenje ima svoj ključ u tablici `obavijesti` i stiže samo jednom. Ključ se upiše tek kad Resend primi mail, pa se neposlano upozorenje pokuša ponovno idući sat.
 

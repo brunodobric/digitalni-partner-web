@@ -9,6 +9,7 @@
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
 // - GET /api/knjige?godina=…&okolina=…  knjiga prometa (KPR) i podaci za PO-SD (Access)
+// - GET /api/obavijesti  popis obavijesti mailom, što je uključeno i zadnje poslane (Access)
 // - POST /api/kpr-stavka  uključi ili isključi stavku izvoda iz KPR-a (Access)
 // - POST /api/izvod  uvoz jednog izvoda CAMT.053 (XML u tijelu zahtjeva) (Access)
 // - POST /upit       javni prijem upita s kontakt obrasca na webu (bez prijave, samo s dopuštene adrese)
@@ -25,7 +26,7 @@ import STRANICA from "./stranica.html";
 import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
 import { citajCamt053 } from "./camt.js";
 import { jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
-import { DOMENA_NADZORA, sastaviUpozorenja } from "./upozorenja.js";
+import { DOMENA_NADZORA, POPIS_OBAVIJESTI, sastaviUpozorenja } from "./upozorenja.js";
 
 export default {
   async fetch(req, env, ctx) {
@@ -89,6 +90,16 @@ export default {
         const okolina = ["produkcija", "test", "sve"].includes(url.searchParams.get("okolina")) ? url.searchParams.get("okolina") : "produkcija";
         if (godina < 2000 || godina > 2100) return json({ greska: "Neispravna godina." }, 400);
         return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_knjige", { p_kljuc: env.NADZOR_KLJUC, p_godina: godina, p_okolina: okolina }));
+      }
+      if (req.method === "GET" && url.pathname === "/api/obavijesti") {
+        const uvjeti = { mail: !!(env.RESEND_KEY && env.OBAVIJEST_NA), iban: !!env.IZVODI_IBAN, fisk: !!fiskToken(env) };
+        uvjeti.iban = uvjeti.iban && uvjeti.mail;
+        uvjeti.fisk = uvjeti.fisk && uvjeti.mail;
+        return json({
+          adresa: env.OBAVIJEST_NA || "",
+          popis: POPIS_OBAVIJESTI.map((o) => ({ ...o, ukljuceno: uvjeti[o.uvjet] })),
+          poslane: await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_obavijesti_popis", { p_kljuc: env.NADZOR_KLJUC }),
+        });
       }
       if (req.method === "POST" && url.pathname === "/api/kpr-stavka") {
         const b = await req.json();

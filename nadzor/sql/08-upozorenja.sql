@@ -8,7 +8,7 @@ create table if not exists public.obavijesti (
 );
 alter table public.obavijesti enable row level security;
 
--- Sve što bi moglo trebati upozorenje, u jednom JSON-u.
+-- Sve što bi moglo trebati upozorenje, u jednom JSON-u (10-obavijesti.sql dodaje primitke).
 create or replace function public.nadzor_upozorenja(p_kljuc text)
 returns jsonb language plpgsql security definer set search_path = '' as $$
 begin
