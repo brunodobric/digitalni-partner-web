@@ -19,6 +19,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Ogledni podaci | `sql/03-ogledni-podaci.sql` |
 | Popis računa iz fiskalizacije (ekran Računi) | `sql/04-racuni.sql` |
 | Registrirani korisnici Kuverte (ekran Kuverta), pokreće se u projektu MyWeddingInvite | `sql/06-kuverta-korisnici.sql` |
+| Brisanje korisničkog računa Kuverte (gumb Obriši uz korisnika), pokreće se u projektu MyWeddingInvite | migracija `023_nadzor_brisanje_korisnika.sql` u repozitoriju MyWeddingInvite; Worker zove `KUVERTA_WEB/interno/obrisi-korisnika` |
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
 | Brisanje troška (olovka uz Dodaj trošak, pa minus uz trošak i potvrda) | `sql/07-brisanje-troska.sql` |
