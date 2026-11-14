@@ -123,6 +123,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
     <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
     <button role="tab" data-ekran="knjige" aria-selected="false">Knjige</button>
+    <button role="tab" data-ekran="obavijesti" aria-selected="false">Obavijesti</button>
   </nav>
 </div></header>
 <div class="traka" id="traka" hidden><div class="wrap"><b>OGLEDNI PODACI</b><span>Brojevi s oznakom OGLEDNO nisu stvarni. Nestaju kad se spoji pravi izvor.</span></div></div>
@@ -161,7 +162,7 @@ function crtaj(){
   var imaOgl = D.prihod_godina_ogledno || D.klijenti.some(function(k){ return k.ogledno; }) || Object.keys(D.metrike).some(function(k){ return D.metrike[k].ogledno; });
   document.getElementById("traka").hidden = !imaOgl;
   oznaci();
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
@@ -671,7 +672,42 @@ document.addEventListener("click", function(ev){ if (!zaglavlje.contains(ev.targ
 addEventListener("resize", function(){ if (innerWidth > 640) izbornik(false); });
 oznaci();
 ucitaj();
-setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); }, 10 * 60 * 1000);
+// ---------- Obavijesti (popis svih obavijesti mailom) ----------
+var OB = null, obGreska = "";
+var OB_UVJET = {mail: "treba RESEND_KEY i OBAVIJEST_NA", iban: "treba IZVODI_IBAN", fisk: "treba ključ za fisk-racun"};
+function ucitajObavijesti(){
+  fetch("/api/obavijesti", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ OB = j; obGreska = ""; if (ekran === "obavijesti") crtaj(); })
+    .catch(function(err){ obGreska = err.message; if (ekran === "obavijesti") crtaj(); });
+}
+function obavijestZaKljuc(k){
+  var x = (OB.popis || []).filter(function(o){ return o.kljuc && (k === o.kljuc || k.indexOf(o.kljuc + ":") === 0); });
+  return x.length ? x[0].naziv : k;
+}
+function obavijesti(){
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Mail</p><h1>Obavijesti</h1></div>';
+  if (obGreska) return h + '<section class="panel"><p class="prazno">Obavijesti se nisu učitale (' + e(obGreska) + '). Osvježi stranicu za minutu.</p></section>';
+  if (!OB) { ucitajObavijesti(); return h + '<section class="panel"><p class="prazno">Učitavam obavijesti…</p></section>'; }
+  var poslane = OB.poslane || [];
+  function zadnje(o){
+    if (!o.kljuc) return "šalje se odmah";
+    var x = poslane.filter(function(p){ return p.kljuc === o.kljuc || p.kljuc.indexOf(o.kljuc + ":") === 0; });
+    return x.length ? vrijeme(x[0].poslano) : "još nije";
+  }
+  h += '<section class="panel"><p style="margin:0">Sve obavijesti stižu na <b>' + e(OB.adresa || "(adresa nije postavljena)") + '</b>. Upiti i izvodi javljaju se odmah. Ostalo nadzor provjerava svaki sat u 15 minuta iza punog sata i sve novo šalje u jednom mailu. Svako upozorenje stiže samo jednom.</p></section>';
+  h += '<section class="panel"><h2>Što se šalje</h2><div class="skrol"><table><thead><tr><th>Obavijest</th><th>Kada se šalje</th><th>Koliko često</th><th>Stanje</th><th>Zadnja</th></tr></thead><tbody>'
+    + OB.popis.map(function(o){
+      return '<tr><td style="font-weight:600">' + e(o.naziv) + '</td><td>' + e(o.kada) + '</td><td>' + e(o.ucestalost) + '</td><td class="nw">'
+        + (o.ukljuceno ? '<span class="oznaka ok">uključeno</span>' : '<span class="oznaka lose">isključeno</span><br><span class="src">' + e(OB_UVJET[o.uvjet] || "") + '</span>')
+        + '</td><td class="nw">' + e(zadnje(o)) + '</td></tr>';
+    }).join("") + '</tbody></table></div></section>';
+  h += '<section class="panel"><h2>Zadnje poslano</h2>' + (poslane.length ? '<div class="skrol"><table><thead><tr><th>Vrijeme</th><th>Obavijest</th><th>Oznaka</th></tr></thead><tbody>'
+    + poslane.slice(0, 20).map(function(p){ return '<tr><td class="nw">' + e(vrijeme(p.poslano)) + '</td><td>' + e(obavijestZaKljuc(p.kljuc)) + '</td><td class="src">' + e(p.kljuc) + '</td></tr>'; }).join("")
+    + '</tbody></table></div>' : '<p class="prazno">Satna upozorenja još nisu ništa poslala.</p>') + '</section>';
+  return h;
+}
+
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); }, 10 * 60 * 1000);
 })();
 </script>
 </body>

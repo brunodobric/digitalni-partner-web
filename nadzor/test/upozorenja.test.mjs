@@ -40,3 +40,18 @@ test("servis fisk-racun ne odgovara: jedno upozorenje po danu", () => {
   const u = sastaviUpozorenja({}, { greska: "HTTP 500" }, "2026-11-16", sada);
   assert.equal(u[0].kljuc, "fisk-nedostupan:2026-11-16");
 });
+
+test("razred paušala: upozorenje tek iznad prvog razreda, jednom po razredu", () => {
+  const za = (eura) => sastaviUpozorenja({ primici: { godina: 2026, centi: eura * 100 } }, null, "2026-11-16", sada);
+  assert.equal(za(11300).length, 0);
+  const u = za(11450);
+  assert.deepEqual(u.map((x) => x.kljuc), ["razred:2026:2"]);
+  assert.match(u[0].tekst, /2\. razred/);
+  assert.deepEqual(za(31000).map((x) => x.kljuc), ["razred:2026:5"]);
+});
+
+test("limit paušala: blizu na 54.000 €, prijeđen iznad 60.000 €", () => {
+  const za = (eura) => sastaviUpozorenja({ primici: { godina: 2026, centi: eura * 100 } }, null, "2026-11-16", sada).map((x) => x.kljuc);
+  assert.deepEqual(za(55000), ["razred:2026:7", "limit-blizu:2026"]);
+  assert.deepEqual(za(61000), ["limit:2026"]);
+});
