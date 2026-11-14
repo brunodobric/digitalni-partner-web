@@ -144,17 +144,28 @@ async function rpc(base, key, fn, args) {
 
 // ---------- PDF računa (servis fisk-racun u Supabaseu) ----------
 
-// Ključ samo za čitanje (PDF, stanje, zdravlje). FISK_TOKEN je stari naziv iste tajne.
 function fiskToken(env) {
   return env.FISK_CITANJE_TOKEN || env.FISK_TOKEN || "";
 }
 
-function fisk(env, tijelo) {
-  return fetch(env.FISK_URL || (env.SUPABASE_URL + "/functions/v1/fisk-racun"), {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-fisk-token": fiskToken(env) },
-    body: JSON.stringify(tijelo),
-  });
+// Ključ samo za čitanje (PDF, stanje, zdravlje) ima prednost. Ako ga fisk-racun odbije (npr. nije isti kao u
+// Supabaseu), poziv se ponovi s punim ključem FISK_TOKEN, da PDF i provjera ne stanu.
+async function fisk(env, tijelo) {
+  const posalji = (token) =>
+    fetch(env.FISK_URL || (env.SUPABASE_URL + "/functions/v1/fisk-racun"), {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-fisk-token": token },
+      body: JSON.stringify(tijelo),
+    });
+  const tokeni = [env.FISK_CITANJE_TOKEN, env.FISK_TOKEN].filter(Boolean);
+  if (!tokeni.length) return posalji("");
+  let r;
+  for (const t of tokeni) {
+    r = await posalji(t);
+    if (r.status !== 401) return r;
+    if (t === env.FISK_CITANJE_TOKEN) console.warn("fisk-racun je odbio FISK_CITANJE_TOKEN");
+  }
+  return r;
 }
 
 async function pdfRacuna(url, env) {
