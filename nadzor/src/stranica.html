@@ -166,6 +166,7 @@ function crtaj(){
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
   if (ekran === "racuni") veziRacune();
+  if (ekran === "vjencanja") veziKorisnike();
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
@@ -341,7 +342,7 @@ function vjencanja(){
 }
 
 // ---------- Korisnici Kuverte (na ekranu Kuverta) ----------
-var K = null, kGreska = "";
+var K = null, kGreska = "", kPoruka = "";
 function ucitajKorisnike(){
   fetch("/api/korisnici", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
     .then(function(j){ K = j.korisnici || []; kGreska = ""; if (ekran === "vjencanja") crtaj(); })
@@ -358,10 +359,39 @@ function korisniciKuverte(){
   var platili = K.filter(function(u){ return Number(u.placeno) > 0; }).length;
   function usl(u){ return [u.pozivnica && "pozivnica", u.album && "album", u.raspored && "raspored"].filter(Boolean).join(", ") || "–"; }
   h += '<p class="num" style="font-size:14px"><b>' + br(K.length) + '</b> ukupno · <b>' + br(novi) + '</b> novih u zadnjih 30 dana · <b>' + br(aktivni) + '</b> prijavljenih u zadnjih 30 dana · <b>' + br(platili) + '</b> platilo</p>';
-  h += '<div class="skrol"><table class="num"><thead><tr><th>E-mail</th><th>Registriran</th><th>Zadnja prijava</th><th>Potvrđen</th><th>Napravio</th><th class="r">Plaćeno</th></tr></thead><tbody>'
-    + K.map(function(u){ return '<tr><td class="nw" style="font-weight:600">' + e(u.email || "–") + '</td><td class="nw">' + vrijeme(u.registriran) + '</td><td class="nw">' + (u.zadnja_prijava ? vrijeme(u.zadnja_prijava) : "nikad") + '</td><td>' + (u.potvrden ? "da" : "ne") + '</td><td>' + e(usl(u)) + '</td><td class="r nw">' + (Number(u.placeno) > 0 ? eur(u.placeno, true) : "–") + '</td></tr>'; }).join("")
-    + '</tbody></table></div><p class="src">Izvor: Supabase Authentication projekta MyWeddingInvite, najnoviji prvi. Plaćeno je zbroj uplata preko Stripea bez testnih.</p></section>';
+  h += '<div class="skrol"><table class="num"><thead><tr><th>E-mail</th><th>Registriran</th><th>Zadnja prijava</th><th>Potvrđen</th><th>Napravio</th><th class="r">Plaćeno</th><th></th></tr></thead><tbody id="korisnici">'
+    + K.map(function(u, i){ return '<tr><td class="nw" style="font-weight:600">' + e(u.email || "–") + '</td><td class="nw">' + vrijeme(u.registriran) + '</td><td class="nw">' + (u.zadnja_prijava ? vrijeme(u.zadnja_prijava) : "nikad") + '</td><td>' + (u.potvrden ? "da" : "ne") + '</td><td>' + e(usl(u)) + '</td><td class="r nw">' + (Number(u.placeno) > 0 ? eur(u.placeno, true) : "–") + '</td><td class="r">' + (u.email ? '<button type="button" class="tiho" data-brisi-korisnika="' + i + '" aria-label="Obriši račun ' + e(u.email) + '">Obriši</button>' : '') + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Izvor: Supabase Authentication projekta MyWeddingInvite, najnoviji prvi. Plaćeno je zbroj uplata preko Stripea bez testnih.</p><p id="korisnici-poruka" class="src" role="status">' + e(kPoruka) + '</p></section>';
   return h;
+}
+// Brisanje korisnika: Obriši otvara potvrdu u retku, a račun se briše tek kad se upiše njegov e-mail.
+function veziKorisnike(){
+  var tb = document.getElementById("korisnici"), por = document.getElementById("korisnici-poruka");
+  if (!tb) return;
+  tb.addEventListener("click", function(ev){
+    var b = ev.target.closest("button"); if (!b) return;
+    var tr = b.closest("tr");
+    if (b.dataset.brisiKorisnika) {
+      var u = K[Number(b.dataset.brisiKorisnika)]; if (!u) return;
+      tr.dataset.stari = tr.innerHTML; tr.className = "potvrda";
+      tr.innerHTML = '<td colspan="7"><div class="potvrda-tekst" style="position:sticky;left:14px;max-width:calc(100vw - 72px)"><span>Obrisati račun <b>' + e(u.email) + '</b>? Brišu se pozivnica, odgovori gostiju, album s datotekama i raspored, i ne vraćaju se. Uplate i računi ostaju. Za potvrdu upiši e-mail.</span><div style="flex-wrap:wrap"><input type="email" autocomplete="off" aria-label="E-mail računa za potvrdu" data-potvrda-email><button type="button" class="tiho" data-odustani>Odustani</button><button type="button" class="gumb opasno" data-obrisi-korisnika="' + b.dataset.brisiKorisnika + '" disabled>Obriši račun</button></div></div></td>';
+      var inp = tr.querySelector("[data-potvrda-email]"), ob = tr.querySelector("[data-obrisi-korisnika]");
+      inp.addEventListener("input", function(){ ob.disabled = inp.value.trim().toLowerCase() !== String(u.email).toLowerCase(); });
+      inp.focus();
+    } else if (b.hasAttribute("data-odustani")) {
+      tr.className = ""; tr.innerHTML = tr.dataset.stari;
+    } else if (b.dataset.obrisiKorisnika) {
+      var x = K[Number(b.dataset.obrisiKorisnika)]; if (!x) return;
+      b.disabled = true; b.textContent = "Brišem…"; kPoruka = ""; por.textContent = "";
+      fetch("/api/korisnik-obrisi", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({email: x.email})})
+        .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+        .then(function(j){
+          kPoruka = "Račun " + x.email + " je obrisan." + ((j.upozorenja || []).length ? " " + j.upozorenja.join(" ") : "");
+          K = null; crtaj();
+        })
+        .catch(function(err){ b.disabled = false; b.textContent = "Obriši račun"; por.textContent = "Račun nije obrisan: " + err.message; });
+    }
+  });
 }
 
 // ---------- Računi ----------
