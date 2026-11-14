@@ -5,6 +5,7 @@
 // - POST /api/trosak-obrisi  brisanje jednog troška po id-u (Access)
 // - GET /api/racuni  računi iz fiskalizacije (Access)
 // - GET /api/korisnici  registrirani korisnici Kuverte: e-mail, registracija, zadnja prijava (Access)
+// - POST /api/korisnik-obrisi  brisanje korisničkog računa Kuverte po e-mailu (Access), vidi obrisiKorisnika
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
 // - GET /api/knjige?godina=…&okolina=…  knjiga prometa (KPR) i podaci za PO-SD (Access)
@@ -77,6 +78,7 @@ export default {
         const korisnici = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_korisnici", { p_kljuc: env.NADZOR_KLJUC });
         return json({ korisnici });
       }
+      if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
       if (req.method === "GET" && url.pathname === "/api/banka") {
         return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_banka", { p_kljuc: env.NADZOR_KLJUC }));
@@ -479,4 +481,25 @@ async function provjeriUpozorenja(env) {
   } catch (e) {
     console.error("upozorenja", e);
   }
+}
+
+// Brisanje korisničkog računa Kuverte. Datoteke albuma su u R2 Kuverte, pa račun briše Worker Kuverte
+// (/interno/obrisi-korisnika). Šalje mu se NADZOR_KLJUC, a provjerava ga baza Kuverte
+// (nadzor_obrisi_korisnika, migracija 023 u repozitoriju MyWeddingInvite).
+async function obrisiKorisnika(req, env) {
+  const b = await req.json().catch(() => ({}));
+  const email = typeof b.email === "string" ? b.email.trim() : "";
+  if (!email || email.length > 320) return json({ greska: "Nedostaje e-mail." }, 400);
+  const r = await fetch(new URL("/interno/obrisi-korisnika", env.KUVERTA_WEB), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ kljuc: env.NADZOR_KLJUC, email }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    console.error("korisnik-obrisi", r.status, j);
+    return json({ greska: j.greska || "Kuverta je vratila " + r.status + "." }, r.status === 404 ? 404 : 502);
+  }
+  console.log("korisnik-obrisi", "obrisan račun Kuverte");
+  return json({ ok: true, upozorenja: j.upozorenja || [] });
 }
