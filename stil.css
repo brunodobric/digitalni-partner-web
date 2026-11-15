@@ -363,3 +363,18 @@ footer .f-sl{font:600 .7rem var(--sans);letter-spacing:.12em;text-transform:uppe
 .faq__q h3{font-size:1.05rem;font-weight:600;letter-spacing:-.01em;line-height:1.35}
 .faq__odg p{color:var(--grafit);max-width:40em;padding:0 40px 24px 0}
 @media(max-width:600px){.faq__odg p{padding-right:0}}
+
+/* PAKET: jedan paket (D start) i opcije bez paketa (samo web stranica, mobilna aplikacija) */
+.plans[data-paketa="1"] .plan.hot{padding:44px 40px 36px}
+.opcije{display:grid;align-content:start;padding:8px 0 0 56px;min-width:0}
+.opcije__nas{margin:0 0 6px;font:600 .74rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--zlato)}
+.opcija{padding:26px 0 28px;border-bottom:1px solid var(--linija-tam)}
+.opcija:last-child{border-bottom:0}
+.opcija h3{font-size:1.3rem}
+.opcija__c{margin-top:8px;font:600 1.6rem/1.1 var(--sans);letter-spacing:-.02em;color:var(--zlato);font-variant-numeric:tabular-nums}
+.opcija__c small{font:400 .85rem var(--sans);letter-spacing:0;color:var(--tekst-tam);margin-left:6px}
+.opcija p{margin:10px 0 14px;font-size:.94rem;color:var(--tekst-tam)}
+.opcija__link{font-weight:600;color:var(--kamen);text-underline-offset:4px;text-decoration-thickness:1px}
+.opcija__link:hover{color:var(--zlato)}
+@media(max-width:960px){.opcije{padding:40px 0 0}}
+@media(min-width:961px){.plans[data-paketa="1"]{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}}
