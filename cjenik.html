@@ -8,7 +8,7 @@
 <!-- SKRIVENE USLUGE: izvorni opis:
 Cjenik Digitalnog partnera: web stranice, mobilne aplikacije, održavanje, SEO i GEO optimizacija, Google poslovni profil, Google i Meta oglasi, AI asistenti, integracija AI agenata i paketi.
 -->
-<meta name="description" content="Web stranica do 5 podstranica 599 €, održavanje 49 € mjesečno, Google poslovni profil 199 €. WEB paket 399 € mjesečno. Obrt nije u sustavu PDV-a.">
+<meta name="description" content="WEB paket 399 € mjesečno: stranica, održavanje, Google profil, SEO i GEO. Samo web stranica 599 €, aplikacija od 4.999 €. Bez PDV-a.">
 <meta name="theme-color" content="#E7E4DE">
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta property="og:type" content="website">
@@ -16,7 +16,7 @@ Cjenik Digitalnog partnera: web stranice, mobilne aplikacije, održavanje, SEO i
 <meta property="og:site_name" content="Digitalni partner">
 <meta property="og:url" content="https://digitalnipartner.hr/cjenik">
 <meta property="og:title" content="Cjenik izrade web stranica i paketa · Digitalni partner">
-<meta property="og:description" content="Web stranica do 5 podstranica 599 €, održavanje 49 € mjesečno, Google poslovni profil 199 €. WEB paket 399 € mjesečno. Obrt nije u sustavu PDV-a.">
+<meta property="og:description" content="WEB paket 399 € mjesečno: stranica, održavanje, Google profil, SEO i GEO. Samo web stranica 599 €, aplikacija od 4.999 €. Bez PDV-a.">
 <meta property="og:image" content="https://digitalnipartner.hr/slike/og-slika.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -55,119 +55,6 @@ Cjenik Digitalnog partnera: web stranice, mobilne aplikacije, održavanje, SEO i
        "@type": "Service",
        "name": "Web stranica po mjeri",
        "description": "Reklamna web stranica do 5 podstranica: usluge, cjenik, fotografije, kontakt i lokacija. Gotova za oko dva tjedna.",
-       "provider": {
-        "@id": "https://digitalnipartner.hr/#organizacija"
-       },
-       "areaServed": {
-        "@type": "Country",
-        "name": "Hrvatska"
-       }
-      }
-     },
-     {
-      "@type": "Offer",
-      "priceCurrency": "EUR",
-      "priceSpecification": {
-       "@type": "UnitPriceSpecification",
-       "price": 49,
-       "priceCurrency": "EUR",
-       "unitCode": "MON",
-       "unitText": "mjesečno"
-      },
-      "itemOffered": {
-       "@type": "Service",
-       "name": "Održavanje web stranice, domena i hosting",
-       "description": "Brinemo se da stranica radi, da je domena plaćena i hosting ispravan, a sitne izmjene unosimo mi.",
-       "provider": {
-        "@id": "https://digitalnipartner.hr/#organizacija"
-       },
-       "areaServed": {
-        "@type": "Country",
-        "name": "Hrvatska"
-       }
-      }
-     },
-     {
-      "@type": "Offer",
-      "priceCurrency": "EUR",
-      "priceSpecification": {
-       "@type": "UnitPriceSpecification",
-       "price": 199,
-       "priceCurrency": "EUR"
-      },
-      "itemOffered": {
-       "@type": "Service",
-       "name": "Postavljanje Google poslovnog profila",
-       "description": "Profil s radnim vremenom, fotografijama, uslugama i poveznicom na stranicu.",
-       "provider": {
-        "@id": "https://digitalnipartner.hr/#organizacija"
-       },
-       "areaServed": {
-        "@type": "Country",
-        "name": "Hrvatska"
-       }
-      }
-     },
-     {
-      "@type": "Offer",
-      "priceCurrency": "EUR",
-      "priceSpecification": {
-       "@type": "UnitPriceSpecification",
-       "price": 99,
-       "priceCurrency": "EUR",
-       "unitCode": "MON",
-       "unitText": "mjesečno"
-      },
-      "itemOffered": {
-       "@type": "Service",
-       "name": "Održavanje Google poslovnog profila",
-       "description": "Redovito osvježavanje Google poslovnog profila.",
-       "provider": {
-        "@id": "https://digitalnipartner.hr/#organizacija"
-       },
-       "areaServed": {
-        "@type": "Country",
-        "name": "Hrvatska"
-       }
-      }
-     },
-     {
-      "@type": "Offer",
-      "priceCurrency": "EUR",
-      "priceSpecification": {
-       "@type": "UnitPriceSpecification",
-       "price": 199,
-       "priceCurrency": "EUR",
-       "unitCode": "MON",
-       "unitText": "mjesečno"
-      },
-      "itemOffered": {
-       "@type": "Service",
-       "name": "SEO optimizacija",
-       "description": "Uređivanje stranice i sadržaja za bolje rangiranje na Googleu.",
-       "provider": {
-        "@id": "https://digitalnipartner.hr/#organizacija"
-       },
-       "areaServed": {
-        "@type": "Country",
-        "name": "Hrvatska"
-       }
-      }
-     },
-     {
-      "@type": "Offer",
-      "priceCurrency": "EUR",
-      "priceSpecification": {
-       "@type": "UnitPriceSpecification",
-       "price": 199,
-       "priceCurrency": "EUR",
-       "unitCode": "MON",
-       "unitText": "mjesečno"
-      },
-      "itemOffered": {
-       "@type": "Service",
-       "name": "GEO optimizacija",
-       "description": "Priprema stranice da je AI tražilice poput ChatGPT-a razumiju i preporuče.",
        "provider": {
         "@id": "https://digitalnipartner.hr/#organizacija"
        },
@@ -280,18 +167,11 @@ document.documentElement.classList.add("js-menu");
   </div>
 </header>
 
-<section class="svj" id="pojedinacno">
+<!-- SKRIVENE USLUGE: pojedinačne usluge (oglasi, AI) čekaju povratak. Web stranica i aplikacija bez paketa stoje u sekciji Paket. -->
+<section class="svj" id="pojedinacno" hidden data-skriveno="oglasi ai">
   <div class="wrap">
     <div class="head"><span class="label">Pojedinačne usluge</span><h2>Uzmite samo ono što Vam treba.</h2></div>
     <div class="tbl">
-      <div class="row"><span class="n">Reklamna web stranica</span><span class="d">Do 5 podstranica</span><span class="c">599 €<small>jednokratno</small></span></div>
-      <div class="row"><span class="n">Dodatna podstranica</span><span class="d">Uz osnovnih 5 podstranica</span><span class="c">49 €<small>jednokratno</small></span></div>
-      <div class="row"><span class="n">Mobilna aplikacija</span><span class="d">Za iOS i Android: online rezervacije, usluge i cjenik te obavijesti klijentima</span><span class="c">od 4.999 €<small>jednokratno</small></span></div>
-      <div class="row"><span class="n">Održavanje web stranice, domena i hosting</span><span class="c">49 €<small>mjesečno</small></span></div>
-      <div class="row"><span class="n">SEO optimizacija</span><span class="d">Vidljivost na Googleu</span><span class="c">199 €<small>mjesečno</small></span></div>
-      <div class="row"><span class="n">GEO optimizacija</span><span class="d">Vidljivost u AI tražilicama poput ChatGPT-a</span><span class="c">199 €<small>mjesečno</small></span></div>
-      <div class="row"><span class="n">Postavljanje Google poslovnog profila</span><span class="c">199 €<small>jednokratno</small></span></div>
-      <div class="row"><span class="n">Održavanje Google poslovnog profila</span><span class="c">99 €<small>mjesečno</small></span></div>
       <div class="row" hidden data-skriveno="oglasi"><span class="n">Google oglasi</span><span class="d">Vođenje kampanje i izrada oglasa (tekst, grafike, kratki video), ne uključuje budžet za oglase</span><span class="c">249 €<small>mjesečno</small></span></div>
       <div class="row" hidden data-skriveno="oglasi"><span class="n">Meta oglasi</span><span class="d">Vođenje kampanje i izrada oglasa (tekst, grafike, kratki video), ne uključuje budžet za oglase</span><span class="c">199 €<small>mjesečno</small></span></div>
       <div class="row" hidden data-skriveno="ai"><span class="n">AI asistent na web stranici</span><span class="d">Postavljanje</span><span class="c">299 €<small>jednokratno</small></span></div>
@@ -300,10 +180,6 @@ document.documentElement.classList.add("js-menu");
       <div class="row" hidden data-skriveno="ai"><span class="n">Analiza narudžbi za AI agenta</span><span class="d">Odbija se od cijene integracije ako nastavite</span><span class="c">490 €<small>jednokratno</small></span></div>
       <div class="row" hidden data-skriveno="ai"><span class="n">Integracija AI agenta</span><span class="d">Narudžbe iz maila u skladište. Konačna cijena nakon analize</span><span class="c">od 1.490 €<small>jednokratno</small></span></div>
       <div class="row" hidden data-skriveno="ai"><span class="n">Održavanje AI agenta</span><span class="d">Praćenje rada, prilagodbe i mjesečni izvještaj</span><span class="c">od 299 €<small>mjesečno</small></span></div>
-    </div>
-    <div class="promo">
-      <span class="k">Za prvih 5 klijenata, do 9. prosinca 2026.</span>
-      <p>Popust na izradu web stranice: osnovna stranica stoji 279,30 € umjesto 599 €.</p>
     </div>
   </div>
 </section>
@@ -353,20 +229,18 @@ document.documentElement.classList.add("js-menu");
         <a class="btn line" href="/kontakt?plan=paket%20D%20premium">Odaberite D premium</a>
       </article>
     </div>
-    
   </div>
 </section>
 
 <section id="tematski">
   <div class="wrap">
-    <div class="head"><span class="label">Tematski paketi</span><h2>Kad Vam treba samo jedno područje.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca</p></div>
-    <div class="tbl">
-      <div class="row"><span class="n">Održavanje i optimizacija</span><span class="d">Održavanje web stranice, domena, hosting, SEO i GEO optimizacija te održavanje Google poslovnog profila</span><span class="c">399 €<small>mjesečno</small></span></div>
+    <div class="head" hidden data-skriveno="oglasi ai"><span class="label">Tematski paketi</span><h2>Kad Vam treba samo jedno područje.</h2><p class="note-min">Mjesečno · ugovor najmanje 3 mjeseca</p></div>
+    <div class="tbl" hidden data-skriveno="oglasi ai">
       <div class="row" hidden data-skriveno="oglasi"><span class="n">Google i Meta oglasi</span><span class="d">Mjesečno vođenje kampanja na Googleu i Meti s izradom oglasa, ne uključuje budžet za oglase</span><span class="c">349 €<small>mjesečno</small></span></div>
       <div class="row" hidden data-skriveno="ai"><span class="n">AI asistenti</span><span class="d">Postavljanje i održavanje AI asistenata na web stranici i WhatsAppu</span><span class="c">399 €<small>mjesečno</small></span></div>
     </div>
     <div class="notes">
-      <p>Cijene paketa i tematskih paketa su mjesečne, uz ugovor od najmanje 3 mjeseca.</p>
+      <p>Cijena WEB paketa je mjesečna, uz ugovor od najmanje 3 mjeseca. Samu web stranicu i mobilnu aplikaciju plaćate jednokratno.</p>
       <p hidden data-skriveno="oglasi">Budžet za Google i Meta oglase plaćate izravno Googleu i Meti.</p>
       <p hidden data-skriveno="oglasi">Tekst, grafike i kratke videe za oglase izrađujemo od fotografija i snimki koje nam pošaljete. Fotografiranje ili snimanje na lokaciji dogovaramo i naplaćujemo posebno.</p>
       <p>Mobilnu aplikaciju plaćate jednokratno, od 4.999 €. Račune za App Store (99 $ godišnje) i Google Play (25 $ jednokratno) otvarate na svoje ime i plaćate ih izravno Appleu i Googleu.</p>

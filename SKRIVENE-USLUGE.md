@@ -23,7 +23,9 @@ Karusel na naslovnici (`js/naslovnica.js`) sam broji vidljive slajdove i preska�
 
 ## D premium s mobilnom aplikacijom (studeni 2026.)
 
-Od 15. studenog 2026. web nudi samo jedan paket, WEB paket (prije D start, 399 € mjesečno, ugovor najmanje 3 mjeseca), te bez paketa samu web stranicu (599 €) i mobilnu aplikaciju (od 4.999 €), jednokratno. D plus i D premium više se ne nude i obrisani su (stari sastavi su u povijesti gita). Stari D premium s oglasima i AI-em (899 €) ostao je skriven ispod WEB paketa i nije ažuriran. Kad se vrate oglasi i AI, treba odlučiti koji sastav paketa ostaje, a drugi obrisati.
+Od 15. studenog 2026. web nudi samo jedan paket, WEB paket (prije D start, 399 € mjesečno, ugovor najmanje 3 mjeseca), te bez paketa samu web stranicu (599 €) i mobilnu aplikaciju (od 4.999 €), jednokratno. D plus i D premium više se ne nude i obrisani su (stari sastavi su u povijesti gita). Stari D premium s oglasima i AI-em (899 €) ostao je skriven ispod WEB paketa i nije ažuriran.
+
+Na cjeniku su pojedinačne usluge (održavanje, SEO, GEO, Google profil zasebno) i tematski paket „Održavanje i optimizacija” uklonjeni 15. 11. 2026. Sekcije „Pojedinačne usluge” i „Tematski paketi” ostale su samo sa skrivenim redcima za oglase i AI, pa su i same skrivene (`data-skriveno="oglasi ai"`). Akcija za prvih 5 klijenata je maknuta. Kad se vrate oglasi i AI, treba odlučiti koji sastav paketa ostaje, a drugi obrisati.
 
 ## Slika za dijeljenje i strukturirani podaci (SEO, studeni 2026.)
 
