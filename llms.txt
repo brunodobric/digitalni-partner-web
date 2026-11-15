@@ -35,6 +35,7 @@ Web je na hrvatskom jeziku. Sve cijene su u eurima. Obrt nije u sustavu PDV-a, p
 ## Jednokratno
 
 - Samo web stranica: 599 €, jednokratno (bez hostinga i održavanja).
+- Samo mobilna aplikacija za iOS i Android: od 4.999 €, jednokratno. U paketu D premium izrada je uključena u mjesečnu cijenu.
 
 ## Kako izgleda suradnja
 
@@ -70,9 +71,9 @@ Obrt nije u sustavu PDV-a, pa na navedene cijene ne dolazi PDV.
 
 GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u sva tri paketa, već od D starta.
 
-### Koliko košta mobilna aplikacija?
+### Mogu li naručiti samo mobilnu aplikaciju?
 
-Aplikaciju za iOS i Android izrađujemo u sklopu paketa D premium, koji stoji 1.199 € mjesečno. Izradu ne plaćate posebno, zato se D premium ugovara na najmanje 6 mjeseci. U cijenu ulaze i održavanje aplikacije i objava novih verzija u App Storeu i Google Playu.
+Možete. Aplikacija za iOS i Android stoji od 4.999 €, jednokratno. U paketu D premium (1.199 € mjesečno, ugovor najmanje 6 mjeseci) izradu ne plaćate posebno, a uključeni su i održavanje aplikacije i objava novih verzija u App Storeu i Google Playu.
 
 ### Radite li samo s poduzetnicima iz Zagreba?
 
