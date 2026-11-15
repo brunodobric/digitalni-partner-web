@@ -20,22 +20,18 @@ Web je na hrvatskom jeziku. Sve cijene su u eurima. Obrt nije u sustavu PDV-a, p
 - Google poslovni profil: postavljanje i održavanje (radno vrijeme, fotografije, usluge, poveznica na stranicu).
 - Održavanje web stranice, domena i hosting: izmjene poput novog cjenika ili radnog vremena unosi Digitalni partner.
 - SEO i GEO optimizacija: vidljivost na Googleu i u AI tražilicama poput ChatGPT-a.
-- Mobilna aplikacija za iOS i Android, u paketu D premium.
-- Poslovni mail na domeni klijenta i nadzorna ploča s upitima, prometom, troškovima, recenzijama i posjetima webu na jednom ekranu.
-- Automatizacije: odgovor na upit, podsjetnik za termin, molba za recenziju, mjesečni izvještaj i slično.
+- Mobilna aplikacija za iOS i Android, jednokratno i bez paketa.
 
-## Paketi (mjesečno)
+## Paket (mjesečno)
 
 | Paket | Cijena | Što uključuje | Najkraći ugovor |
 |---|---|---|---|
 | D start | 399 € mjesečno | Web stranica do 5 podstranica, održavanje web stranice, domena i hosting, postavljanje i vođenje Google poslovnog profila, SEO i GEO optimizacija | 3 mjeseca |
-| D plus | 799 € mjesečno | Sve iz D starta, poslovni mail na domeni klijenta (postavljen na mobitel i računalo, s potpisom i zaštitom od spama), nadzorna ploča: upiti, promet, troškovi, recenzije i posjeti webu na jednom ekranu, do 4 automatizacije po mjeri (npr. odgovor na upit, podsjetnik za termin, molba za recenziju, mjesečni izvještaj) | 3 mjeseca |
-| D premium | 1.199 € mjesečno | Sve iz D plusa, izrada mobilne aplikacije za iOS i Android bez dodatnog plaćanja, održavanje aplikacije i objava novih verzija u App Storeu i Google Playu, do 8 automatizacija | 6 mjeseci |
 
 ## Jednokratno
 
 - Samo web stranica: 599 €, jednokratno (bez hostinga i održavanja).
-- Samo mobilna aplikacija za iOS i Android: od 4.999 €, jednokratno. U paketu D premium izrada je uključena u mjesečnu cijenu.
+- Samo mobilna aplikacija za iOS i Android: od 4.999 €, jednokratno.
 
 ## Kako izgleda suradnja
 
@@ -55,13 +51,13 @@ Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o st
 
 Oko dva tjedna od upitnika do objavljene stranice. U tom vremenu stranicu vidite prije objave i javljate nam što treba promijeniti.
 
-### Po čemu se razlikuju paketi D start, D plus i D premium?
+### Koja je razlika između paketa D start i same web stranice?
 
-D start (399 € mjesečno) obuhvaća web stranicu do 5 podstranica, domenu, hosting, održavanje, Google poslovni profil te SEO i GEO optimizaciju. D plus (799 € mjesečno) dodaje poslovni mail na Vašoj domeni, postavljen na mobitel i računalo, s potpisom i zaštitom od spama, nadzornu ploču na kojoj su upiti, promet, troškovi, recenzije i posjeti webu na jednom ekranu te do 4 automatizacije, primjerice podsjetnik za termin ili molbu za recenziju. D premium (1.199 € mjesečno) dodaje mobilnu aplikaciju za iOS i Android s održavanjem i do 8 automatizacija. Izrada aplikacije uključena je u mjesečnu cijenu, bez dodatnog plaćanja.
+Samu web stranicu (599 €, jednokratno) predajemo Vam gotovu i dalje se o njoj brinete sami. U paketu D start (399 € mjesečno) mi održavamo stranicu, plaćamo domenu i hosting, vodimo Google poslovni profil i radimo SEO i GEO optimizaciju.
 
 ### Na koliko se dugo ugovara paket?
 
-D start i D plus ugovaraju se na najmanje 3 mjeseca, a D premium na najmanje 6 mjeseci.
+Paket D start ugovara se na najmanje 3 mjeseca. Samu web stranicu i mobilnu aplikaciju plaćate jednokratno, bez mjesečne obveze.
 
 ### Jesu li cijene s PDV-om?
 
@@ -69,11 +65,11 @@ Obrt nije u sustavu PDV-a, pa na navedene cijene ne dolazi PDV.
 
 ### Što je GEO optimizacija?
 
-GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u sva tri paketa, već od D starta.
+GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u paket D start.
 
 ### Mogu li naručiti samo mobilnu aplikaciju?
 
-Možete. Aplikacija za iOS i Android stoji od 4.999 €, jednokratno. U paketu D premium (1.199 € mjesečno, ugovor najmanje 6 mjeseci) izradu ne plaćate posebno, a uključeni su i održavanje aplikacije i objava novih verzija u App Storeu i Google Playu.
+Možete. Aplikacija za iOS i Android stoji od 4.999 €, jednokratno. Osnovna aplikacija ima online rezervacije, popis usluga s cjenikom i obavijesti klijentima, a račune za App Store i Google Play otvarate na svoje ime.
 
 ### Radite li samo s poduzetnicima iz Zagreba?
 

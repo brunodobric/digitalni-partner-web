@@ -23,7 +23,7 @@ Karusel na naslovnici (`js/naslovnica.js`) sam broji vidljive slajdove i preska�
 
 ## D premium s mobilnom aplikacijom (studeni 2026.)
 
-Od 15. studenog 2026. paketi su D start 399 €, D plus 799 € i D premium 1.199 € mjesečno. D premium uključuje izradu mobilne aplikacije bez dodatnog jednokratnog plaćanja (zato ugovor najmanje 6 mjeseci), njezino održavanje i do 8 automatizacija. Samostalna mobilna aplikacija i dalje stoji od 4.999 € jednokratno. Stari D premium s oglasima i AI-em (899 €) ostao je skriven odmah ispod novog i nije ažuriran. Kad se vrate oglasi i AI, treba odlučiti koji sastav paketa ostaje, a drugi obrisati.
+Od 15. studenog 2026. web nudi samo jedan paket, D start (399 € mjesečno, ugovor najmanje 3 mjeseca), te bez paketa samu web stranicu (599 €) i mobilnu aplikaciju (od 4.999 €), jednokratno. D plus i D premium više se ne nude i obrisani su (stari sastavi su u povijesti gita). Stari D premium s oglasima i AI-em (899 €) ostao je skriven ispod D starta i nije ažuriran. Kad se vrate oglasi i AI, treba odlučiti koji sastav paketa ostaje, a drugi obrisati.
 
 ## Slika za dijeljenje i strukturirani podaci (SEO, studeni 2026.)
 
