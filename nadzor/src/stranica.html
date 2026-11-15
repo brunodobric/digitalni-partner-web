@@ -167,7 +167,7 @@ function crtaj(){
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
   if (ekran === "racuni") veziRacune();
-  if (ekran === "vjencanja") veziKorisnike();
+  if (ekran === "vjencanja") { veziKorisnike(); var izd = document.getElementById("izvori-dana"); if (izd) izd.addEventListener("change", function(){ izDana = Number(izd.value); izGreska = ""; crtaj(); }); }
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
@@ -338,7 +338,40 @@ function vjencanja(){
   h += '<section class="panel"><h2>Vjenčanja po mjesecima, idućih 12 mjeseci</h2><svg viewBox="0 0 720 230" role="img" aria-label="Broj vjenčanja po mjesecu" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="200" y2="200" stroke="rgba(11,11,12,.14)"/>' + s + '</svg><p class="src">Izvor: datum vjenčanja na pozivnicama i rasporedima. Stvarni podaci iz baze MyWeddingInvite.</p></section>';
   var id = k.iduca || [];
   h += '<section class="panel"><h2>Iduća vjenčanja</h2>' + (id.length ? '<div class="skrol"><table class="num"><thead><tr><th>Datum</th><th>Objavljena</th><th class="r">Potvrde</th><th class="r">Gostiju dolazi</th><th>Album</th><th class="r">Stolova</th></tr></thead><tbody>' + id.map(function(v){ return '<tr><td class="nw" style="font-weight:600">' + datum(v.datum) + '</td><td>' + (v.objavljena ? "da" : "ne") + '</td><td class="r">' + v.potvrde + '</td><td class="r">' + v.dolazi + '</td><td>' + (v.ima_album ? "da" : "ne") + '</td><td class="r">' + v.stolovi + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Nema pozivnica s datumom u budućnosti.</p>') + '<p class="src">Imena parova i gostiju se ne prenose u dashboard, samo brojevi.</p></section>';
+  h += izvoriKuverte();
   h += korisniciKuverte();
+  return h;
+}
+
+// ---------- Otkud dolaze kupci (na ekranu Kuverta) ----------
+var IZ = null, izGreska = "", izDana = 30, izUcitavam = -1;
+var IZVOR_IME = {instagram: "Instagram", facebook: "Facebook", meta: "Meta (FB/IG, bez oznake)", google: "Google", bing: "Bing", chatgpt: "ChatGPT", perplexity: "Perplexity", claude: "Claude", gemini: "Gemini", tiktok: "TikTok", potpis: "Potpis na pozivnici", preporuka: "Preporuka", drugo: "Drugo", nepoznato: "Nepoznato"};
+function imeIzvora(x){ return IZVOR_IME[x] || x; }
+function ucitajIzvore(){
+  if (izUcitavam === izDana) return;
+  izUcitavam = izDana;
+  fetch("/api/izvori?dana=" + izDana, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ izUcitavam = -1; if (j.dana !== izDana) return; IZ = j; izGreska = ""; if (ekran === "vjencanja") crtaj(); })
+    .catch(function(err){ izUcitavam = -1; izGreska = err.message; if (ekran === "vjencanja") crtaj(); });
+}
+function izvoriKuverte(){
+  var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2>'
+    + '<label class="src" style="display:flex;align-items:center;gap:8px">Razdoblje<select id="izvori-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === izDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label></div>';
+  if (izGreska) return h + '<p class="prazno">Izvori se nisu učitali (' + e(izGreska) + '). Ako piše da funkcija ne postoji, u projektu MyWeddingInvite treba pokrenuti sql/12-kuverta-izvori.sql.</p></section>';
+  if (!IZ || IZ.dana !== izDana) { ucitajIzvore(); return h + '<p class="prazno">Učitavam izvore…</p></section>'; }
+  var pi = IZ.po_izvoru || [];
+  var uk = pi.reduce(function(a, x){ a.p += x.posjete; a.r += x.registracije; a.k += x.kupnje; a.e += Number(x.prihod); return a; }, {p:0, r:0, k:0, e:0});
+  h += '<p class="num" style="font-size:14px"><b>' + br(uk.p) + '</b> posjeta s poznatim izvorom · <b>' + br(uk.r) + '</b> registracija · <b>' + br(uk.k) + '</b> kupnji · <b>' + eur(uk.e, true) + '</b></p>';
+  var pd = IZ.po_danu || [], mx = Math.max(4, Math.max.apply(null, pd.map(function(x){ return x.posjete; }))), sl = 680 / Math.max(1, pd.length), s = "";
+  pd.forEach(function(x, i){ var hh = x.posjete / mx * 70; s += '<rect x="' + (32 + i * sl + sl * .15) + '" y="' + (80 - hh) + '" width="' + (sl * .7) + '" height="' + hh + '" fill="#C6A15B"><title>' + datum(x.dan) + ': ' + x.posjete + '</title></rect>'; });
+  h += '<svg viewBox="0 0 720 90" role="img" aria-label="Posjete s poznatim izvorom po danu, zadnjih 30 dana" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="80" y2="80" stroke="rgba(11,11,12,.14)"/>' + s + '</svg><p class="src">Posjete po danu, zadnjih 30 dana.</p>';
+  h += pi.length ? '<div class="skrol"><table class="num"><thead><tr><th>Izvor</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
+    + pi.map(function(x){ return '<tr><td class="nw" style="font-weight:600">' + e(imeIzvora(x.izvor)) + '</td><td class="r">' + br(x.posjete) + '</td><td class="r">' + br(x.registracije) + '</td><td class="r">' + br(x.kupnje) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; }).join("")
+    + '</tbody></table></div>' : '<p class="prazno">U ovom razdoblju još nema posjeta s oznakom ni registracija.</p>';
+  var pk = IZ.po_kampanji || [];
+  if (pk.length) h += '<h2 style="margin-top:18px;font-size:16px">Po kampanji</h2><div class="skrol"><table class="num"><thead><tr><th>Izvor</th><th>Medij</th><th>Kampanja</th><th class="r">Posjete</th></tr></thead><tbody>'
+    + pk.map(function(x){ return '<tr><td class="nw">' + e(imeIzvora(x.izvor)) + '</td><td>' + e(x.medij || "–") + '</td><td>' + e(x.kampanja || "–") + '</td><td class="r">' + br(x.posjete) + '</td></tr>'; }).join("") + '</tbody></table></div>';
+  h += '<p class="src">Posjete se broje bez kolačića (oznake utm u poveznici ili stranica s koje je posjetitelj došao). Izvor registracije je zapamćen samo kad je posjetitelj prihvatio kolačiće, a inače njegov odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih.</p></section>';
   return h;
 }
 
@@ -360,8 +393,8 @@ function korisniciKuverte(){
   var platili = K.filter(function(u){ return Number(u.placeno) > 0; }).length;
   function usl(u){ return [u.pozivnica && "pozivnica", u.album && "album", u.raspored && "raspored"].filter(Boolean).join(", ") || "–"; }
   h += '<p class="num" style="font-size:14px"><b>' + br(K.length) + '</b> ukupno · <b>' + br(novi) + '</b> novih u zadnjih 30 dana · <b>' + br(aktivni) + '</b> prijavljenih u zadnjih 30 dana · <b>' + br(platili) + '</b> platilo</p>';
-  h += '<div class="skrol"><table class="num"><thead><tr><th>E-mail</th><th>Registriran</th><th>Zadnja prijava</th><th>Potvrđen</th><th>Napravio</th><th class="r">Plaćeno</th><th></th></tr></thead><tbody id="korisnici">'
-    + K.map(function(u, i){ return '<tr><td class="nw" style="font-weight:600">' + e(u.email || "–") + '</td><td class="nw">' + vrijeme(u.registriran) + '</td><td class="nw">' + (u.zadnja_prijava ? vrijeme(u.zadnja_prijava) : "nikad") + '</td><td>' + (u.potvrden ? "da" : "ne") + '</td><td>' + e(usl(u)) + '</td><td class="r nw">' + (Number(u.placeno) > 0 ? eur(u.placeno, true) : "–") + '</td><td class="r">' + (u.email ? '<button type="button" class="tiho" data-brisi-korisnika="' + i + '" aria-label="Obriši račun ' + e(u.email) + '">Obriši</button>' : '') + '</td></tr>'; }).join("")
+  h += '<div class="skrol"><table class="num"><thead><tr><th>E-mail</th><th>Registriran</th><th>Zadnja prijava</th><th>Potvrđen</th><th>Izvor</th><th>Napravio</th><th class="r">Plaćeno</th><th></th></tr></thead><tbody id="korisnici">'
+    + K.map(function(u, i){ return '<tr><td class="nw" style="font-weight:600">' + e(u.email || "–") + '</td><td class="nw">' + vrijeme(u.registriran) + '</td><td class="nw">' + (u.zadnja_prijava ? vrijeme(u.zadnja_prijava) : "nikad") + '</td><td>' + (u.potvrden ? "da" : "ne") + '</td><td class="nw">' + e(u.izvor ? imeIzvora(u.izvor) : "–") + '</td><td>' + e(usl(u)) + '</td><td class="r nw">' + (Number(u.placeno) > 0 ? eur(u.placeno, true) : "–") + '</td><td class="r">' + (u.email ? '<button type="button" class="tiho" data-brisi-korisnika="' + i + '" aria-label="Obriši račun ' + e(u.email) + '">Obriši</button>' : '') + '</td></tr>'; }).join("")
     + '</tbody></table></div><p class="src">Izvor: Supabase Authentication projekta MyWeddingInvite, najnoviji prvi. Plaćeno je zbroj uplata preko Stripea bez testnih.</p><p id="korisnici-poruka" class="src" role="status">' + e(kPoruka) + '</p></section>';
   return h;
 }
@@ -375,7 +408,7 @@ function veziKorisnike(){
     if (b.dataset.brisiKorisnika) {
       var u = K[Number(b.dataset.brisiKorisnika)]; if (!u) return;
       tr.dataset.stari = tr.innerHTML; tr.className = "potvrda";
-      tr.innerHTML = '<td colspan="7"><div class="potvrda-tekst" style="position:sticky;left:14px;max-width:calc(100vw - 72px)"><span>Obrisati račun <b>' + e(u.email) + '</b>? Brišu se pozivnica, odgovori gostiju, album s datotekama i raspored, i ne vraćaju se. Uplate i računi ostaju. Za potvrdu upiši e-mail.</span><div style="flex-wrap:wrap"><input type="email" autocomplete="off" aria-label="E-mail računa za potvrdu" data-potvrda-email><button type="button" class="tiho" data-odustani>Odustani</button><button type="button" class="gumb opasno" data-obrisi-korisnika="' + b.dataset.brisiKorisnika + '" disabled>Obriši račun</button></div></div></td>';
+      tr.innerHTML = '<td colspan="8"><div class="potvrda-tekst" style="position:sticky;left:14px;max-width:calc(100vw - 72px)"><span>Obrisati račun <b>' + e(u.email) + '</b>? Brišu se pozivnica, odgovori gostiju, album s datotekama i raspored, i ne vraćaju se. Uplate i računi ostaju. Za potvrdu upiši e-mail.</span><div style="flex-wrap:wrap"><input type="email" autocomplete="off" aria-label="E-mail računa za potvrdu" data-potvrda-email><button type="button" class="tiho" data-odustani>Odustani</button><button type="button" class="gumb opasno" data-obrisi-korisnika="' + b.dataset.brisiKorisnika + '" disabled>Obriši račun</button></div></div></td>';
       var inp = tr.querySelector("[data-potvrda-email]"), ob = tr.querySelector("[data-obrisi-korisnika]");
       inp.addEventListener("input", function(){ ob.disabled = inp.value.trim().toLowerCase() !== String(u.email).toLowerCase(); });
       inp.focus();
