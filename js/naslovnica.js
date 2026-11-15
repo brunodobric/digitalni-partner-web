@@ -134,10 +134,3 @@
   schedule(DURATION);
   requestAnimationFrame(() => requestAnimationFrame(() => hero.classList.remove('pk-init')));
 })();
-
-// Traka fotografija "Za koga radimo": popis se udvostruči da putuje bez prekida (uz smanjeno kretanje stoji i može se listati)
-(function () {
-  const red = document.querySelector('.b-film__red');
-  if (!red || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  [...red.children].forEach(li => { const k = li.cloneNode(true); k.setAttribute('aria-hidden', 'true'); red.appendChild(k); });
-})();
