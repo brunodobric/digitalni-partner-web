@@ -187,9 +187,6 @@ nav .wrap{display:flex;justify-content:space-between;align-items:center;height:7
   .b-desno .pk-dots button{width:100%}
 }
 
-/* Prva sekcija odmah ispod heroa je na istoj podlozi, pa joj ne treba puni gornji razmak */
-.b-hero + section{padding-top:clamp(40px,5vw,72px)}
-
 @media(prefers-reduced-motion:reduce){
   .b-vrsta,.b-foto,.b-ph{transition:none!important}
   .b-foto img{animation:none!important;transform:none!important}
