@@ -26,7 +26,7 @@ Web je na hrvatskom jeziku. Sve cijene su u eurima. Obrt nije u sustavu PDV-a, p
 
 | Paket | Cijena | Što uključuje | Najkraći ugovor |
 |---|---|---|---|
-| D start | 399 € mjesečno | Web stranica do 5 podstranica, održavanje web stranice, domena i hosting, postavljanje i vođenje Google poslovnog profila, SEO i GEO optimizacija | 3 mjeseca |
+| WEB paket | 399 € mjesečno | Web stranica do 5 podstranica, održavanje web stranice, domena i hosting, postavljanje i vođenje Google poslovnog profila, SEO i GEO optimizacija | 3 mjeseca |
 
 ## Jednokratno
 
@@ -45,19 +45,19 @@ Od upitnika do objavljene stranice prođu oko dva tjedna.
 
 ### Koliko košta izrada web stranice?
 
-Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o stranici i nakon objave, paket D start košta 399 € mjesečno i uz stranicu do 5 podstranica uključuje održavanje, domenu, hosting, Google poslovni profil te SEO i GEO optimizaciju.
+Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o stranici i nakon objave, WEB paket košta 399 € mjesečno i uz stranicu do 5 podstranica uključuje održavanje, domenu, hosting, Google poslovni profil te SEO i GEO optimizaciju.
 
 ### Koliko traje izrada stranice?
 
 Oko dva tjedna od upitnika do objavljene stranice. U tom vremenu stranicu vidite prije objave i javljate nam što treba promijeniti.
 
-### Koja je razlika između paketa D start i same web stranice?
+### Koja je razlika između WEB paketa i same web stranice?
 
-Samu web stranicu (599 €, jednokratno) predajemo Vam gotovu i dalje se o njoj brinete sami. U paketu D start (399 € mjesečno) mi održavamo stranicu, plaćamo domenu i hosting, vodimo Google poslovni profil i radimo SEO i GEO optimizaciju.
+Samu web stranicu (599 €, jednokratno) predajemo Vam gotovu i dalje se o njoj brinete sami. U WEB paketu (399 € mjesečno) mi održavamo stranicu, plaćamo domenu i hosting, vodimo Google poslovni profil i radimo SEO i GEO optimizaciju.
 
 ### Na koliko se dugo ugovara paket?
 
-Paket D start ugovara se na najmanje 3 mjeseca. Samu web stranicu i mobilnu aplikaciju plaćate jednokratno, bez mjesečne obveze.
+WEB paket ugovara se na najmanje 3 mjeseca. Samu web stranicu i mobilnu aplikaciju plaćate jednokratno, bez mjesečne obveze.
 
 ### Jesu li cijene s PDV-om?
 
@@ -65,7 +65,7 @@ Obrt nije u sustavu PDV-a, pa na navedene cijene ne dolazi PDV.
 
 ### Što je GEO optimizacija?
 
-GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u paket D start.
+GEO (engl. generative engine optimization) znači pripremiti stranicu tako da je AI tražilice poput ChatGPT-a, Perplexityja i Googleovih AI pregleda razumiju i mogu navesti u odgovoru. Na stranicu stavljamo jasne činjenice o Vašem poslu, cijene i česta pitanja, dodajemo strukturirane podatke i AI robotima dopuštamo da stranicu čitaju. GEO je uključen u WEB paket.
 
 ### Mogu li naručiti samo mobilnu aplikaciju?
 
