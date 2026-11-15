@@ -26,6 +26,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Privici iz maila (MIME) i XML iz ZIP-a | `src/mail.js` |
 | Upozorenja mailom (sastavljanje) i njihove funkcije u bazi | `src/upozorenja.js`, `sql/08-upozorenja.sql` |
 | Knjiga prometa (KPR) i PO-SD (ekran Knjige) | `sql/09-knjige.sql` |
+| Izvor upita s weba (UTM oznake ili stranica s koje je posjetitelj došao), u mailu i u stupcu Izvor | `../js/izvor.js`, `sql/11-izvor-upita.sql` |
 | Testovi s izmišljenim izvodima | `test/` (`node --test nadzor/test/*.test.mjs`) |
 
 Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U bazama je spremljen samo njegov SHA-256 sažetak. Tablice imaju uključen RLS bez pravila, pa ih javni ključ ne može čitati izravno.

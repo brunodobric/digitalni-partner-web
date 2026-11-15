@@ -53,7 +53,10 @@
     if(!validate()){ msg.textContent = ""; return; }
     if(FORM_ENDPOINT){
       msg.textContent = "Šaljemo upit…";
-      fetch(FORM_ENDPOINT, {method:"POST", body:new FormData(f), headers:{Accept:"application/json"}})
+      // Uz upit ide i izvor posjeta (js/izvor.js), npr. "instagram · bio (ulaz: /)", da se vidi koji kanal donosi upite
+      var podaci = new FormData(f);
+      podaci.append("izvor", window.dpIzvor || "nepoznato");
+      fetch(FORM_ENDPOINT, {method:"POST", body:podaci, headers:{Accept:"application/json"}})
         .then(function(r){
           if(!r.ok) throw r;
           // Uspjeh: otvara se stranica zahvale /hvala (noindex, nije u izborniku). Upisanu adresu prikazuje samo ona,
