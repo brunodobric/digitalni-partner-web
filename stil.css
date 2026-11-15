@@ -187,24 +187,12 @@ nav .wrap{display:flex;justify-content:space-between;align-items:center;height:7
   .b-desno .pk-dots button{width:100%}
 }
 
-/* Traka "za koga radimo": fotografije koje polako putuju */
-.b-traka{background:var(--kamen-svj);padding-bottom:clamp(80px,10vw,120px)}
-.b-traka .head{margin-bottom:48px}
-.b-film{overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-.b-film__red{display:flex;gap:20px;width:max-content;list-style:none;margin:0;padding:0;animation:b-film 60s linear infinite}
-.b-film:hover .b-film__red{animation-play-state:paused}
-.b-film li{position:relative;width:clamp(220px,22vw,320px);flex:none;margin:0}
-.b-film li:nth-child(even){margin-top:48px}
-.b-film img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
-.b-film span{display:block;margin-top:14px;font:600 .8rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
-.b-film span::before{content:"";display:inline-block;vertical-align:middle;width:24px;height:1px;margin-right:10px;background:var(--zlato)}
-@keyframes b-film{to{transform:translateX(calc(-50% - 10px))}}
+/* Prva sekcija odmah ispod heroa je na istoj podlozi, pa joj ne treba puni gornji razmak */
+.b-hero + section{padding-top:clamp(40px,5vw,72px)}
 
 @media(prefers-reduced-motion:reduce){
   .b-vrsta,.b-foto,.b-ph{transition:none!important}
   .b-foto img{animation:none!important;transform:none!important}
-  .b-film{overflow-x:auto}
-  .b-film__red{animation:none}
 }
 
 #bar{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:2px;width:0;z-index:45;background:var(--zlato)}
