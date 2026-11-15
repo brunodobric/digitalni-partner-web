@@ -79,6 +79,11 @@ export default {
         const korisnici = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_korisnici", { p_kljuc: env.NADZOR_KLJUC });
         return json({ korisnici });
       }
+      if (req.method === "GET" && url.pathname === "/api/izvori") {
+        const dana = [7, 30, 90, 0].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 30;
+        const izvori = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana });
+        return json({ ...izvori, dana });
+      }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
       if (req.method === "GET" && url.pathname === "/api/banka") {
