@@ -28,7 +28,7 @@ Web je na hrvatskom jeziku. Sve cijene su u eurima. Obrt nije u sustavu PDV-a, p
 
 | Paket | Cijena | Što uključuje | Najkraći ugovor |
 |---|---|---|---|
-| D start | 399 € mjesečno | Web stranica do 7 podstranica, domena i hosting, održavanje i sitne izmjene teksta i slika, postavljanje i vođenje Google poslovnog profila, SEO i GEO optimizacija | 3 mjeseca |
+| D start | 399 € mjesečno | Web stranica do 5 podstranica, održavanje web stranice, domena i hosting, postavljanje i vođenje Google poslovnog profila, SEO i GEO optimizacija | 3 mjeseca |
 | D plus | 799 € mjesečno | Sve iz D starta, poslovni mail na domeni klijenta, pregled poslovanja (upiti, promet, troškovi, recenzije, posjeti webu), do 4 automatizacije po mjeri (npr. odgovor na upit, podsjetnik za termin, molba za recenziju, mjesečni izvještaj) | 3 mjeseca |
 | D premium | 1.199 € mjesečno | Sve iz D plusa, izrada mobilne aplikacije za iOS i Android bez dodatnog plaćanja, održavanje aplikacije i objava novih verzija u App Storeu i Google Playu, do 8 automatizacija | 6 mjeseci |
 
@@ -49,7 +49,7 @@ Od upitnika do objavljene stranice prođu oko dva tjedna.
 
 ### Koliko košta izrada web stranice?
 
-Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o stranici i nakon objave, paket D start košta 399 € mjesečno i uz stranicu do 7 podstranica uključuje održavanje, domenu, hosting, Google poslovni profil te SEO i GEO optimizaciju.
+Samo web stranica stoji 599 €, jednokratno. Ako želite da se netko brine o stranici i nakon objave, paket D start košta 399 € mjesečno i uz stranicu do 5 podstranica uključuje održavanje, domenu, hosting, Google poslovni profil te SEO i GEO optimizaciju.
 
 ### Koliko traje izrada stranice?
 
@@ -57,7 +57,7 @@ Oko dva tjedna od upitnika do objavljene stranice. U tom vremenu stranicu vidite
 
 ### Po čemu se razlikuju paketi D start, D plus i D premium?
 
-D start (399 € mjesečno) obuhvaća web stranicu do 7 podstranica, domenu, hosting, održavanje, Google poslovni profil te SEO i GEO optimizaciju. D plus (799 € mjesečno) dodaje poslovni mail na Vašoj domeni, pregled poslovanja na jednom mjestu i do 4 automatizacije, primjerice podsjetnik za termin ili molbu za recenziju. D premium (1.199 € mjesečno) dodaje mobilnu aplikaciju za iOS i Android s održavanjem i do 8 automatizacija. Izrada aplikacije uključena je u mjesečnu cijenu, bez dodatnog plaćanja.
+D start (399 € mjesečno) obuhvaća web stranicu do 5 podstranica, domenu, hosting, održavanje, Google poslovni profil te SEO i GEO optimizaciju. D plus (799 € mjesečno) dodaje poslovni mail na Vašoj domeni, pregled poslovanja na jednom mjestu i do 4 automatizacije, primjerice podsjetnik za termin ili molbu za recenziju. D premium (1.199 € mjesečno) dodaje mobilnu aplikaciju za iOS i Android s održavanjem i do 8 automatizacija. Izrada aplikacije uključena je u mjesečnu cijenu, bez dodatnog plaćanja.
 
 ### Na koliko se dugo ugovara paket?
 
