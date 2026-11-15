@@ -16,7 +16,6 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Logo na ekranu za prijavu (Cloudflare Access), javno na webu jer se prijava otvara prije Workera | `../slike/nadzor-prijava.png` |
 | Shema baze dashboarda | `sql/01-nadzor-shema.sql` |
 | Funkcija za brojeve iz Kuverte | `sql/02-kuverta-statistika.sql` |
-| Ogledni podaci | `sql/03-ogledni-podaci.sql` |
 | Popis računa iz fiskalizacije (ekran Računi) | `sql/04-racuni.sql` |
 | Registrirani korisnici Kuverte (ekran Kuverta), pokreće se u projektu MyWeddingInvite | `sql/06-kuverta-korisnici.sql` |
 | Brisanje korisničkog računa Kuverte (gumb Obriši uz korisnika), pokreće se u projektu MyWeddingInvite | migracija `023_nadzor_brisanje_korisnika.sql` u repozitoriju MyWeddingInvite; Worker zove `KUVERTA_WEB/interno/obrisi-korisnika` |
@@ -87,14 +86,6 @@ Svako upozorenje ima svoj ključ u tablici `obavijesti` i stiže samo jednom. Kl
 Knjiga prometa slaže se iz fiskaliziranih računa (gotovina, kartice) i priljeva s uvezenih izvoda (transakcijski račun). Isplate sa Stripea se po zadanom ne broje, jer su te uplate već u knjizi kao računi plaćeni karticom. Svaku uplatu s izvoda može se ručno uključiti ili isključiti (stupac `izvod_stavke.kpr`). Odbijeni računi nisu u zbroju.
 
 PO-SD dio pokazuje primitke po vrsti, razred i godišnji paušalni dohodak prema razredima koji vrijede od 2024. (`RAZREDI` u `src/stranica.html`). Knjiga se preuzima kao CSV za Excel (točka-zarez, decimalni zarez). Iznose prije predaje potvrditi s knjigovođom.
-
-## Ogledni podaci
-
-Svi ogledni redovi imaju `ogledno = true` i na dashboardu nose oznaku OGLEDNO. Kad se spoji pravi izvor, brišu se po liniji:
-
-```sql
-select public.nadzor_obrisi_ogledno('<NADZOR_KLJUC>', 'usluge');  -- ili 'aplikacije', 'vjencanja', 'obrt', 'sve'
-```
 
 ## Ekran za prijavu
 
