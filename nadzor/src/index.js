@@ -359,10 +359,10 @@ async function posaljiMail(env, naslov, tekst) {
 // ---------- Javni prijem upita s weba ----------
 
 async function primiUpit(req, env, ctx) {
-  const izvor = req.headers.get("origin") || "";
+  const origin = req.headers.get("origin") || "";
   const dopusteni = (env.DOZVOLJENI_IZVORI || "").split(",").map((s) => s.trim()).filter(Boolean);
-  const cors = dopusteni.includes(izvor)
-    ? { "access-control-allow-origin": izvor, "access-control-allow-methods": "POST", "access-control-allow-headers": "accept", vary: "origin" }
+  const cors = dopusteni.includes(origin)
+    ? { "access-control-allow-origin": origin, "access-control-allow-methods": "POST", "access-control-allow-headers": "accept", vary: "origin" }
     : {};
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
   if (req.method !== "POST") return new Response("Samo POST.", { status: 405 });
