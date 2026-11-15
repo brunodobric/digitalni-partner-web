@@ -371,13 +371,23 @@ async function primiUpit(req, env, ctx) {
   const poruka = (f.get("poruka") || "").toString().trim();
   if (!ime || !/^\S+@\S+\.\S+$/.test(email) || !poruka) return json({ greska: "Nedostaju podaci." }, 400, cors);
 
+  // Izvor posjeta s weba (js/izvor.js): UTM oznake, domena s koje je posjetitelj došao ili "izravno", te prva otvorena stranica.
+  const izvor = (f.get("izvor") || "").toString().replace(/[^\p{L}\p{N} .·:/()_-]/gu, "").trim().slice(0, 200) || "nepoznato";
+
   const kontakt = [email, tel].filter(Boolean).join(" · ");
-  await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_upit", { p_kljuc: env.NADZOR_KLJUC, p_ime: ime, p_kontakt: kontakt, p_djelatnost: "", p_poruka: poruka });
-  if (env.RESEND_KEY && env.OBAVIJEST_NA) ctx.waitUntil(posaljiObavijest(env, ime, kontakt, poruka));
+  const upit = { p_kljuc: env.NADZOR_KLJUC, p_ime: ime, p_kontakt: kontakt, p_djelatnost: "", p_poruka: poruka };
+  try {
+    await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_upit", { ...upit, p_izvor: izvor });
+  } catch (e) {
+    // Baza još nema funkciju s izvorom (sql/11-izvor-upita.sql): upit se ipak sprema, samo bez izvora. Izvor ostaje u mailu.
+    console.error("upit s izvorom", e);
+    await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_upit", upit);
+  }
+  if (env.RESEND_KEY && env.OBAVIJEST_NA) ctx.waitUntil(posaljiObavijest(env, ime, kontakt, poruka, izvor));
   return json({ ok: true }, 200, cors);
 }
 
-async function posaljiObavijest(env, ime, kontakt, poruka) {
+async function posaljiObavijest(env, ime, kontakt, poruka, izvor) {
   try {
     await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -386,7 +396,7 @@ async function posaljiObavijest(env, ime, kontakt, poruka) {
         from: env.OBAVIJEST_OD || "Digitalni partner <onboarding@resend.dev>",
         to: [env.OBAVIJEST_NA],
         subject: "Novi upit s weba: " + (ime),
-        text: "Ime: " + (ime) + "\nKontakt: " + (kontakt) + "\n\n" + (poruka),
+        text: "Ime: " + (ime) + "\nKontakt: " + (kontakt) + "\nIzvor: " + (izvor) + "\n\n" + (poruka),
       }),
     });
   } catch (e) {
