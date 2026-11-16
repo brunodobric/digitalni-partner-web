@@ -1,0 +1,116 @@
+/* PROTOTIP: hero s laptopom koji se otvara na skrol (stranica prototip-laptop.html, skripta js/prototip-laptop.js).
+   Laptop je složen od HTML ploha u 3D prostoru: postolje s tipkovnicom, poklopac s vanjskom stranom i zaslonom.
+   Skripta prema položaju skrola upisuje varijable (--A nagib, --B otvorenost poklopca...) na .lh-scena.
+   Vrijednosti upisane ovdje su završno stanje, pa stranica bez skripte ili uz "smanjeno kretanje" prikazuje otvoren laptop. */
+
+.lh{position:relative;padding:0;height:auto}
+.lh-scena{
+  --W:min(68vw,1000px,calc((100vh - 170px) * 1.16));
+  --D:calc(var(--W) / 1.46);          /* dubina postolja i visina poklopca */
+  --T:calc(var(--W) * .016);          /* debljina postolja */
+  --TL:calc(var(--W) * .007);         /* debljina poklopca */
+  --A:82deg; --B:104deg; --ty:calc(var(--D) * .46); --s:1; --on:1; --pod:1;
+  --sj-y:0px; --sj-sx:1; --sj-sy:1; --sj-o:0;
+  --alu-1:#DCD9D3; --alu-2:#C5C2BB; --alu-rub:#A9A6A0; --alu-rub-2:#8F8C86;
+  position:relative;height:100vh;height:100svh;min-height:520px;overflow:hidden;
+  perspective:calc(var(--W) * 5);perspective-origin:50% 46%;
+}
+@supports(height:100svh){.lh-scena{--W:min(68vw,1000px,calc((100svh - 170px) * 1.16))}}
+
+/* Animirani način: scena je pribodena dok se skrola kroz .lh */
+.lh-anim .lh{height:340vh}
+.lh-anim .lh-scena{position:sticky;top:0}
+
+/* Laptop */
+.lp{position:absolute;left:50%;top:50%;width:var(--W);height:var(--D);margin:calc(var(--D) / -2) 0 0 calc(var(--W) / -2);
+  transform-style:preserve-3d;transform:translateY(var(--ty)) scale(var(--s)) rotateX(var(--A));will-change:transform}
+.lp-poklopac{transform-style:preserve-3d}
+.lp-pod{position:absolute;inset:2% 1%;transform:translateZ(calc(var(--T) * -1 - 1px));background:rgba(11,11,12,.5);
+  box-shadow:0 0 calc(var(--W) * .03) calc(var(--W) * .012) rgba(11,11,12,.5);border-radius:calc(var(--W) * .03);opacity:calc(var(--pod) * .55)}
+.lp-baza{position:absolute;inset:0;border-radius:calc(var(--W) * .022);
+  background:linear-gradient(180deg,var(--alu-2),var(--alu-1) 30%,var(--alu-1));box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.lp-celo{position:absolute;left:calc(var(--W) * .006);right:calc(var(--W) * .006);top:100%;height:var(--T);margin-top:-1px;
+  transform-origin:50% 0;transform:rotateX(-90deg);
+  background:linear-gradient(180deg,var(--alu-rub),var(--alu-rub-2));border-radius:0 0 calc(var(--T) * .8) calc(var(--T) * .8)}
+.lp-celo::after{content:"";position:absolute;left:44%;right:44%;top:0;height:22%;background:rgba(11,11,12,.28);border-radius:0 0 4px 4px}
+/* Tipkovnica i dodirna ploha: samo naznaka, u završnom pogledu vide se pod oštrim kutom */
+.lp-tipke{position:absolute;left:7%;right:7%;top:9%;height:50%;border-radius:calc(var(--W) * .008);background-color:#1B1C1D;
+  background-image:repeating-linear-gradient(90deg,transparent 0 6.35%,#0B0B0C 6.35% 7.14%),repeating-linear-gradient(180deg,transparent 0 17.6%,#0B0B0C 17.6% 20%);
+  box-shadow:0 0 0 calc(var(--W) * .003) #0B0B0C}
+.lp-ploha{position:absolute;left:31%;right:31%;top:65%;bottom:5%;border-radius:calc(var(--W) * .008);
+  background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(11,11,12,.12)}
+.lp-sarka{position:absolute;left:12%;right:12%;top:0;height:3.2%;background:#1B1C1D;border-radius:0 0 calc(var(--W) * .006) calc(var(--W) * .006)}
+
+/* Poklopac: okreće se oko stražnjeg ruba postolja */
+.lp-poklopac{position:absolute;inset:0;transform-origin:50% 0;transform:rotateX(var(--B));will-change:transform}
+.lp-vani,.lp-unutra{position:absolute;inset:0;border-radius:calc(var(--W) * .022);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.lp-vani{transform:translateZ(var(--TL));background:linear-gradient(165deg,var(--alu-1),var(--alu-2));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.4),inset 0 calc(var(--W) * -.004) calc(var(--W) * .01) rgba(11,11,12,.08)}
+.lp-rub{position:absolute;left:calc(var(--W) * .006);right:calc(var(--W) * .006);top:100%;height:var(--TL);margin-top:-1px;
+  transform-origin:50% 0;transform:translateZ(var(--TL)) rotateX(-90deg);background:var(--alu-rub);border-radius:0 0 3px 3px;opacity:var(--rub,0)}
+.lp-unutra{transform:rotateX(180deg) translateZ(1px);background:#0B0B0C;padding:1.6% 1.5% 2.4%;display:grid;box-shadow:0 0 0 calc(var(--W) * .002) var(--alu-rub)}
+.lp-zaslon{position:relative;overflow:hidden;border-radius:calc(var(--W) * .008);background:#0B0B0C;container-type:inline-size}
+.lp-zaslon::after{content:"";position:absolute;inset:0;background:#0B0B0C;opacity:calc(1 - var(--on));pointer-events:none}
+
+/* Sjena na podlozi */
+.lh-sjena{position:absolute;left:50%;top:50%;width:var(--W);height:calc(var(--W) * .16);margin:calc(var(--W) * -.08) 0 0 calc(var(--W) / -2);
+  transform:translateY(var(--sj-y)) scale(var(--sj-sx),var(--sj-sy));opacity:var(--sj-o);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(11,11,12,.42),rgba(11,11,12,.16) 55%,transparent);filter:blur(calc(var(--W) * .012))}
+
+/* Demo stranica na zaslonu. Mjere su u cqw (postotak širine zaslona), pa se sve skalira zajedno s laptopom. */
+.ds{position:absolute;inset:0;background:var(--kamen-svj);color:var(--oniks);display:grid;grid-template-rows:auto 1fr;font-size:1.55cqw;line-height:1.6}
+.ds-vrh{display:flex;justify-content:space-between;align-items:center;padding:2.2cqw 4.5cqw;border-bottom:1px solid var(--linija)}
+.ds-vrh .mono{font-size:1.25cqw}
+.ds-vrh .word{font-size:1.7cqw}
+.ds-logo{display:flex;align-items:center;gap:1.1cqw}
+.ds-izb{display:flex;gap:2.6cqw;font:600 1.05cqw var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.ds-tijelo{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:0}
+.ds-tekst{display:grid;align-content:center;justify-items:start;gap:2.2cqw;padding:3cqw 3cqw 3cqw 4.5cqw}
+.ds .label{font-size:1.02cqw;gap:1.2cqw}
+.ds .label::before{width:3cqw}
+.ds-h1{font:800 5.3cqw/1.02 var(--sans);letter-spacing:-.035em;text-wrap:balance}
+.ds-uvod{color:var(--grafit);max-width:27em}
+.ds .btn{min-height:0;padding:1.5cqw 2.6cqw;font-size:1.05cqw}
+.ds-desno{position:relative;background:var(--smaragd);overflow:hidden;display:grid;justify-items:center;align-items:start;padding-top:4cqw}
+.ds-ph{width:24cqw}
+@container (max-width:560px){
+  .ds-izb,.ds-uvod{display:none}
+  .ds-vrh .mono{font-size:2cqw}
+  .ds-vrh .word{font-size:2.7cqw}
+  .ds-tijelo{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+  .ds-tekst{gap:3cqw}
+  .ds .label{display:none}
+  .ds-h1{font-size:6.6cqw}
+  .ds .btn{font-size:2.3cqw;padding:2.2cqw 3.4cqw;letter-spacing:.08em}
+}
+
+/* Logo koji s poklopca leti na svoje mjesto u izborniku. Ploha .lh-let na početku leži točno na poklopcu,
+   a do kraja leta izravna se s ekranom. Skripta upisuje položaj i veličinu znaka i natpisa. */
+.lh-let{position:absolute;inset:0;pointer-events:none;display:none;transform-origin:50% 50%;
+  transform:translateY(var(--l-ty,0px)) scale(var(--l-s,1)) rotateX(var(--l-A,0deg)) translateZ(var(--l-tz,0px))}
+.lh-anim .lh-let{display:block}
+.lh-let > *{position:absolute;left:50%;top:50%;transform-origin:50% 50%;will-change:transform}
+.lh-let .mono{background:color-mix(in srgb,var(--smaragd) calc(var(--lt,1) * 100%),var(--l-znak,var(--smaragd)));
+  color:color-mix(in srgb,var(--kamen) calc(var(--lt,1) * 100%),var(--l-dp,var(--kamen)))}
+.lh-let .word{color:color-mix(in srgb,var(--smaragd) calc(var(--lt,1) * 100%),var(--l-partner,var(--smaragd)))}
+.lh-let .word b{color:color-mix(in srgb,var(--smaragd) calc(var(--lt,1) * 100%),var(--l-digitalni,var(--smaragd)))}
+
+/* Izbornik: dok animacija traje nema pozadine, poveznice se pojavljuju postupno, a pravi logo je skriven dok leteći ne sleti */
+.lh-anim nav{background:transparent;border-bottom-color:transparent}
+.lh-anim nav.lh-gotov{background:var(--kamen);border-bottom-color:rgba(11,11,12,calc(.12 * var(--p)))}
+.lh-anim nav:not(.lh-gotov) .brand{visibility:hidden}
+.lh-anim nav .links,.lh-anim nav .menu-btn{opacity:var(--lh-izb,1)}
+.lh-anim nav.lh-skriven{pointer-events:none}
+.lh-anim nav.open{background:var(--kamen)}
+
+/* Inačica u smaragdu (adresa s ?boja=smaragd): tamni laptop, logo na njemu u kamenu i zlatu */
+.lh-smaragd .lh-scena{--alu-1:#12463D;--alu-2:#0C3029;--alu-rub:#0A2924;--alu-rub-2:#071E1A;
+  --l-znak:#E7E4DE;--l-dp:#0F3B33;--l-partner:#E7E4DE;--l-digitalni:#C6A15B}
+.lh-smaragd .lp-baza,.lh-smaragd .lp-vani{box-shadow:inset 0 0 0 1px rgba(231,228,222,.12)}
+.lh-smaragd .lp-ploha{background:rgba(231,228,222,.08)}
+
+@media(max-width:860px){
+  .lh-scena{--W:min(90vw,calc((100vh - 150px) * 1.16))}
+  @supports(height:100svh){.lh-scena{--W:min(90vw,calc((100svh - 150px) * 1.16))}}
+  .lh-anim .lh{height:300vh}
+}
