@@ -17,6 +17,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Shema baze dashboarda | `sql/01-nadzor-shema.sql` |
 | Funkcija za brojeve iz Kuverte | `sql/02-kuverta-statistika.sql` |
 | Popis računa iz fiskalizacije (ekran Računi) | `sql/04-racuni.sql` |
+| Prihod Kuverte (linija Kuverta na Pregledu i ekranu Kuverta): pravi fiskalizirani računi Kuverte, sa stornima, bez testnih | `sql/13-prihod-kuverte.sql` |
 | Registrirani korisnici Kuverte (ekran Kuverta), pokreće se u projektu MyWeddingInvite | `sql/06-kuverta-korisnici.sql` |
 | Brisanje korisničkog računa Kuverte (gumb Obriši uz korisnika), pokreće se u projektu MyWeddingInvite | migracija `023_nadzor_brisanje_korisnika.sql` u repozitoriju MyWeddingInvite; Worker zove `KUVERTA_WEB/interno/obrisi-korisnika` |
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
