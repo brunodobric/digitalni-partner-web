@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "../src/mail.js";
+import { izOmotnice, jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "../src/mail.js";
 import { citajCamt053 } from "../src/camt.js";
 
 const procitaj = (ime) => readFileSync(new URL(ime, import.meta.url));
@@ -73,4 +73,14 @@ test("pošiljatelj: adresa ili domena", () => {
   assert.ok(!posiljateljDopusten("x@evilpbz.hr", ["@pbz.hr"]));
   assert.ok(posiljateljDopusten("izvodi@pbz.hr", ["izvodi@pbz.hr"]));
   assert.ok(!posiljateljDopusten("drugi@pbz.hr", ["izvodi@pbz.hr"]));
+});
+
+test("PBZ omotnica .sgn: base64 ZIP s CAMT.053 unutra", async () => {
+  const zip = izOmotnice(new Uint8Array(procitaj("izvod-pbz.xml.sgn")));
+  assert.ok(jeZip(zip));
+  const [x] = await xmlIzZipa(zip);
+  assert.match(x.naziv, /^PBZ_STMT_CAMT053_/);
+  const [iz] = citajCamt053(new TextDecoder().decode(x.bajtovi));
+  assert.equal(iz.iban, "HR9824020061100000001");
+  assert.equal(izOmotnice(new Uint8Array(procitaj("izvod-camt053-v02.xml"))), null);
 });

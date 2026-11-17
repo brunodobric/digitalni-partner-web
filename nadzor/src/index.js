@@ -25,7 +25,7 @@
 import STRANICA from "./stranica.html";
 import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
 import { citajCamt053 } from "./camt.js";
-import { jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
+import { izOmotnice, jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
 import { DOMENA_NADZORA, POPIS_OBAVIJESTI, sastaviUpozorenja } from "./upozorenja.js";
 
 export default {
@@ -218,6 +218,13 @@ class GreskaIzvoda extends Error {}
 // Uvozi jednu datoteku: XML izvod ili ZIP s XML izvodima. dopusteniIban (niz) ograničava račune.
 async function uveziDatoteku(env, bajtovi, naziv, dopusteniIban) {
   if (!bajtovi.length) throw new GreskaIzvoda("Datoteka je prazna.");
+  let unutra;
+  try {
+    unutra = izOmotnice(bajtovi);
+  } catch (e) {
+    throw new GreskaIzvoda(String(e.message || e));
+  }
+  if (unutra) return await uveziDatoteku(env, unutra, naziv, dopusteniIban);
   if (jeZip(bajtovi)) {
     let xmlovi;
     try {
@@ -314,9 +321,9 @@ async function primiMail(poruka, env) {
     return await javi(t);
   }
 
-  const datoteke = privitci(raw).filter((p) => /\.(xml|zip)$/i.test(p.naziv) || /(^|\/)(xml|zip|x-zip-compressed)$/.test(p.vrsta));
+  const datoteke = privitci(raw).filter((p) => /\.(xml|zip|sgn)$/i.test(p.naziv) || /(^|\/)(xml|zip|x-zip-compressed)$/.test(p.vrsta));
   if (!datoteke.length) {
-    const t = "Mail od " + od + " (" + (poruka.headers.get("subject") || "bez naslova") + ") nema XML ni ZIP privitka.";
+    const t = "Mail od " + od + " (" + (poruka.headers.get("subject") || "bez naslova") + ") nema privitka s izvodom (XML, ZIP ili SGN).";
     await zapisi(false, t);
     return await javi(t);
   }

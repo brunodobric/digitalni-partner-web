@@ -54,6 +54,7 @@ Izvod u formatu CAMT.053 (ISO 20022, XML) preuzme se iz internetskog bankarstva 
 - Svaki izvod se provjeri: početno stanje (OPBD, inače PRCD) + knjiženi promet mora dati završno. Ako se ne slaže, izvod je označen.
 - Stavke na čekanju (PDNG) se prikazuju, ali ne ulaze u zbroj. Isplate sa Stripea dobiju oznaku STRIPE.
 - CAMT.052 i CAMT.054 se odbijaju s porukom. ZIP se raspakira i uvezu se XML datoteke iz njega.
+- PBZ šalje izvod kao potpisanu omotnicu `.xml.sgn` (FileUpload s base64 ZIP-om u kojem je CAMT.053). Omotnica se otvori i uveze, a potpis banke se ne provjerava.
 
 ### Izvodi mailom
 

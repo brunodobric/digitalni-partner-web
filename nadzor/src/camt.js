@@ -176,7 +176,7 @@ function stavka(ntry, rb) {
     : null;
   const protustranaIban = t ? prvi(t, ["RltdPties/" + strana + "Acct/Id/IBAN", "RltdPties/" + strana + "Acct/Id/Othr/Id"]) : null;
   const ustrd = t ? sva(t, "RmtInf/Ustrd").map((u) => tekst(u)).filter(Boolean).join(" ") : "";
-  const opis = ustrd || (t && tekst(t, "AddtlTxInf")) || tekst(ntry, "AddtlNtryInf") || null;
+  const opis = ustrd || (t && prvi(t, ["RmtInf/Strd/AddtlRmtInf", "AddtlTxInf"])) || tekst(ntry, "AddtlNtryInf") || null;
   const sts = prvi(ntry, ["Sts/Cd", "Sts/Prtry", "Sts"]);
   return {
     rb,
@@ -217,7 +217,10 @@ export function citajCamt053(xml) {
     const knjizene = stavke.filter((x) => x.status === "BOOK");
     const promet = knjizene.reduce((a, x) => a + x.iznosCenti, 0);
     const valuta = tekst(stmt, "Acct/Ccy") || (jedan(stmt, "Bal/Amt") || { a: {} }).a.Ccy || "EUR";
-    const oznaka = tekst(stmt, "Id") || [iban, prvi(stmt, ["ElctrncSeqNb", "LglSeqNb"]), zavrsno.datum].join("/");
+    // Stmt/Id nije svugdje jedinstven (PBZ u njega stavlja broj računa i valutu, isto svaki dan),
+    // pa oznaka spaja Id, redni broj i razdoblje izvoda.
+    const odDo = [tekst(stmt, "FrToDt/FrDtTm"), tekst(stmt, "FrToDt/ToDtTm")].filter(Boolean).map((d) => d.slice(0, 10));
+    const oznaka = [tekst(stmt, "Id") || iban, prvi(stmt, ["LglSeqNb", "ElctrncSeqNb"]) || "", odDo.length ? [...new Set(odDo)].join("-") : zavrsno.datum].join("/");
     return {
       oznaka,
       redniBroj: prvi(stmt, ["LglSeqNb", "ElctrncSeqNb"]),
