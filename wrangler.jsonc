@@ -1,12 +1,16 @@
-// Cloudflare: web je statička stranica bez serverskog koda, sve datoteke iz korijena repozitorija idu kao statičke datoteke.
+// Cloudflare: web je statička stranica, sve datoteke iz korijena repozitorija idu kao statičke datoteke.
+// Jedina iznimka je worker/index.js: vraća Googleovu datoteku za potvrdu vlasništva bez preusmjeravanja (run_worker_first).
 // not_found_handling: nepostojeća adresa vraća 404.html sa statusom 404, pa je tražilice ne indeksiraju kao pravu stranicu.
 // Blok "previews" treba da bi probne verzije za grane (npx wrangler preview) radile.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "digitalni-partner-web",
   "compatibility_date": "2026-10-23",
+  "main": "worker/index.js",
   "assets": {
     "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/googleb1c04fa9c791f150.html"],
     "not_found_handling": "404-page"
   },
   "observability": {
