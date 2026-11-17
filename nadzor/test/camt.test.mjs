@@ -10,7 +10,7 @@ test("izvod .001.02: salda, stavke i usklađenost", () => {
   const [iz, ...visak] = citajCamt053(procitaj("izvod-camt053-v02.xml"));
   assert.equal(visak.length, 0);
   assert.equal(iz.iban, "HR1210010051863000160");
-  assert.equal(iz.oznaka, "HR1210010051863000160-2026-221");
+  assert.equal(iz.oznaka, "HR1210010051863000160-2026-221/221/2026-11-12");
   assert.equal(iz.redniBroj, "221");
   assert.equal(iz.valuta, "EUR");
   assert.equal(iz.vlasnik, "PRIMJER OBRT, VL. IVO IVIĆ");

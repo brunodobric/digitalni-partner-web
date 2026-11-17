@@ -188,3 +188,19 @@ export function posiljateljDopusten(adresa, dopusteni) {
     return d.startsWith("@") ? a.endsWith(d) : a === d;
   });
 }
+
+// PBZ (i druge banke preko FINA-e) šalje izvod u potpisanoj omotnici .sgn:
+// <FileUpload><File compress="zip" encoding="base64"><![CDATA[...]]></File><Signer>...</Signer></FileUpload>.
+// Vraća sadržaj datoteke (najčešće ZIP s CAMT.053) ili null ako to nije takva omotnica.
+// Potpis banke se ovdje ne provjerava.
+export function izOmotnice(b) {
+  const pocetak = uTekst(b.subarray(0, 4096));
+  if (!/<FileUpload[\s>]/.test(pocetak)) return null;
+  const t = uTekst(b);
+  const m = /<File\b([^>]*)>\s*(?:<!\[CDATA\[([\s\S]*?)\]\]>|([^<]*))\s*<\/File>/.exec(t);
+  if (!m) throw new Error("Omotnica izvoda (.sgn) nema datoteku.");
+  const atributi = m[1];
+  const sadrzaj = m[2] !== undefined ? m[2] : m[3];
+  if (/encoding\s*=\s*["']base64["']/i.test(atributi)) return base64(sadrzaj);
+  return uBajtove(sadrzaj.trim());
+}
