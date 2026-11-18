@@ -18,7 +18,8 @@
 // - GET /api/posta/html?id=…  HTML mail za okvir na stranici, bez skripti i vanjskih slika (Access)
 // - GET /api/posta/privitak?id=…&i=…  preuzimanje privitka (Access)
 // - GET /api/posta/eml?id=…  cijeli izvorni mail (.eml) (Access)
-// - POST /api/posta/procitano, POST /api/posta/obrisi  (Access)
+// - POST /api/posta/procitano, POST /api/posta/obrisi, POST /api/posta/mapa (ulazni ili spam)  (Access)
+// - GET /api/posta/blokirani, POST /api/posta/blokiraj, POST /api/posta/odblokiraj  blokirani pošiljatelji (Access)
 // - email            svaki mail spremi u sandučić (R2 + baza), a izvode CAMT.053 i uveze, vidi primiMail
 // - cron u 5:00 UTC  (6:00 zimi, 7:00 ljeti po hrvatskom vremenu) skuplja podatke iz izvora
 // - cron svaki sat   provjerava upozorenja i šalje mail za svako novo (vidi provjeriUpozorenja)
@@ -430,6 +431,7 @@ async function spremiUSanducic(poruka, raw, env) {
       omotnica_za: String(poruka.to || ""),
       od: m.od, za: m.za, kopija: m.kopija, odgovor_na: m.odgovor_na, naslov: m.naslov, poslano: m.poslano,
       message_id: m.message_id, provjera: m.provjera,
+      adresa: adrese(m.od)[0] || String(poruka.from || "").toLowerCase(),
       velicina: Number(poruka.rawSize || (raw ? raw.length : 0)),
       tekst: m.tekst.slice(0, NAJVISE_TEKSTA),
       ima_html: m.html !== null,
@@ -470,7 +472,32 @@ async function posta(req, url, env) {
   if (req.method === "GET" && put === "/api/posta") {
     const prije = Number(url.searchParams.get("prije"));
     const trazi = (url.searchParams.get("trazi") || "").slice(0, 200);
-    return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_popis", { p_kljuc: env.NADZOR_KLJUC, p_trazi: trazi, p_prije_id: Number.isInteger(prije) && prije > 0 ? prije : null }));
+    const mapa = url.searchParams.get("mapa") === "spam" ? "spam" : "ulazni";
+    return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_popis", { p_kljuc: env.NADZOR_KLJUC, p_trazi: trazi, p_prije_id: Number.isInteger(prije) && prije > 0 ? prije : null, p_mapa: mapa }));
+  }
+  if (req.method === "GET" && put === "/api/posta/blokirani") {
+    return json({ blokirani: await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_blokirani", { p_kljuc: env.NADZOR_KLJUC }) });
+  }
+  if (req.method === "POST" && put === "/api/posta/mapa") {
+    const b = await req.json().catch(() => ({}));
+    const pid = Number(b.id);
+    if (!Number.isInteger(pid) || pid <= 0 || !["ulazni", "spam"].includes(b.mapa)) return json({ greska: "Neispravan zahtjev." }, 400);
+    const ok = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_mapa", { p_kljuc: env.NADZOR_KLJUC, p_id: pid, p_mapa: b.mapa });
+    if (!ok) return json({ greska: "Mail više ne postoji. Osvježi stranicu." }, 404);
+    return json({ ok: true });
+  }
+  if (req.method === "POST" && (put === "/api/posta/blokiraj" || put === "/api/posta/odblokiraj")) {
+    const b = await req.json().catch(() => ({}));
+    const uzorak = String(b.uzorak || "").trim().toLowerCase();
+    if (!/^([^\s@]+@[^\s@]+\.[^\s@]+|@[^\s@]+\.[^\s@]+)$/.test(uzorak) || uzorak.length > 320) return json({ greska: "Upiši adresu (ime@domena.hr) ili domenu (@domena.hr)." }, 400);
+    if (put === "/api/posta/odblokiraj") {
+      await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_odblokiraj", { p_kljuc: env.NADZOR_KLJUC, p_uzorak: uzorak });
+      return json({ ok: true });
+    }
+    // Vlastite adrese se ne mogu blokirati, da sva pošta ne završi u Spamu.
+    if (/@(banka\.)?digitalnipartner\.hr$/.test(uzorak) || uzorak === "@digitalnipartner.hr") return json({ greska: "Vlastitu domenu ne možeš blokirati." }, 400);
+    const premjesteno = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_blokiraj", { p_kljuc: env.NADZOR_KLJUC, p_uzorak: uzorak });
+    return json({ ok: true, premjesteno });
   }
   if (req.method === "GET" && put === "/api/posta/poruka") {
     if (!imaId) return json({ greska: "Nepoznat mail." }, 400);
