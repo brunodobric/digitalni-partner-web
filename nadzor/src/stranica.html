@@ -724,12 +724,11 @@ document.addEventListener("click", function(ev){ if (!zaglavlje.contains(ev.targ
 addEventListener("resize", function(){ if (innerWidth > 640) izbornik(false); });
 oznaci();
 ucitaj();
-ucitajPostu(); // broj nepročitanih mailova uz Pošta u izborniku
 // ---------- Pošta (sandučić za dolazne mailove) ----------
 var PO = null, poGreska = "", poTrazi = "", poMail = null, poMailGreska = "", poPoruka = "", poTekst = false, poBrisi = false, poStarije = false;
 function poBedz(){ var b = document.getElementById("posta-bedz"); if (!b || !PO) return; b.hidden = !PO.neprocitano; b.textContent = PO.neprocitano > 99 ? "99+" : String(PO.neprocitano); }
 function ucitajPostu(starije){
-  var q = "/api/posta?trazi=" + encodeURIComponent(poTrazi) + (starije && PO && PO.mailovi.length ? "&prije=" + PO.mailovi[PO.mailovi.length - 1].id : "");
+  var q = "/api/posta?trazi=" + encodeURIComponent(poTrazi || "") + (starije && PO && PO.mailovi.length ? "&prije=" + PO.mailovi[PO.mailovi.length - 1].id : "");
   fetch(q, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
     .then(function(j){ poStarije = j.mailovi.length === 50; if (starije && PO) { j.mailovi = PO.mailovi.concat(j.mailovi); } PO = j; poGreska = ""; poBedz(); if (ekran === "posta" && D) crtaj(); })
     .catch(function(err){ poGreska = err.message; if (ekran === "posta" && D) crtaj(); });
@@ -871,6 +870,8 @@ function obavijesti(){
 }
 
 setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); if (PO && !poTrazi) ucitajPostu(); }, 10 * 60 * 1000);
+// Broj nepročitanih mailova uz Pošta u izborniku. Mora biti ovdje, nakon što su varijable Pošte postavljene.
+if (!PO) ucitajPostu();
 })();
 </script>
 </body>
