@@ -150,6 +150,14 @@ export default {
       console.error("posta", e);
       await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_zapis", { p_kljuc: env.NADZOR_KLJUC, p_izvor: "posta", p_uspjeh: false, p_poruka: String(e.message || e).slice(0, 300) }).catch(console.error);
     }
+    // Sigurnosna kopija svakog maila na privatnu adresu (POSTA_KOPIJA, mora biti potvrđena u Email Routingu).
+    if (env.POSTA_KOPIJA) {
+      try {
+        await poruka.forward(env.POSTA_KOPIJA);
+      } catch (e) {
+        console.error("posta-kopija", e);
+      }
+    }
     if (!jeAdresaZaIzvode(poruka.to, env)) return;
     try {
       const ishod = await primiMail(poruka, raw, env);
@@ -328,7 +336,7 @@ async function primiMail(poruka, raw, env) {
 }
 
 async function primiIzvod(poruka, raw, env, od, zapisi, javi) {
-  if (env.IZVODI_PROSLIJEDI) {
+  if (env.IZVODI_PROSLIJEDI && env.IZVODI_PROSLIJEDI !== env.POSTA_KOPIJA) {
     try {
       await poruka.forward(env.IZVODI_PROSLIJEDI);
     } catch (e) {

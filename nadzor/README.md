@@ -42,6 +42,7 @@ Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U 
 | `RESEND_KEY`, `OBAVIJEST_NA` | Mail o svakom novom upitu s weba i upozorenja | ne |
 | `IZVODI_IBAN` | IBAN-i (odvojeni zarezom) za koje se primaju izvodi mailom. Bez nje se mail ne uvozi | za uvoz mailom |
 | `IZVODI_POSILJATELJI` | Adrese ili domene pošiljatelja izvoda, npr. `@pbz.hr`. Prazno pušta svakoga | preporučeno |
+| `POSTA_KOPIJA` | Adresa na koju se proslijedi kopija svakog dolaznog maila (sigurnosna kopija dok sandučić ne dokaže da radi). Mora biti potvrđena u Email Routingu | ne |
 | `IZVODI_ADRESA` | Adrese (odvojene zarezom) čija se pošta uvozi kao izvod. Prazno znači svaka adresa `izvodi@…` | ne |
 | `IZVODI_PROSLIJEDI` | Adresa na koju se mail s izvodom proslijedi nakon uvoza (mora biti potvrđena u Email Routingu) | ne |
 | `FISK_CITANJE_TOKEN` | PDF računa na ekranu Računi i provjera isteka certifikata. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun). Stari naziv `FISK_TOKEN` radi kao rezerva | ne, bez nje popis radi, a PDF ne |
@@ -84,7 +85,7 @@ Na ekranu Pošta je popis s pretraživanjem (pošiljatelj, primatelj, naslov, te
 
 Sigurnost: HTML mail se prikazuje u okviru sa `sandbox` (bez skripti), a adresa `/api/posta/html` šalje i CSP `sandbox; default-src 'none'; img-src data:`, pa se skripte ne izvrše ni kad se otvori izravno. Vanjske slike su blokirane (praćenje otvaranja), a slike iz samog maila (`cid:`) ugrade se kao `data:`. Privici se uvijek preuzimaju kao datoteka (`application/octet-stream`, `attachment`), nikad se ne otvaraju na adresi dashboarda.
 
-Koje adrese stižu u sandučić određuje Email Routing (pravila za `banka.digitalnipartner.hr`). Slanje mailova nije dio sandučića; „Odgovori u svom mailu” otvara vlastiti mail program.
+Koje adrese stižu u sandučić određuje Email Routing: od 18. 11. 2026. MX glavne domene je na Cloudflareu (više ne na Zohu), a pravila šalju Workeru `info@`, `izvodi@` i `bruno.dobric@digitalnipartner.hr` te `izvodi@banka.digitalnipartner.hr`. Nova adresa = novo pravilo „adresa → Worker dp-nadzor”. Zoho i dalje može slati (SPF uključuje `zohomail.eu`). Slanje mailova nije dio sandučića; „Odgovori u svom mailu” otvara vlastiti mail program.
 
 ## Upozorenja mailom
 
