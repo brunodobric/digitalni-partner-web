@@ -105,34 +105,184 @@ svg text{font-family:Manrope,sans-serif}
   nav button{text-align:left;font-size:16px;min-height:48px;padding:0 12px}
   nav button[aria-selected=true]::after{left:12px;right:auto;width:24px;bottom:8px}
 }
-/* Pošta: popis lijevo, mail desno; na mobitelu jedno ispod drugog */
+/* Pošta: tri stupca preko cijelog ekrana (mape, popis, čitač); na mobitelu popis ili čitač */
 .bedz{display:inline-block;min-width:18px;margin-left:6px;padding:0 5px;border-radius:999px;background:var(--zlato);color:var(--oniks);font-size:11px;font-weight:700;line-height:18px;text-align:center}
-.posta{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:20px;align-items:start}
-@media (max-width:900px){.posta{grid-template-columns:1fr}}
-.posta-popis{padding:8px;gap:2px}
-.posta-popis button.mail{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:3px solid transparent;width:100%}
-.posta-popis button.mail:hover{background:var(--pozadina)}
-.posta-popis button.mail:focus-visible{outline:2px solid var(--zlato)}
-.posta-popis button.mail[aria-current=true]{background:var(--smaragd-svj)}
-.posta-popis button.mail.novo{border-left-color:var(--zlato)}
-.posta-popis button.mail.novo .od,.posta-popis button.mail.novo .ns{font-weight:700}
-.mail .gore{display:flex;justify-content:space-between;gap:8px;font-size:14px}
-.mail .od{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mail .ns{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mail .is{font-size:12.5px;color:var(--grafit);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+body.po-cijelo{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+body.po-cijelo main{flex:1;min-height:0}
+body.po-cijelo main .wrap{max-width:none;padding:0;gap:0;height:100%}
+body.po-cijelo footer{display:none}
+.po-app{position:relative;display:grid;grid-template-columns:232px minmax(300px,400px) minmax(0,1fr);height:100%;background:#fff;font-size:14px;line-height:1.5}
+svg.ik{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.ik.mali{width:14px;height:14px}
+.po-app button{font-family:inherit}
+.po-ik{width:34px;height:34px;display:inline-grid;place-items:center;border:0;border-radius:8px;background:none;color:var(--grafit);cursor:pointer;padding:0;text-decoration:none;flex:none}
+.po-ik:hover{background:var(--pozadina);color:var(--oniks)}
+.po-ik.opasno:hover{background:var(--crvena-svj);color:var(--crvena)}
+.po-ik.vrti svg{animation:po-vrti .6s linear}
+@keyframes po-vrti{to{transform:rotate(360deg)}}
+/* mape */
+.po-mape{background:var(--pozadina);border-right:1px solid var(--linija);padding:16px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto}
+.po-pisi{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--smaragd);color:#fff;border:0;border-radius:10px;min-height:42px;font:600 14px Manrope,sans-serif;margin-bottom:14px}
+.po-pisi:disabled{opacity:.45;cursor:not-allowed}.po-pisi small{font-weight:500;font-size:11px;opacity:.85}
+.po-mapa{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--oniks);font-weight:500;cursor:pointer;width:100%}
+.po-mapa>span:not(.n):not(.toc){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.po-mapa:hover{background:rgba(11,11,12,.04)}
+.po-mapa:focus-visible{outline:2px solid var(--zlato)}
+.po-mapa svg{color:var(--grafit)}
+.po-mapa .n{margin-left:auto;font-size:12.5px;color:var(--grafit);font-variant-numeric:tabular-nums}
+.po-mapa .n.jako{font-weight:700;color:var(--oniks)}
+.po-mapa[aria-current=true]{background:var(--smaragd-svj);color:var(--smaragd);font-weight:700}
+.po-mapa[aria-current=true] svg,.po-mapa[aria-current=true] .n{color:var(--smaragd)}
+.po-nasl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--grafit);padding:16px 10px 6px}
+.toc{width:8px;height:8px;border-radius:50%;flex:none;margin:0 5px}
+/* popis */
+.po-lista{border-right:1px solid var(--linija);display:flex;flex-direction:column;min-height:0;min-width:0}
+.po-alatna{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--linija-svj);min-height:63px}
+.po-sve{display:grid;place-items:center;width:34px;height:34px;cursor:pointer;flex:none}
+.po-sve input,.po-av-k input{width:16px;height:16px;min-height:0;margin:0;accent-color:var(--smaragd);cursor:pointer}
+.po-trazi{flex:1;display:flex;align-items:center;gap:8px;background:var(--pozadina);border:1px solid var(--linija);border-radius:9px;padding:0 10px;height:38px;color:var(--grafit);min-width:0}
+.po-trazi:focus-within{border-color:var(--smaragd);background:#fff}
+.po-trazi input{flex:1;border:0;background:none;padding:0;min-height:0;height:36px;min-width:0;font-size:14px;outline:none}
+.po-trazi kbd,.po-precaci kbd{font:600 11px Manrope,sans-serif;border:1px solid var(--linija);border-radius:4px;padding:0 5px;background:#fff;color:var(--grafit)}
+.po-trazi:focus-within kbd{display:none}
+.po-traka{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:8px 14px;background:var(--pozadina);border-bottom:1px solid var(--linija-svj);font-size:13px;color:var(--grafit)}
+.po-traka.odabrano{background:var(--smaragd-svj);color:var(--smaragd);justify-content:flex-start;padding:6px 14px}
+.po-traka.odabrano b{margin-right:auto}
+.po-traka.opasno{background:var(--crvena-svj);color:var(--oniks)}
+.po-traka.zlato{background:var(--zlato-svj);color:var(--oniks)}
+.po-tijelo .po-traka{border-radius:10px;margin-bottom:16px;padding:12px 14px}
+.po-traka-g{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.po-skup{flex:1;overflow:auto;min-height:0}
+.po-grupa{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--grafit);padding:12px 16px 6px;background:#fff;position:sticky;top:0;z-index:1}
+.po-m{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;padding:10px 16px 11px 18px;border-bottom:1px solid var(--linija-svj);position:relative}
+.po-m:hover{background:var(--pozadina)}
+.po-m.on{background:var(--smaragd-svj)}
+.po-m.odabran{background:#F3F7F5}
+.po-m.novo::before{content:"";position:absolute;left:6px;top:24px;width:7px;height:7px;border-radius:50%;background:var(--zlato)}
+.po-m.stiglo{animation:po-stiglo 4s ease-out}
+@keyframes po-stiglo{0%,30%{background:var(--zlato-svj)}100%{background:transparent}}
+.po-av-k{position:relative;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:inherit;font-size:inherit}
+.po-av-k input{position:absolute;opacity:0}
+.po-av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none;letter-spacing:.01em}
+.po-av.vel{width:42px;height:42px;font-size:14px}
+.po-m:hover .po-av-k .po-av,.po-app.odabir .po-av-k .po-av,.po-av-k:focus-within .po-av{display:none}
+.po-m:hover .po-av-k input,.po-app.odabir .po-av-k input,.po-av-k input:focus-visible{opacity:1}
+.po-otvori{all:unset;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 10px;cursor:pointer;min-width:0}
+.po-otvori:focus-visible{outline:2px solid var(--zlato);outline-offset:4px;border-radius:4px}
+.po-od{font-weight:500;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.po-vr{font-size:12px;color:var(--grafit);white-space:nowrap;display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.po-ns{grid-column:1/-1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:26px}
+.po-is{grid-column:1/-1;font-size:12.5px;color:var(--grafit);overflow:hidden;white-space:nowrap;display:flex;gap:6px;align-items:center;padding-right:26px}
+.po-isj{overflow:hidden;text-overflow:ellipsis}
+.po-m.novo .po-od,.po-m.novo .po-ns{font-weight:700}
+.po-adr{font-size:11px;font-weight:600;border-radius:5px;padding:0 6px;line-height:18px;white-space:nowrap;flex:none}
+.po-oz{font-size:11px;font-weight:700;border-radius:999px;padding:0 7px;line-height:18px;color:var(--smaragd);background:var(--smaragd-svj);white-space:nowrap;flex:none}
+.po-oz.lose{color:var(--crvena);background:var(--crvena-svj)}
+.po-oz.siv{color:var(--grafit);background:var(--linija-svj)}
+.po-zv{position:absolute;right:12px;top:32px;width:28px;height:28px;display:grid;place-items:center;border:0;background:none;border-radius:6px;color:var(--linija);cursor:pointer;padding:0;opacity:0}
+.po-zv svg{width:16px;height:16px}
+.po-zv.da{color:var(--zlato);opacity:1}.po-zv.da svg{fill:var(--zlato)}
+.po-m:hover .po-zv,.po-zv:focus-visible{opacity:1;color:var(--grafit)}
+.po-m:hover .po-zv.da{color:var(--zlato)}
+.po-cit-alati .po-zv{position:static;width:34px;height:34px;opacity:1;color:var(--grafit)}
+.po-cit-alati .po-zv.da{color:var(--zlato)}
+.po-brze{position:absolute;right:12px;top:6px;display:none;gap:2px;background:#fff;border:1px solid var(--linija);border-radius:8px;padding:2px;box-shadow:0 2px 6px rgba(11,11,12,.08)}
+.po-brze .po-ik{width:28px;height:28px}.po-brze svg{width:16px;height:16px}
+@media (hover:hover){.po-m:hover .po-brze,.po-brze:focus-within{display:flex}}
+.po-prazno{color:var(--grafit);padding:24px 18px;font-size:14px}
+.po-starije{display:block;margin:12px auto}
+.po-kraj{text-align:center;font-size:12px;color:var(--grafit);padding:14px}
+/* čitač */
+.po-citac{display:flex;flex-direction:column;min-height:0;min-width:0}
+.po-cit-alati{justify-content:space-between}
+.po-grupa-ik{display:flex;gap:2px;align-items:center}
+.po-natrag{display:none}
+.po-tijelo{flex:1;overflow:auto;padding:24px 32px 40px;min-height:0}
+.po-naslov{font-size:22px;font-weight:700;letter-spacing:-.015em;margin:0 0 18px;line-height:1.25;word-break:break-word}
+.po-spam{margin:0 0 16px;padding:10px 14px;border-radius:10px;background:var(--crvena-svj);font-size:14px}
+.po-spam b{color:var(--crvena);margin-right:6px;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+.po-spam.siv{background:var(--pozadina)}.po-spam.siv b{color:var(--grafit)}
+.po-posi{display:flex;gap:12px;align-items:flex-start}
+.po-tko{flex:1;min-width:0;word-break:break-word}.po-tko b{font-size:15px}.po-tko .src{font-size:13px}
+.po-provjera{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.po-provjera span{font-size:11px;font-weight:600;border-radius:999px;padding:0 8px;line-height:20px}
+.po-provjera .ok{color:var(--smaragd);background:var(--smaragd-svj)}.po-provjera .ceka{color:var(--zlato-tamno);background:var(--zlato-svj)}.po-provjera .lose{color:var(--crvena);background:var(--crvena-svj)}
+.po-kad{font-size:13px;color:var(--grafit);white-space:nowrap}
+.po-detalji{margin:14px 0 0 54px;font-size:13px}
+.po-detalji summary{cursor:pointer;color:var(--grafit);font-weight:600;width:max-content}
+.po-detalji .mail-glava{margin-top:8px;font-size:13px}
+.po-izvod{margin:16px 0 0;padding:10px 14px;border-radius:10px;background:var(--smaragd-svj);font-size:14px}
+.po-izvod b{color:var(--smaragd);margin-right:6px}
+.po-izvod.lose{background:var(--crvena-svj)}.po-izvod.lose b{color:var(--crvena)}
+.po-privitci{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 4px}
+.po-kart{display:flex;align-items:center;gap:10px;border:1px solid var(--linija);border-radius:10px;padding:6px 6px 6px 8px;width:260px;max-width:100%}
+.po-vrs{width:36px;height:40px;border-radius:6px;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;flex:none}
+.po-sl{width:40px;height:40px;border:0;padding:0;border-radius:6px;overflow:hidden;cursor:zoom-in;background:var(--pozadina);flex:none}
+.po-sl img{width:100%;height:100%;object-fit:cover;display:block}
+.po-kart-t{flex:1;min-width:0}
+.po-kart-t b{display:block;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.po-kart-t small{color:var(--grafit);font-size:12px}
+.po-kart .po-ik{width:30px;height:30px}
+iframe.po-html{display:block;width:100%;height:max(420px,65vh);border:0;margin-top:18px;background:#fff}
+.po-sadrzaj{margin-top:22px;font-size:15px;line-height:1.65;max-width:720px}
+.po-odg{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px}
+.po-odg a{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--linija);border-radius:9px;padding:0 14px;min-height:38px;font-weight:600;color:var(--oniks);text-decoration:none}
+.po-odg a:hover{background:var(--pozadina)}
+.po-odg+.src{margin-top:8px}
+.po-poruka{margin:0 0 12px;font-size:13px;color:var(--crvena)}
+.po-vise{position:relative}
+.po-vise summary{list-style:none}.po-vise summary::-webkit-details-marker{display:none}
+.po-izbornik{position:absolute;right:0;top:38px;z-index:3;background:#fff;border:1px solid var(--linija);border-radius:10px;box-shadow:0 8px 24px rgba(11,11,12,.12);padding:6px;min-width:230px;display:flex;flex-direction:column}
+.po-izbornik button,.po-izbornik a{all:unset;box-sizing:border-box;padding:9px 12px;border-radius:6px;cursor:pointer;font-size:14px;color:var(--oniks)}
+.po-izbornik button:hover,.po-izbornik a:hover,.po-izbornik button:focus-visible,.po-izbornik a:focus-visible{background:var(--pozadina)}
+.po-dobrodoslica{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--grafit);text-align:center}
+.po-ikona-v{width:56px;height:56px;border-radius:50%;background:var(--pozadina);display:grid;place-items:center}
+.po-ikona-v svg{width:26px;height:26px}
+.po-precaci{display:grid;grid-template-columns:auto auto;gap:6px 14px;margin:8px 0 0;font-size:13px;text-align:left}
+.po-precaci dt{text-align:right}.po-precaci dd{margin:0}
+/* pregled privitka i obavijest dolje */
+.po-lb{position:fixed;inset:0;z-index:20;background:rgba(11,11,12,.7);display:grid;place-items:center;padding:24px}
+.po-lb-v{background:#fff;border-radius:12px;width:min(1000px,100%);height:min(90vh,100%);display:flex;flex-direction:column;overflow:hidden}
+.po-lb-g{display:flex;align-items:center;gap:4px;padding:8px 8px 8px 16px;border-bottom:1px solid var(--linija-svj)}
+.po-lb-g b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.po-lb iframe{flex:1;border:0;width:100%}
+.po-lb-sl{flex:1;display:grid;place-items:center;overflow:auto;background:var(--pozadina)}
+.po-lb-sl img{max-width:100%;max-height:100%;object-fit:contain}
+.po-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:15;background:var(--oniks);color:#fff;border-radius:10px;padding:10px 16px;font-size:13.5px;display:flex;gap:16px;align-items:center;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;max-width:calc(100vw - 32px)}
+.po-toast.vidljiv{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.po-toast button{all:unset;cursor:pointer;font-weight:700;color:var(--zlato)}
+.po-mobnasl,.po-donja{display:none}
+@media (max-width:1200px) and (min-width:901px){.po-app{grid-template-columns:200px minmax(280px,340px) minmax(0,1fr)}.po-tijelo{padding:20px 24px 32px}}
+@media (max-width:900px){
+  .po-app{grid-template-columns:minmax(0,1fr)}
+  .po-mape,.po-citac,.po-sve{display:none}
+  .po-app.citac .po-lista{display:none}
+  .po-app.citac .po-citac{display:flex}
+  .po-lista{border-right:0}
+  .po-mobnasl{display:flex;align-items:center;gap:8px;padding:12px 16px 0;font-weight:700;font-size:20px}
+  .po-mobnasl select{margin-left:auto;font-size:13px;font-weight:600;border-radius:999px;padding:4px 10px;min-height:32px;color:var(--grafit);max-width:55%}
+  .po-alatna{padding:10px 16px;min-height:0}
+  .po-trazi kbd{display:none}
+  .po-m{padding:12px 16px 12px 18px}
+  .po-m .po-zv{opacity:1}.po-m .po-zv:not(.da){display:none}
+  .po-donja{flex:none;display:flex;justify-content:space-around;border-top:1px solid var(--linija);background:#fff;padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
+  .po-donja button{all:unset;position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--grafit);padding:4px 8px;cursor:pointer;min-width:52px}
+  .po-donja button[aria-current=true]{color:var(--smaragd)}
+  .po-donja i{position:absolute;top:0;right:8px;font-style:normal;background:var(--zlato);color:var(--oniks);border-radius:999px;font-size:10px;font-weight:700;line-height:16px;min-width:16px;padding:0 4px;text-align:center}
+  .po-natrag{all:unset;display:flex;align-items:center;gap:4px;font-weight:600;color:var(--smaragd);cursor:pointer;padding:6px 4px}
+  .po-cit-alati{padding:8px 12px}
+  .po-tijelo{padding:18px 16px 30px}
+  .po-naslov{font-size:20px}
+  .po-detalji{margin-left:0}
+  .po-lb{padding:0}.po-lb-v{border-radius:0;height:100%}
+  .po-toast{bottom:76px}
+}
+@media (prefers-reduced-motion:reduce){.po-m.stiglo,.po-ik.vrti svg{animation:none}.po-toast{transition:none}}
 .mail-glava{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}
 .mail-glava dt{color:var(--grafit)}.mail-glava dd{margin:0;word-break:break-word}
 .mail-tekst{white-space:pre-wrap;word-break:break-word;font:inherit;font-size:14.5px;margin:0}
-iframe.mail-html{width:100%;height:70vh;border:1px solid var(--linija-svj);border-radius:8px;background:#fff}
-.alati{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-a.tiho{font:600 13px Manrope,sans-serif;color:var(--grafit);border:1px solid var(--linija);border-radius:8px;padding:0 12px;min-height:32px;display:inline-flex;align-items:center;text-decoration:none}
-a.tiho:hover{color:var(--oniks);background:var(--pozadina)}
-.mape{display:flex;gap:8px;flex-wrap:wrap}
-.mape button[aria-pressed=true]{background:var(--smaragd);border-color:var(--smaragd);color:#fff}
-.mape button[aria-pressed=true] .src{color:rgba(255,255,255,.8)}
-.privitci{display:flex;flex-wrap:wrap;gap:8px}
-.privitci a{display:inline-flex;gap:6px;align-items:center;font-size:13.5px;padding:6px 10px;border:1px solid var(--linija);border-radius:8px;text-decoration:none;color:var(--oniks)}
-.privitci a:hover{background:var(--pozadina)}
+.mail-tekst.po-sadrzaj{margin-top:22px;font-size:15px}
 @media (prefers-reduced-motion:reduce){.izb span{transition:none}}
 </style>
 </head>
@@ -185,7 +335,10 @@ function oznaci(){
 function crtaj(){
   oznaci();
   var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige, posta: postaEkran, obavijesti: obavijesti}[ekran] || pregled;
-  document.getElementById("sadrzaj").innerHTML = f();
+  document.body.classList.toggle("po-cijelo", ekran === "posta");
+  // Pošta se, kad je već na ekranu, samo osvježi (otvoreni mail i pozicija na popisu ostaju).
+  if (ekran === "posta" && document.getElementById("po-app")) poCrtaj("ml");
+  else document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
   if (ekran === "racuni") veziRacune();
@@ -728,163 +881,558 @@ addEventListener("resize", function(){ if (innerWidth > 640) izbornik(false); })
 oznaci();
 ucitaj();
 // ---------- Pošta (sandučić za dolazne mailove) ----------
-var PO = null, poGreska = "", poTrazi = "", poMail = null, poMailGreska = "", poPoruka = "", poTekst = false, poBrisi = false, poStarije = false;
-var poMapa = "ulazni", poBlokiraj = false, BL = null, blPoruka = "";
-function ucitajBlokirane(){
-  fetch("/api/posta/blokirani", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ BL = j.blokirani || []; if (ekran === "posta" && D) crtaj(); })
-    .catch(function(err){ BL = []; blPoruka = "Popis se nije učitao: " + err.message; if (ekran === "posta" && D) crtaj(); });
+// Tri stupca: mape i adrese, popis mailova, čitač. Svaki se dio crta zasebno (poCrtaj), da osvježavanje popisa
+// svake minute ne ponovno učitava otvoreni mail. Na mobitelu je vidljiv popis ili čitač.
+var PO = null, poGreska = "", poTrazi = "", poMapa = "ulazni", poAdresa = "", poStarije = false, poUcitava = false, poZahtjev = 0;
+var poMail = null, poMailGreska = "", poTekst = false, poPotvrda = "", poPoruka = "", poPrikaz = "mail", poMobCitac = false;
+var poOdabrano = {}, poNovi = {}, poPregled = null, poToast = null, poToastTimer = 0;
+var BL = null, blPoruka = "";
+var PO_MAPE = [
+  {k: "ulazni", n: "Ulazna pošta", i: "inbox", prazno: "Ulazna pošta je prazna."},
+  {k: "oznaceno", n: "Označeno", i: "zv", prazno: "Nema mailova sa zvjezdicom. Zvjezdicom (ili tipkom s) označi mail kojem se želiš vratiti."},
+  {k: "arhiva", n: "Arhiva", i: "arh", prazno: "Arhiva je prazna. Arhiviraj (tipka e) mail koji je riješen, a ne želiš ga obrisati."},
+  {k: "spam", n: "Spam", i: "spam", prazno: "Spam je prazan."},
+  {k: "obrisano", n: "Obrisano", i: "kanta", prazno: "Obrisano je prazno."}
+];
+var PO_IK = {
+  inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  arh: '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
+  spam: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+  kanta: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
+  trazi: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  osvj: '<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  klip: '<path d="m21.4 11-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
+  odg: '<path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+  prosl: '<path d="m15 17 5-5-5-5"/><path d="M4 18v-2a4 4 0 0 1 4-4h12"/>',
+  oko: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  preuz: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  vise: '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  olovka: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  zv: '<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
+  nat: '<path d="m15 18-6-6 6-6"/>',
+  nepr: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',
+  procit: '<path d="M21.2 8.4c.5.38.8.97.8 1.6v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V10a2 2 0 0 1 .8-1.6l8-6a2 2 0 0 1 2.4 0l8 6Z"/><path d="m22 10-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 10"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  blok: '<circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/>',
+  vani: '<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>'
+};
+function ik(n, kl){ return '<svg class="ik' + (kl ? " " + kl : "") + '" viewBox="0 0 24 24" aria-hidden="true">' + PO_IK[n] + '</svg>'; }
+function poJ(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if (!r.ok) throw new Error(j.greska || r.status); return j; }); }
+function postaPost(put, tijelo){
+  return fetch(put, {method: "POST", credentials: "same-origin", headers: {"content-type": "application/json"}, body: JSON.stringify(tijelo)}).then(poJ);
 }
+function poMob(){ return innerWidth <= 900; }
 function poBedz(){ var b = document.getElementById("posta-bedz"); if (!b || !PO) return; b.hidden = !PO.neprocitano; b.textContent = PO.neprocitano > 99 ? "99+" : String(PO.neprocitano); }
-function ucitajPostu(starije){
-  var q = "/api/posta?mapa=" + poMapa + "&trazi=" + encodeURIComponent(poTrazi || "") + (starije && PO && PO.mailovi.length ? "&prije=" + PO.mailovi[PO.mailovi.length - 1].id : "");
-  fetch(q, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ poStarije = j.mailovi.length === 50; if (starije && PO) { j.mailovi = PO.mailovi.concat(j.mailovi); } PO = j; poGreska = ""; poBedz(); if (ekran === "posta" && D) crtaj(); })
-    .catch(function(err){ poGreska = err.message; if (ekran === "posta" && D) crtaj(); });
+function poBr(k){ return PO && PO.brojevi ? Number(PO.brojevi[k] || 0) : 0; }
+function poNazivMape(k){ var x = PO_MAPE.filter(function(m){ return m.k === k; })[0]; return x ? x.n : k; }
+
+// način: "nova" (prazan popis), "starije" (sljedećih 50), "osvjezi" (novi mailovi na vrhu, ostalo ostaje)
+function ucitajPostu(nacin){
+  nacin = nacin || "nova";
+  var starije = nacin === "starije" && PO && PO.mailovi.length;
+  var q = "/api/posta?mapa=" + poMapa + "&adresa=" + encodeURIComponent(poAdresa || "") + "&trazi=" + encodeURIComponent(poTrazi || "") + (starije ? "&prije=" + PO.mailovi[PO.mailovi.length - 1].id : "");
+  var broj = ++poZahtjev; poUcitava = true;
+  fetch(q, {credentials: "same-origin"}).then(poJ).then(function(j){
+    if (broj !== poZahtjev) return;
+    poUcitava = false; poGreska = "";
+    if (starije) { poStarije = j.mailovi.length === 50; j.mailovi = PO.mailovi.concat(j.mailovi); }
+    else if (nacin === "osvjezi" && PO && PO.mapa === j.mapa) {
+      var stari = {}, najveci = 0; PO.mailovi.forEach(function(m){ stari[m.id] = m; if (m.id > najveci) najveci = m.id; });
+      var najmanji = j.mailovi.length ? j.mailovi[j.mailovi.length - 1].id : Infinity;
+      j.mailovi.forEach(function(m){ if (!stari[m.id] && m.id > najveci && najveci) poNovi[m.id] = Date.now(); });
+      if (j.mailovi.length === 50) j.mailovi = j.mailovi.concat(PO.mailovi.filter(function(m){ return m.id < najmanji; }));
+      else poStarije = false;
+    }
+    else poStarije = j.mailovi.length === 50;
+    PO = j; poBedz();
+    Object.keys(poOdabrano).forEach(function(id){ if (!j.mailovi.some(function(m){ return m.id === Number(id); })) delete poOdabrano[id]; });
+    if (ekran === "posta" && D) poCrtaj("ml");
+  }).catch(function(err){
+    if (broj !== poZahtjev) return;
+    poUcitava = false;
+    if (nacin === "osvjezi" && PO) return; // tiho: pokušat će opet za minutu
+    poGreska = err.message; if (ekran === "posta" && D) poCrtaj("ml");
+  });
+}
+function ucitajBlokirane(){
+  fetch("/api/posta/blokirani", {credentials: "same-origin"}).then(poJ)
+    .then(function(j){ BL = j.blokirani || []; if (ekran === "posta" && D) poCrtaj("mc"); })
+    .catch(function(err){ BL = []; blPoruka = "Popis se nije učitao: " + err.message; if (ekran === "posta" && D) poCrtaj("mc"); });
 }
 function otvoriMail(id){
-  poMail = {id: id, ucitavam: true}; poMailGreska = ""; poTekst = false; poBrisi = false; poBlokiraj = false; poPoruka = "";
-  if (ekran === "posta" && D) crtaj();
-  fetch("/api/posta/poruka?id=" + id, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){
-      if (!poMail || poMail.id !== id) return;
-      poMail = j;
-      PO && PO.mailovi.forEach(function(m){ if (m.id === id && !m.procitano) { m.procitano = true; if (m.mapa !== "spam") PO.neprocitano = Math.max(0, PO.neprocitano - 1); } });
-      poBedz(); if (ekran === "posta" && D) crtaj();
-    })
-    .catch(function(err){ poMailGreska = err.message; if (ekran === "posta" && D) crtaj(); });
+  poMail = {id: id, ucitavam: true}; poMailGreska = ""; poTekst = false; poPotvrda = ""; poPoruka = ""; poPrikaz = "mail"; poPregled = null;
+  if (poMob() && !poMobCitac) { poMobCitac = true; try { history.pushState({poCitac: 1}, "", location.hash); } catch (x) {} }
+  poCrtaj("lc");
+  fetch("/api/posta/poruka?id=" + id, {credentials: "same-origin"}).then(poJ).then(function(j){
+    if (!poMail || poMail.id !== id) return;
+    poMail = j;
+    var m = poNadji(id);
+    if (m && !m.procitano) { m.procitano = true; poPromijeniBroj(m, -1); }
+    poBedz(); poCrtaj("mlc");
+  }).catch(function(err){ if (!poMail || poMail.id !== id) return; poMailGreska = err.message; poCrtaj("c"); });
 }
+function poNadji(id){ return PO ? PO.mailovi.filter(function(m){ return m.id === id; })[0] : null; }
+// Broj nepročitanih u ulaznoj pošti i uz adresu, kad se mail pročita (-1) ili označi nepročitanim (+1).
+function poPromijeniBroj(m, d){
+  if (!PO || m.mapa !== "ulazni") return;
+  PO.neprocitano = Math.max(0, PO.neprocitano + d);
+  if (PO.brojevi) PO.brojevi.ulazni = Math.max(0, PO.brojevi.ulazni + d);
+  (PO.adrese || []).forEach(function(a){ if (a.adresa === String(m.omotnica_za || "").toLowerCase()) a.neprocitano = Math.max(0, a.neprocitano + d); });
+}
+function zatvoriCitac(){
+  poMobCitac = false; poPregled = null;
+  if (history.state && history.state.poCitac) { try { history.back(); } catch (x) {} }
+  poCrtaj("c");
+}
+addEventListener("popstate", function(){ if (poMobCitac) { poMobCitac = false; poPregled = null; if (ekran === "posta") poCrtaj("c"); } });
+
+// ---- pomoćno za prikaz ----
 function imeIzAdrese(s){ var m = /^\s*"?([^"<]*?)"?\s*<[^>]+>/.exec(s || ""); return (m && m[1].trim()) || String(s || "").replace(/[<>]/g, "").trim() || "(nepoznat pošiljatelj)"; }
+function adresaIz(s){ var m = /<([^>]+)>/.exec(s || ""); return (m ? m[1] : String(s || "")).trim(); }
+function inicijali(ime){
+  var r = String(ime).replace(/[^\p{L}\p{N}\s]/gu, " ").trim().split(/\s+/).filter(Boolean);
+  if (!r.length) return "?";
+  return (r.length > 1 ? r[0][0] + r[1][0] : r[0].slice(0, 2)).toUpperCase();
+}
+var PO_BOJE = ["#6E8F86", "#3D5A80", "#7A5B1E", "#8C5A7A", "#5E6266", "#A0613A", "#0F3B33", "#4F6B3A"];
+function bojaZa(s){ var h = 0; s = String(s || "").toLowerCase(); for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return PO_BOJE[h % PO_BOJE.length]; }
+function avatar(m, kl){ var ime = imeIzAdrese(m.od || m.omotnica_od); return '<span class="' + kl + '" style="background:' + bojaZa(m.adresa || ime) + '" aria-hidden="true">' + e(inicijali(ime)) + '</span>'; }
+// Adresa na koju je mail stigao, skraćeno: info@, izvodi@banka
+function kratkaAdresa(a){ a = String(a || "").toLowerCase(); var p = a.split("@"); if (p.length < 2) return a; var d = p[1].replace(/\.?digitalnipartner\.hr$/, ""); return p[0] + "@" + (d ? d.split(".")[0] : ""); }
+function adrBoja(a){
+  var l = String(a || "").toLowerCase().split("@")[0];
+  if (l === "info") return ["#0F3B33", "#E8EFED"];
+  if (l === "izvodi") return ["#7A5B1E", "#FBF5E8"];
+  if (/^bruno/.test(l)) return ["#3D5A80", "#E7EEF6"];
+  return ["#5E6266", "#EFEDE9"];
+}
+function adrCip(a){ var b = adrBoja(a); return '<span class="po-adr" style="color:' + b[0] + ';background:' + b[1] + '">' + e(kratkaAdresa(a)) + '</span>'; }
+function poDan(d){ var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function poGrupa(t){
+  var d = new Date(t), danas = poDan(new Date()), razl = Math.round((danas - poDan(d)) / 864e5);
+  if (razl <= 0) return "Danas";
+  if (razl === 1) return "Jučer";
+  var pon = new Date(danas); pon.setDate(danas.getDate() - ((danas.getDay() + 6) % 7));
+  if (d >= pon) return "Ovaj tjedan";
+  if (d.getFullYear() === danas.getFullYear() && d.getMonth() === danas.getMonth()) return "Ovaj mjesec";
+  return MJ[d.getMonth()].charAt(0).toUpperCase() + MJ[d.getMonth()].slice(1) + (d.getFullYear() === danas.getFullYear() ? "" : " " + d.getFullYear() + ".");
+}
+var PO_DANI = ["ned", "pon", "uto", "sri", "čet", "pet", "sub"];
 function kadaMail(t){
   if (!t) return "";
-  var d = new Date(t), sad = new Date();
-  if (d.toDateString() === sad.toDateString()) return d.toLocaleTimeString("hr-HR", {hour:"2-digit", minute:"2-digit"});
-  return d.getFullYear() === sad.getFullYear() ? d.getDate() + ". " + (d.getMonth() + 1) + "." : d.getDate() + ". " + (d.getMonth() + 1) + ". " + d.getFullYear() + ".";
+  var d = new Date(t), danas = poDan(new Date()), razl = Math.round((danas - poDan(d)) / 864e5);
+  if (razl <= 0) return d.toLocaleTimeString("hr-HR", {hour: "2-digit", minute: "2-digit"});
+  if (razl === 1) return "jučer";
+  if (razl < 7) return PO_DANI[d.getDay()];
+  return d.getDate() + ". " + (d.getMonth() + 1) + "." + (d.getFullYear() === danas.getFullYear() ? "" : " " + d.getFullYear() + ".");
+}
+function kadaDugo(t){
+  if (!t) return "";
+  var d = new Date(t), razl = Math.round((poDan(new Date()) - poDan(d)) / 864e5), sat = d.toLocaleTimeString("hr-HR", {hour: "2-digit", minute: "2-digit"});
+  if (razl <= 0) return "danas u " + sat;
+  if (razl === 1) return "jučer u " + sat;
+  return d.getDate() + ". " + (d.getMonth() + 1) + ". " + d.getFullYear() + ". u " + sat;
 }
 function velicinaF(b){ b = Number(b || 0); return b < 1024 ? b + " B" : (b < 1048576 ? Math.round(b / 1024) + " KB" : (b / 1048576).toLocaleString("hr-HR", {maximumFractionDigits: 1}) + " MB"); }
+function nastavakF(naziv, vrsta){
+  var n = /\.([a-z0-9]{1,5})$/i.exec(naziv || "");
+  if (n) return n[1].toUpperCase();
+  var v = String(vrsta || "").split("/")[1] || "";
+  return (v.replace(/^x-/, "").slice(0, 4) || "DAT").toUpperCase();
+}
+var PO_VRSTE = {PDF: "#A33A2A", JPG: "#3D5A80", JPEG: "#3D5A80", PNG: "#3D5A80", GIF: "#3D5A80", WEBP: "#3D5A80", XML: "#7A5B1E", SGN: "#7A5B1E", ZIP: "#5E6266", DOC: "#2B579A", DOCX: "#2B579A", XLS: "#217346", XLSX: "#217346", CSV: "#217346"};
+
+// Radnje koje imaju smisla za mail u određenoj mapi: [radnja, naziv, ikona]
+function poRadnje(mapa, procitano){
+  var r = [];
+  if (mapa === "ulazni") r.push(["arhiva", "Arhiviraj (e)", "arh"]);
+  else r.push(["ulazni", mapa === "spam" ? "Nije spam" : "Vrati u ulaznu poštu", "inbox"]);
+  if (procitano !== undefined) r.push(procitano ? ["neprocitano", "Označi kao nepročitano (u)", "nepr"] : ["procitano", "Označi kao pročitano", "procit"]);
+  if (mapa === "ulazni" || mapa === "arhiva") r.push(["spam", "Premjesti u Spam", "spam"]);
+  r.push(mapa === "spam" || mapa === "obrisano" ? ["trajno", "Obriši zauvijek", "kanta"] : ["obrisano", "Obriši (#)", "kanta"]);
+  return r;
+}
+function poGumbi(radnje, atr){
+  return radnje.map(function(r){ return '<button type="button" class="po-ik' + (r[0] === "trajno" ? " opasno" : "") + '" ' + atr + '="' + r[0] + '" title="' + e(r[1]) + '" aria-label="' + e(r[1]) + '">' + ik(r[2]) + '</button>'; }).join("");
+}
+
+// ---- crtanje ----
 function postaEkran(){
-  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Mail · banka.digitalnipartner.hr</p><h1>Pošta</h1></div>';
-  if (poGreska) return h + '<section class="panel"><p class="prazno">Pošta se nije učitala (' + e(poGreska) + '). Osvježi stranicu za minutu.</p></section>';
-  if (!PO) { ucitajPostu(); return h + '<section class="panel"><p class="prazno">Učitavam poštu…</p></section>'; }
-  h += '<form class="filtri" id="posta-trazi" role="search"><label style="flex:1 1 260px">Traži po pošiljatelju, naslovu ili tekstu<input type="search" name="t" value="' + e(poTrazi) + '" autocomplete="off"></label><button class="gumb" type="submit">Traži</button>'
-    + '<span class="src" style="align-self:center">' + br(PO.ukupno) + (poMapa === "spam" ? ' u Spamu' : ' mailova, ' + br(PO.neprocitano) + ' nepročitanih') + '</span></form>';
-  h += '<div class="mape" role="group" aria-label="Mapa"><button type="button" class="tiho" data-mapa="ulazni" aria-pressed="' + (poMapa === "ulazni") + '">Ulazna pošta' + (PO.neprocitano ? ' <b>' + br(PO.neprocitano) + '</b>' : '') + '</button><button type="button" class="tiho" data-mapa="spam" aria-pressed="' + (poMapa === "spam") + '">Spam' + (PO.spam ? ' <span class="src">' + br(PO.spam) + '</span>' : '') + '</button></div>';
-  h += '<div class="posta"><section class="panel posta-popis" aria-label="Popis mailova">';
-  if (!PO.mailovi.length) h += '<p class="prazno" style="padding:12px">' + (poTrazi ? 'Nijedan mail ne odgovara pretrazi.' : poMapa === "spam" ? 'Spam je prazan.' : 'Još nema mailova. Svaki mail koji stigne na adresu @banka.digitalnipartner.hr pojavit će se ovdje.') + '</p>';
-  h += PO.mailovi.map(function(m){
-    var od = imeIzAdrese(m.od || m.omotnica_od);
-    return '<button type="button" class="mail' + (m.procitano ? '' : ' novo') + '" data-mail="' + m.id + '"' + (poMail && poMail.id === m.id ? ' aria-current="true"' : '') + '>'
-      + '<span class="gore"><span class="od">' + e(od) + '</span><span class="src nw">' + (m.broj_privitaka ? '📎 ' : '') + e(kadaMail(m.poslano || m.primljeno)) + '</span></span>'
-      + '<span class="ns">' + e(m.naslov || "(bez naslova)") + '</span>'
-      + '<span class="is">' + (m.izvod != null ? '<span class="oznaka ' + (/^nije/.test(m.izvod) ? 'lose' : 'ok') + '" style="margin-right:6px">izvod</span>' : '') + e(m.isjecak) + '</span></button>';
+  if (!PO && !poGreska) ucitajPostu("nova");
+  return '<div class="po-app' + (poMobCitac ? ' citac' : '') + '" id="po-app">'
+    + '<aside class="po-mape" id="po-mape" aria-label="Mape">' + poMapeHtml() + '</aside>'
+    + '<section class="po-lista" aria-label="Popis mailova">'
+    + '<div class="po-mobnasl" id="po-mobnasl"></div>'
+    + '<div class="po-alatna"><label class="po-sve" title="Odaberi sve"><input type="checkbox" id="po-sve" aria-label="Odaberi sve mailove na popisu"></label>'
+    + '<form class="po-trazi" id="po-trazi" role="search">' + ik("trazi") + '<input type="search" name="t" id="po-trazi-polje" value="' + e(poTrazi) + '" placeholder="Traži poštu" aria-label="Traži po pošiljatelju, naslovu ili tekstu" autocomplete="off"><kbd>/</kbd></form>'
+    + '<button type="button" class="po-ik" data-akcija="osvjezi" title="Osvježi" aria-label="Osvježi">' + ik("osvj") + '</button></div>'
+    + '<div id="po-skupne"></div><div class="po-skup" id="po-skup"></div>'
+    + '<div class="po-donja" id="po-donja" role="navigation" aria-label="Mape"></div></section>'
+    + '<section class="po-citac" id="po-citac" aria-live="polite"></section>'
+    + '<div id="po-pregled"></div><div id="po-toast" class="po-toast" role="status"></div></div>';
+}
+function poCrtaj(d){
+  var app = document.getElementById("po-app");
+  if (!app) { if (ekran === "posta" && D) crtaj(); return; }
+  app.classList.toggle("citac", poMobCitac);
+  app.classList.toggle("odabir", Object.keys(poOdabrano).length > 0);
+  if (d.indexOf("m") >= 0) document.getElementById("po-mape").innerHTML = poMapeHtml();
+  if (d.indexOf("l") >= 0) {
+    var skup = document.getElementById("po-skup"), vrh = skup.scrollTop;
+    document.getElementById("po-mobnasl").innerHTML = poMobNaslHtml();
+    document.getElementById("po-skupne").innerHTML = poSkupneHtml();
+    skup.innerHTML = poPopisHtml();
+    skup.scrollTop = vrh;
+    document.getElementById("po-donja").innerHTML = poDonjaHtml();
+    var sve = document.getElementById("po-sve"), n = Object.keys(poOdabrano).length, uk = PO ? PO.mailovi.length : 0;
+    sve.checked = n > 0 && n === uk; sve.indeterminate = n > 0 && n < uk;
+    var polje = document.getElementById("po-trazi-polje");
+    if (polje) polje.placeholder = "Traži: " + poNazivMape(poMapa) + (poAdresa ? ", " + kratkaAdresa(poAdresa) : "");
+  }
+  if (d.indexOf("c") >= 0) { document.getElementById("po-citac").innerHTML = poCitacHtml(); var t = document.querySelector("#po-citac .po-tijelo"); if (t) t.scrollTop = 0; }
+  document.getElementById("po-pregled").innerHTML = poPregledHtml();
+  poToastCrtaj();
+}
+function poMapeHtml(){
+  var h = '<button type="button" class="po-pisi" disabled title="Slanje mailova iz nadzora dolazi u 2. koraku">' + ik("olovka") + ' Novi mail <small>uskoro</small></button>';
+  h += PO_MAPE.map(function(m){
+    var n = m.k === "arhiva" ? 0 : poBr(m.k);
+    return '<button type="button" class="po-mapa" data-mapa="' + m.k + '"' + (poMapa === m.k && poPrikaz !== "blokirani" ? ' aria-current="true"' : '') + '>' + ik(m.i) + '<span>' + m.n + '</span>' + (n ? '<span class="n' + (m.k === "ulazni" ? ' jako' : '') + '">' + br(n) + '</span>' : '') + '</button>';
   }).join("");
-  if (poStarije) h += '<button type="button" class="tiho" id="posta-starije" style="margin:8px">Učitaj starije</button>';
-  h += '</section><section class="panel" aria-live="polite">' + citacMaila() + '</section></div>';
-  h += blokiraniPanel();
+  var adr = PO && PO.adrese ? PO.adrese : [];
+  if (adr.length > 1 || poAdresa) {
+    h += '<p class="po-nasl">Adrese</p><button type="button" class="po-mapa" data-adresa=""' + (!poAdresa ? ' aria-current="true"' : '') + '><span class="toc" style="background:var(--linija)"></span><span>Sve adrese</span></button>';
+    h += adr.map(function(a){
+      return '<button type="button" class="po-mapa" data-adresa="' + e(a.adresa) + '" title="' + e(a.adresa) + '"' + (poAdresa === a.adresa ? ' aria-current="true"' : '') + '><span class="toc" style="background:' + adrBoja(a.adresa)[0] + '"></span><span>' + e(kratkaAdresa(a.adresa)) + '</span>' + (a.neprocitano ? '<span class="n">' + br(a.neprocitano) + '</span>' : '') + '</button>';
+    }).join("");
+  }
+  h += '<p class="po-nasl">Zaštita</p><button type="button" class="po-mapa" data-prikaz="blokirani"' + (poPrikaz === "blokirani" ? ' aria-current="true"' : '') + '>' + ik("blok") + '<span>Blokirani</span>' + (BL && BL.length ? '<span class="n">' + br(BL.length) + '</span>' : '') + '</button>';
   return h;
 }
-function citacMaila(){
-  if (poMailGreska) return '<p class="prazno">Mail se nije učitao (' + e(poMailGreska) + ').</p>';
-  if (!poMail) return '<p class="prazno">Odaberi mail s popisa.</p>';
-  if (poMail.ucitavam) return '<p class="prazno">Učitavam mail…</p>';
-  var m = poMail, h = '<h2 style="font-size:19px;line-height:1.3">' + e(m.naslov || "(bez naslova)") + '</h2>';
-  h += '<dl class="mail-glava"><dt>Od</dt><dd>' + e(m.od || m.omotnica_od) + (m.omotnica_od && m.od.toLowerCase().indexOf(m.omotnica_od.toLowerCase()) < 0 ? ' <span class="src">(poslao ' + e(m.omotnica_od) + ')</span>' : '') + '</dd>'
+function poMobNaslHtml(){
+  var adr = PO && PO.adrese ? PO.adrese : [];
+  return '<span>' + e(poNazivMape(poMapa)) + '</span>'
+    + (adr.length > 1 || poAdresa ? '<select id="po-adresa-m" aria-label="Adresa"><option value="">Sve adrese</option>' + adr.map(function(a){ return '<option value="' + e(a.adresa) + '"' + (poAdresa === a.adresa ? ' selected' : '') + '>' + e(kratkaAdresa(a.adresa)) + (a.neprocitano ? ' (' + a.neprocitano + ')' : '') + '</option>'; }).join("") + '</select>' : '');
+}
+function poDonjaHtml(){
+  return [["ulazni", "Pošta", "inbox"], ["oznaceno", "Označeno", "zv"], ["arhiva", "Arhiva", "arh"], ["spam", "Spam", "spam"], ["obrisano", "Obrisano", "kanta"]].map(function(x){
+    var n = x[0] === "ulazni" ? poBr("ulazni") : 0;
+    return '<button type="button" data-mapa="' + x[0] + '"' + (poMapa === x[0] && poPrikaz !== "blokirani" ? ' aria-current="true"' : '') + '>' + ik(x[2]) + '<span>' + x[1] + '</span>' + (n ? '<i>' + (n > 99 ? "99+" : n) + '</i>' : '') + '</button>';
+  }).join("");
+}
+function poSkupneHtml(){
+  var ids = Object.keys(poOdabrano);
+  if (!ids.length) {
+    if (PO && (poMapa === "obrisano" || poMapa === "spam") && PO.mailovi.length && !poTrazi) {
+      if (poPotvrda === "isprazni") return '<div class="po-traka opasno"><span>Trajno obrisati sve mailove u mapi ' + poNazivMape(poMapa) + ' (' + br(poBr(poMapa)) + ')? Brišu se i privitci, i ne vraćaju se.</span><span class="po-traka-g"><button type="button" class="tiho" data-akcija="odustani">Odustani</button><button type="button" class="gumb opasno" data-akcija="isprazni-da">Obriši sve</button></span></div>';
+      return '<div class="po-traka"><span>' + (poMapa === "spam" ? 'Spam se ne prazni sam.' : 'Obrisani mailovi ostaju ovdje dok ih ne obrišeš zauvijek.') + '</span><button type="button" class="tiho" data-akcija="isprazni">Isprazni ' + (poMapa === "spam" ? "Spam" : "Obrisano") + '</button></div>';
+    }
+    return '';
+  }
+  if (poPotvrda === "trajno-odabrano") return '<div class="po-traka opasno"><span>Trajno obrisati ' + (ids.length === 1 ? 'ovaj mail' : br(ids.length) + ' mailova') + '? Brišu se i privitci, i ne vraćaju se.</span><span class="po-traka-g"><button type="button" class="tiho" data-akcija="odustani">Odustani</button><button type="button" class="gumb opasno" data-akcija="trajno-da">Obriši zauvijek</button></span></div>';
+  var mapa = poMapa === "oznaceno" ? "ulazni" : poMapa;
+  var sviProcitani = ids.every(function(id){ var m = poNadji(Number(id)); return m && m.procitano; });
+  var r = poRadnje(mapa, sviProcitani);
+  if (poMapa === "oznaceno") r.splice(1, 0, ["odznaci", "Makni zvjezdicu", "zv"]);
+  return '<div class="po-traka odabrano"><button type="button" class="po-ik" data-akcija="odznaci-sve" title="Odustani od odabira" aria-label="Odustani od odabira">' + ik("x") + '</button><b>' + br(ids.length) + ' odabrano</b><span class="po-traka-g">' + poGumbi(r, "data-skupno") + '</span></div>';
+}
+function poPopisHtml(){
+  if (poGreska && !PO) return '<p class="po-prazno">Pošta se nije učitala (' + e(poGreska) + '). <button type="button" class="tiho" data-akcija="osvjezi">Pokušaj opet</button></p>';
+  if (!PO) return '<p class="po-prazno">Učitavam poštu…</p>';
+  if (!PO.mailovi.length) {
+    var x = PO_MAPE.filter(function(m){ return m.k === poMapa; })[0];
+    return '<p class="po-prazno">' + (poTrazi ? 'Nijedan mail u mapi ' + e(poNazivMape(poMapa)) + ' ne odgovara pretrazi „' + e(poTrazi) + '”.' : poAdresa ? 'Na ' + e(poAdresa) + ' nema mailova u ovoj mapi.' : e(x ? x.prazno : "")) + '</p>';
+  }
+  var h = "", grupa = "", sad = Date.now();
+  PO.mailovi.forEach(function(m){
+    var g = poGrupa(m.primljeno);
+    if (g !== grupa) { grupa = g; h += '<div class="po-grupa">' + e(g) + '</div>'; }
+    var od = imeIzAdrese(m.od || m.omotnica_od), odabran = !!poOdabrano[m.id];
+    var kl = "po-m" + (m.procitano ? "" : " novo") + (poMail && poMail.id === m.id && poPrikaz === "mail" ? " on" : "") + (odabran ? " odabran" : "") + (poNovi[m.id] && sad - poNovi[m.id] < 8000 ? " stiglo" : "");
+    h += '<div class="' + kl + '" data-mail="' + m.id + '">'
+      + '<label class="po-av-k"><input type="checkbox" data-odaberi="' + m.id + '"' + (odabran ? ' checked' : '') + ' aria-label="Odaberi mail: ' + e(m.naslov || od) + '">' + avatar(m, "po-av") + '</label>'
+      + '<button type="button" class="po-otvori" data-otvori="' + m.id + '"' + (poMail && poMail.id === m.id ? ' aria-current="true"' : '') + '>'
+      + '<span class="po-od">' + (m.procitano ? '' : '<span class="vh">Nepročitano: </span>') + e(od) + '</span>'
+      + '<span class="po-vr">' + (m.broj_privitaka ? ik("klip", "mali") : '') + e(kadaMail(m.primljeno)) + '</span>'
+      + '<span class="po-ns">' + e(m.naslov || "(bez naslova)") + '</span>'
+      + '<span class="po-is">' + (!poAdresa && m.omotnica_za ? adrCip(m.omotnica_za) : '') + (poMapa === "oznaceno" && m.mapa !== "ulazni" ? '<span class="po-oz siv">' + e(poNazivMape(m.mapa)) + '</span>' : '') + (m.izvod != null ? '<span class="po-oz' + (/^nije/i.test(m.izvod) ? ' lose' : '') + '">' + (/^nije/i.test(m.izvod) ? 'izvod nije uvezen' : 'izvod uvezen') + '</span>' : '') + (m.mapa === "spam" && m.spam_razlog ? '<span class="po-oz lose">' + e(m.spam_razlog.replace(/ \(.*$/, "")) + '</span>' : '') + '<span class="po-isj">' + e(m.isjecak) + '</span></span>'
+      + '</button>'
+      + '<button type="button" class="po-zv' + (m.oznaceno ? ' da' : '') + '" data-zvjezdica="' + m.id + '" aria-pressed="' + !!m.oznaceno + '" title="' + (m.oznaceno ? 'Makni zvjezdicu' : 'Označi zvjezdicom') + '" aria-label="Zvjezdica">' + ik("zv") + '</button>'
+      + '<div class="po-brze">' + poGumbi(poRadnje(m.mapa, m.procitano), 'data-id="' + m.id + '" data-brzo') + '</div>'
+      + '</div>';
+  });
+  if (poStarije) h += '<button type="button" class="tiho po-starije" data-akcija="starije">Učitaj starije</button>';
+  else h += '<p class="po-kraj">' + br(PO.mailovi.length) + (poTrazi ? ' pronađeno' : ' od ' + br(PO.ukupno) + ' u mapi') + '</p>';
+  if (poMob()) h += '<button type="button" class="tiho po-starije" data-prikaz="blokirani">Blokirani pošiljatelji' + (BL && BL.length ? ' (' + BL.length + ')' : '') + '</button>';
+  return h;
+}
+function poNatrag(){ return '<button type="button" class="po-natrag" data-akcija="natrag">' + ik("nat") + ' ' + e(poNazivMape(poMapa)) + '</button>'; }
+function poCitacHtml(){
+  if (poPrikaz === "blokirani") return '<div class="po-alatna po-cit-alati">' + poNatrag() + '<span></span></div><div class="po-tijelo">' + blokiraniHtml() + '</div>';
+  if (!poMail) return '<div class="po-tijelo po-dobrodoslica"><div class="po-ikona-v">' + ik("inbox") + '</div><p>Odaberi mail s popisa.</p>'
+    + '<dl class="po-precaci"><dt><kbd>j</kbd> <kbd>k</kbd></dt><dd>sljedeći i prethodni mail</dd><dt><kbd>e</kbd></dt><dd>arhiviraj</dd><dt><kbd>#</kbd></dt><dd>obriši</dd><dt><kbd>s</kbd></dt><dd>zvjezdica</dd><dt><kbd>u</kbd></dt><dd>označi kao nepročitano</dd><dt><kbd>x</kbd></dt><dd>odaberi mail</dd><dt><kbd>/</kbd></dt><dd>traži</dd></dl></div>';
+  if (poMailGreska) return '<div class="po-alatna po-cit-alati">' + poNatrag() + '</div><div class="po-tijelo"><p class="prazno">Mail se nije učitao (' + e(poMailGreska) + ').</p></div>';
+  if (poMail.ucitavam) return '<div class="po-alatna po-cit-alati">' + poNatrag() + '</div><div class="po-tijelo"><p class="prazno">Učitavam mail…</p></div>';
+  var m = poMail, ime = imeIzAdrese(m.od || m.omotnica_od), adr = adresaIz(m.od || m.omotnica_od), odg = (m.adrese_od || [])[0], posiljatelj = m.adresa || odg || "";
+  var h = '<div class="po-alatna po-cit-alati">' + poNatrag() + '<span class="po-grupa-ik">' + poGumbi(poRadnje(m.mapa, true), "data-radnja") + '</span>'
+    + '<span class="po-grupa-ik"><button type="button" class="po-ik po-zv' + (m.oznaceno ? ' da' : '') + '" data-radnja="' + (m.oznaceno ? 'odznaci' : 'oznaci') + '" aria-pressed="' + !!m.oznaceno + '" title="Zvjezdica (s)" aria-label="Zvjezdica">' + ik("zv") + '</button>'
+    + '<details class="po-vise"><summary class="po-ik" title="Više" aria-label="Više radnji">' + ik("vise") + '</summary><div class="po-izbornik">'
+    + (m.ima_html ? '<button type="button" data-akcija="tekst">' + (poTekst ? 'Prikaži oblikovano' : 'Prikaži samo tekst') + '</button>' : '')
+    + (posiljatelj ? '<button type="button" data-akcija="blokiraj">Blokiraj pošiljatelja</button>' : '')
+    + '<a href="/api/posta/eml?id=' + m.id + '">Preuzmi izvorni mail (.eml)</a></div></details></span></div>';
+  h += '<div class="po-tijelo">';
+  if (poPotvrda === "trajno") h += '<div class="po-traka opasno"><span>Obrisati ovaj mail zauvijek? Briše se i izvorna datoteka s privicima, i ne vraća se.</span><span class="po-traka-g"><button type="button" class="tiho" data-akcija="odustani">Odustani</button><button type="button" class="gumb opasno" data-akcija="trajno-mail">Obriši zauvijek</button></span></div>';
+  if (poPotvrda === "blokiraj" && posiljatelj) {
+    var dom = "@" + posiljatelj.split("@").pop();
+    h += '<div class="po-traka zlato"><span>Blokirati pošiljatelja? Sva njegova pošta, i dosadašnja i buduća, ide u Spam.</span><span class="po-traka-g"><button type="button" class="tiho" data-akcija="odustani">Odustani</button><button type="button" class="gumb" data-blokiraj="' + e(posiljatelj) + '">Samo ' + e(posiljatelj) + '</button>' + (/@(gmail|googlemail|yahoo|hotmail|outlook|live|icloud|t-com|net)\./.test(dom) ? '' : '<button type="button" class="gumb opasno" data-blokiraj="' + e(dom) + '">Cijelu domenu ' + e(dom) + '</button>') + '</span></div>';
+  }
+  if (poPoruka) h += '<p class="po-poruka">' + e(poPoruka) + '</p>';
+  h += '<h1 class="po-naslov">' + e(m.naslov || "(bez naslova)") + '</h1>';
+  if (m.mapa === "spam") h += '<p class="po-spam"><b>Spam</b> ' + e(m.spam_razlog || "") + '. Pazi s poveznicama i privicima.</p>';
+  if (m.mapa === "obrisano") h += '<p class="po-spam siv"><b>Obrisano</b> Mail je u mapi Obrisano. Vrati ga u ulaznu poštu ikonom gore.</p>';
+  h += '<div class="po-posi">' + avatar(m, "po-av vel") + '<div class="po-tko"><b>' + e(ime) + '</b>' + (adr && adr !== ime ? ' <span class="src">&lt;' + e(adr) + '&gt;</span>' : '')
+    + '<div class="src">za ' + (m.omotnica_za ? adrCip(m.omotnica_za) + ' ' + e(m.omotnica_za) : e(m.za)) + (m.kopija ? ' · kopija ' + e(m.kopija) : '') + '</div>'
+    + (m.provjera ? '<div class="po-provjera">' + m.provjera.split(" ").map(function(x){ var p = x.split("="); return '<span class="' + (p[1] === "pass" ? "ok" : (p[1] === "none" || p[1] === "neutral" ? "ceka" : "lose")) + '">' + e(p[0].toUpperCase() + " " + p[1]) + '</span>'; }).join("") + '</div>' : '')
+    + '</div><div class="po-kad" title="' + e(vrijeme(m.primljeno)) + '">' + e(kadaDugo(m.poslano || m.primljeno)) + '</div></div>';
+  h += '<details class="po-detalji"><summary>Detalji</summary><dl class="mail-glava"><dt>Od</dt><dd>' + e(m.od || m.omotnica_od) + '</dd>'
+    + (m.omotnica_od && String(m.od || "").toLowerCase().indexOf(m.omotnica_od.toLowerCase()) < 0 ? '<dt>Poslao</dt><dd>' + e(m.omotnica_od) + ' <span class="src">(SMTP omotnica)</span></dd>' : '')
     + '<dt>Za</dt><dd>' + e(m.za || m.omotnica_za) + '</dd>'
     + (m.kopija ? '<dt>Kopija</dt><dd>' + e(m.kopija) + '</dd>' : '')
     + (m.odgovor_na ? '<dt>Odgovor na</dt><dd>' + e(m.odgovor_na) + '</dd>' : '')
-    + '<dt>Poslano</dt><dd>' + e(vrijeme(m.poslano || m.primljeno)) + (m.poslano ? ' <span class="src">· stiglo ' + e(vrijeme(m.primljeno)) + '</span>' : '') + '</dd>'
-    + (m.provjera ? '<dt>Provjera</dt><dd>' + m.provjera.split(" ").map(function(x){ var p = x.split("="); return '<span class="oznaka ' + (p[1] === "pass" ? "ok" : (p[1] === "none" || p[1] === "neutral" ? "ceka" : "lose")) + '" style="margin-right:4px">' + e(p[0].toUpperCase() + " " + p[1]) + '</span>'; }).join("") + '</dd>' : '')
-    + (m.izvod != null ? '<dt>Izvod</dt><dd>' + e(m.izvod) + '</dd>' : '')
-    + '</dl>';
-  if (m.mapa === "spam") h += '<p class="stavka" style="border-left-color:var(--crvena);background:var(--crvena-svj)"><b class="hitno">SPAM</b>' + e(m.spam_razlog || "") + '. Pazi s poveznicama i privicima.</p>';
-  var adr = (m.adrese_od || [])[0], posiljatelj = m.adresa || adr || "";
-  h += '<div class="alati">'
-    + (adr ? '<a class="tiho" href="mailto:' + e(encodeURIComponent(adr).replace(/%40/g, "@")) + '?subject=' + e(encodeURIComponent("Re: " + (m.naslov || ""))) + '">Odgovori u svom mailu</a>' : '')
-    + (m.ima_html ? '<button type="button" class="tiho" id="posta-prikaz">' + (poTekst ? 'Prikaži oblikovano' : 'Prikaži samo tekst') + '</button>' : '')
-    + '<button type="button" class="tiho" id="posta-neprocitano">Označi kao nepročitano</button>'
-    + '<button type="button" class="tiho" id="posta-premjesti" data-u="' + (m.mapa === "spam" ? "ulazni" : "spam") + '">' + (m.mapa === "spam" ? 'Nije spam' : 'Premjesti u Spam') + '</button>'
-    + (posiljatelj ? '<button type="button" class="tiho" id="posta-blokiraj">Blokiraj pošiljatelja</button>' : '')
-    + '<a class="tiho" href="/api/posta/eml?id=' + m.id + '">Preuzmi .eml</a>'
-    + '<button type="button" class="tiho" id="posta-brisi" style="color:var(--crvena)">Obriši</button>'
-    + '<span class="src" id="posta-poruka">' + e(poPoruka) + '</span></div>';
-  if (poBlokiraj && posiljatelj) {
-    var dom = "@" + posiljatelj.split("@").pop();
-    h += '<div class="potvrda-tekst" style="background:var(--zlato-svj);padding:12px 14px;border-radius:8px"><span>Blokirati pošiljatelja? Sva njegova pošta, i dosadašnja i buduća, ide u Spam.</span><div style="flex-wrap:wrap"><button type="button" class="tiho" id="posta-odustani-bl">Odustani</button><button type="button" class="gumb" data-blokiraj="' + e(posiljatelj) + '">Samo ' + e(posiljatelj) + '</button>' + (/@(gmail|googlemail|yahoo|hotmail|outlook|live|icloud|t-com|net)\./.test(dom) ? '' : '<button type="button" class="gumb opasno" data-blokiraj="' + e(dom) + '">Cijelu domenu ' + e(dom) + '</button>') + '</div></div>';
+    + '<dt>Poslano</dt><dd>' + e(vrijeme(m.poslano)) + '</dd><dt>Stiglo</dt><dd>' + e(vrijeme(m.primljeno)) + '</dd>'
+    + '<dt>Veličina</dt><dd>' + velicinaF(m.velicina) + '</dd></dl></details>';
+  if (m.izvod != null) h += '<p class="po-izvod' + (/^nije/i.test(m.izvod) ? ' lose' : '') + '"><b>Izvod</b> ' + e(m.izvod) + '</p>';
+  if (m.privitci && m.privitci.length) h += '<div class="po-privitci">' + m.privitci.map(function(p){
+    var ext = nastavakF(p.naziv, p.vrsta), url = "/api/posta/privitak?id=" + m.id + "&amp;i=" + p.i, slika = p.pregled && p.pregled.indexOf("image/") === 0;
+    return '<div class="po-kart">' + (slika ? '<button type="button" class="po-sl" data-pregled="' + p.i + '" aria-label="Pregledaj ' + e(p.naziv) + '"><img src="' + url + '&amp;pregled=1" alt="" loading="lazy"></button>' : '<span class="po-vrs" style="background:' + (PO_VRSTE[ext] || "#5E6266") + '">' + e(ext.slice(0, 4)) + '</span>')
+      + '<span class="po-kart-t"><b title="' + e(p.naziv) + '">' + e(p.naziv) + '</b><small>' + velicinaF(p.velicina) + '</small></span>'
+      + (p.pregled ? '<button type="button" class="po-ik" data-pregled="' + p.i + '" title="Pregledaj" aria-label="Pregledaj ' + e(p.naziv) + '">' + ik("oko") + '</button>' : '')
+      + '<a class="po-ik" href="' + url + '" download title="Preuzmi" aria-label="Preuzmi ' + e(p.naziv) + '">' + ik("preuz") + '</a></div>';
+  }).join("") + '</div>';
+  if (m.ima_html && !poTekst) h += '<iframe class="po-html" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" title="Sadržaj maila" src="/api/posta/html?id=' + m.id + '"></iframe><p class="src">Vanjske slike su blokirane, da pošiljatelj ne vidi kad si otvorio mail.</p>';
+  else h += '<pre class="mail-tekst po-sadrzaj">' + (m.tekst ? e(m.tekst) : '<span class="prazno">Mail nema teksta.</span>') + '</pre>';
+  if (odg) {
+    var re = /^re:/i.test(m.naslov || "") ? m.naslov : "Re: " + (m.naslov || "");
+    var citat = "\n\n" + kadaDugo(m.poslano || m.primljeno) + ", " + ime + " je napisao/la:\n" + String(m.tekst || "").slice(0, 1500).split("\n").map(function(l){ return "> " + l; }).join("\n");
+    var fwd = "\n\n---------- Proslijeđeni mail ----------\nOd: " + (m.od || "") + "\nPoslano: " + vrijeme(m.poslano || m.primljeno) + "\nNaslov: " + (m.naslov || "") + "\nZa: " + (m.za || "") + "\n\n" + String(m.tekst || "").slice(0, 1500);
+    h += '<div class="po-odg"><a href="mailto:' + e(encodeURIComponent(odg).replace(/%40/g, "@")) + '?subject=' + e(encodeURIComponent(re)) + '&amp;body=' + e(encodeURIComponent(citat)) + '">' + ik("odg") + ' Odgovori</a>'
+      + '<a href="mailto:?subject=' + e(encodeURIComponent("Fwd: " + (m.naslov || ""))) + '&amp;body=' + e(encodeURIComponent(fwd)) + '">' + ik("prosl") + ' Proslijedi</a></div>'
+      + '<p class="src">Odgovori i Proslijedi zasad otvaraju tvoj mail program. Slanje iz nadzora dolazi u 2. koraku.</p>';
   }
-  if (poBrisi) h += '<div class="potvrda-tekst" style="background:var(--crvena-svj);padding:12px 14px;border-radius:8px"><span>Obrisati ovaj mail? Briše se i izvorna datoteka s privicima, i ne vraća se.</span><div><button type="button" class="tiho" id="posta-odustani">Odustani</button><button type="button" class="gumb opasno" id="posta-obrisi">Obriši</button></div></div>';
-  if (m.privitci && m.privitci.length) h += '<div class="privitci">' + m.privitci.map(function(p){ return '<a href="/api/posta/privitak?id=' + m.id + '&amp;i=' + p.i + '" download>📎 ' + e(p.naziv) + ' <span class="src">' + velicinaF(p.velicina) + '</span></a>'; }).join("") + '</div>';
-  if (m.ima_html && !poTekst) h += '<iframe class="mail-html" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" title="Sadržaj maila" src="/api/posta/html?id=' + m.id + '"></iframe><p class="src">Vanjske slike su blokirane, da pošiljatelj ne vidi kad si otvorio mail.</p>';
-  else h += '<pre class="mail-tekst">' + (m.tekst ? e(m.tekst) : '<span class="prazno">Mail nema teksta.</span>') + '</pre>';
+  return h + '</div>';
+}
+function blokiraniHtml(){
+  if (!BL) { ucitajBlokirane(); return '<p class="prazno">Učitavam…</p>'; }
+  var h = '<h1 class="po-naslov">Blokirani pošiljatelji</h1><p class="src" style="margin-bottom:16px">Pošta od ovih adresa i domena odmah ide u Spam. Uvoz izvoda iz banke radi i za njih.</p>';
+  h += BL.length ? '<div class="skrol"><table><tbody>' + BL.map(function(b){ return '<tr><td style="font-weight:600">' + e(b.uzorak) + '</td><td class="src nw">od ' + e(vrijeme(b.dodano)) + '</td><td class="r"><button type="button" class="tiho" data-odblokiraj="' + e(b.uzorak) + '">Odblokiraj</button></td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Nitko nije blokiran.</p>';
+  h += '<form class="filtri" id="blokiraj-novi" style="margin-top:16px"><label style="flex:1 1 260px">Dodaj adresu ili domenu<input name="u" placeholder="ime@domena.hr ili @domena.hr" autocomplete="off"></label><button class="gumb" type="submit">Blokiraj</button></form>' + (blPoruka ? '<p class="src" style="margin-top:8px">' + e(blPoruka) + '</p>' : '');
   return h;
 }
-function blokiraniPanel(){
-  if (!BL) { ucitajBlokirane(); return ''; }
-  var h = '<section class="panel"><h2>Blokirani pošiljatelji</h2><p class="src">Pošta od ovih adresa i domena odmah ide u Spam. Uvoz izvoda iz banke radi i za njih.</p>';
-  h += BL.length ? '<div class="skrol"><table><tbody>' + BL.map(function(b){ return '<tr><td style="font-weight:600">' + e(b.uzorak) + '</td><td class="src nw">od ' + e(vrijeme(b.dodano)) + '</td><td class="r"><button type="button" class="tiho" data-odblokiraj="' + e(b.uzorak) + '">Odblokiraj</button></td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Nitko nije blokiran.</p>';
-  h += '<form class="filtri" id="blokiraj-novi"><label style="flex:1 1 260px">Dodaj adresu ili domenu<input name="u" placeholder="ime@domena.hr ili @domena.hr" autocomplete="off"></label><button class="gumb" type="submit">Blokiraj</button><span class="src" style="align-self:center">' + e(blPoruka) + '</span></form></section>';
-  return h;
+function poPregledHtml(){
+  if (!poPregled || !poMail || poMail.id !== poPregled.id) return '';
+  var p = poPregled, url = "/api/posta/privitak?id=" + p.id + "&amp;i=" + p.i;
+  return '<div class="po-lb" data-akcija="zatvori-pregled"><div class="po-lb-v" role="dialog" aria-modal="true" aria-label="Pregled privitka ' + e(p.naziv) + '">'
+    + '<div class="po-lb-g"><b>' + e(p.naziv) + '</b><a class="po-ik" href="' + url + '&amp;pregled=1" target="_blank" rel="noopener" title="Otvori u novoj kartici" aria-label="Otvori u novoj kartici">' + ik("vani") + '</a><a class="po-ik" href="' + url + '" download title="Preuzmi" aria-label="Preuzmi">' + ik("preuz") + '</a><button type="button" class="po-ik" data-akcija="zatvori-pregled" title="Zatvori (Esc)" aria-label="Zatvori">' + ik("x") + '</button></div>'
+    + (p.vrsta === "application/pdf" ? '<iframe src="' + url + '&amp;pregled=1" title="' + e(p.naziv) + '"></iframe>' : '<div class="po-lb-sl"><img src="' + url + '&amp;pregled=1" alt="' + e(p.naziv) + '"></div>')
+    + '</div></div>';
+}
+function poToastCrtaj(){
+  var t = document.getElementById("po-toast"); if (!t) return;
+  t.classList.toggle("vidljiv", !!poToast);
+  t.innerHTML = poToast ? '<span>' + e(poToast.tekst) + '</span>' + (poToast.ponisti ? '<button type="button" data-akcija="ponisti">Poništi</button>' : '') : '';
+}
+function poPokaziToast(tekst, ponisti){
+  poToast = {tekst: tekst, ponisti: ponisti}; poToastCrtaj();
+  clearTimeout(poToastTimer); poToastTimer = setTimeout(function(){ poToast = null; poToastCrtaj(); }, 7000);
+}
+
+// ---- radnje ----
+var PO_PORUKE = {arhiva: "Arhivirano", ulazni: "Vraćeno u ulaznu poštu", spam: "Premješteno u Spam", obrisano: "Premješteno u Obrisano", procitano: "Označeno kao pročitano", neprocitano: "Označeno kao nepročitano", oznaci: "Označeno zvjezdicom", odznaci: "Zvjezdica maknuta"};
+// Skupna radnja nad mailovima. Premještanje ih odmah makne s popisa; Poništi ih vraća u mape iz kojih su došli.
+function poRadi(ids, radnja){
+  ids = ids.map(Number);
+  var premjesti = ["arhiva", "ulazni", "spam", "obrisano"].indexOf(radnja) >= 0;
+  var prije = {}, otvoren = poMail && ids.indexOf(poMail.id) >= 0, sljedeci = null;
+  ids.forEach(function(id){ var m = poNadji(id); if (m) prije[id] = {mapa: m.mapa, procitano: m.procitano, oznaceno: m.oznaceno}; });
+  if (premjesti && otvoren && PO) {
+    var lista = PO.mailovi.filter(function(m){ return ids.indexOf(m.id) < 0 || m.id === poMail.id; }), i = lista.map(function(m){ return m.id; }).indexOf(poMail.id);
+    var s = lista[i + 1] || lista[i - 1]; sljedeci = s && s.id !== poMail.id ? s.id : null;
+  }
+  // Odmah na popisu
+  if (PO) {
+    PO.mailovi.forEach(function(m){
+      if (ids.indexOf(m.id) < 0) return;
+      if (radnja === "procitano" || radnja === "neprocitano") { var p = radnja === "procitano"; if (m.procitano !== p) { m.procitano = p; poPromijeniBroj(m, p ? -1 : 1); } }
+      if (radnja === "oznaci" || radnja === "odznaci") m.oznaceno = radnja === "oznaci";
+    });
+    var ostaje = function(m){
+      if (ids.indexOf(m.id) < 0) return true;
+      if (premjesti) return poMapa === "oznaceno" && (radnja === "arhiva" || radnja === "ulazni");
+      return !(poMapa === "oznaceno" && radnja === "odznaci");
+    };
+    var prijeBroj = PO.mailovi.length;
+    PO.mailovi = PO.mailovi.filter(ostaje);
+    PO.ukupno = Math.max(0, PO.ukupno - (prijeBroj - PO.mailovi.length));
+  }
+  if (poMail && otvoren) {
+    if (radnja === "oznaci" || radnja === "odznaci") poMail.oznaceno = radnja === "oznaci";
+    if (premjesti && !(poMapa === "oznaceno" && (radnja === "arhiva" || radnja === "ulazni"))) { poMail = null; if (sljedeci && !poMob()) otvoriMail(sljedeci); else if (poMobCitac) zatvoriCitac(); }
+    else if (premjesti) poMail.mapa = radnja;
+    if (radnja === "neprocitano" && ids.length === 1) { poMail = null; if (poMobCitac) zatvoriCitac(); }
+  }
+  ids.forEach(function(id){ delete poOdabrano[id]; });
+  poPotvrda = ""; poBedz(); poCrtaj("mlc");
+  return postaPost("/api/posta/skupno", {ids: ids, radnja: radnja}).then(function(){
+    var tekst = PO_PORUKE[radnja] + (ids.length > 1 ? ": " + ids.length + " mailova" : "") + ".";
+    var ponisti = premjesti || radnja === "procitano" || radnja === "neprocitano" ? function(){ poVrati(prije, radnja); } : null;
+    if (radnja !== "oznaci" && radnja !== "odznaci" && !(radnja === "procitano" && ids.length === 1)) poPokaziToast(tekst, ponisti);
+    ucitajPostu("osvjezi");
+  }).catch(function(err){ poPokaziToast("Nije spremljeno: " + err.message); ucitajPostu("nova"); });
+}
+function poVrati(prije, radnja){
+  var grupe = {};
+  Object.keys(prije).forEach(function(id){
+    var p = prije[id], k = radnja === "procitano" || radnja === "neprocitano" ? (p.procitano ? "procitano" : "neprocitano") : p.mapa;
+    (grupe[k] = grupe[k] || []).push(Number(id));
+  });
+  poToast = null; poToastCrtaj();
+  Promise.all(Object.keys(grupe).map(function(k){ return postaPost("/api/posta/skupno", {ids: grupe[k], radnja: k}); }))
+    .then(function(){ poPokaziToast("Poništeno."); ucitajPostu("nova"); })
+    .catch(function(err){ poPokaziToast("Nije poništeno: " + err.message); });
+}
+function poObrisiTrajno(ids){
+  var tijelo = {mapa: poMapa}; if (ids) tijelo.ids = ids.map(Number);
+  poPotvrda = "";
+  return postaPost("/api/posta/obrisi-trajno", tijelo).then(function(j){
+    if (poMail && (!ids || ids.map(Number).indexOf(poMail.id) >= 0)) { poMail = null; if (poMobCitac) zatvoriCitac(); }
+    poOdabrano = {}; poPokaziToast("Trajno obrisano mailova: " + br(j.obrisano) + "."); ucitajPostu("nova"); poCrtaj("c");
+  }).catch(function(err){ poPokaziToast("Nije obrisano: " + err.message); poCrtaj("lc"); });
 }
 function blokiraj(uzorak){
   return postaPost("/api/posta/blokiraj", {uzorak: uzorak}).then(function(j){
     blPoruka = "Blokirano: " + uzorak + (j.premjesteno ? ", u Spam premješteno mailova: " + j.premjesteno : "") + ".";
-    BL = null; poBlokiraj = false; if (poMail && poMapa === "ulazni") poMail = null; PO = null; crtaj();
+    BL = null; poPotvrda = "";
+    if (poMail && poMapa !== "spam" && poPrikaz === "mail") { poMail = null; if (poMobCitac) zatvoriCitac(); }
+    poPokaziToast(blPoruka); ucitajPostu("nova"); ucitajBlokirane(); poCrtaj("c");
   });
 }
-function postaPost(put, tijelo){
-  return fetch(put, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(tijelo)})
-    .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); });
+function poPromijeniMapu(mapa, adresa){
+  poMapa = mapa; if (adresa !== undefined) poAdresa = adresa;
+  poPrikaz = "mail"; poMail = null; poOdabrano = {}; poPotvrda = ""; poTrazi = ""; PO = null; poGreska = "";
+  var polje = document.getElementById("po-trazi-polje"); if (polje) polje.value = "";
+  if (poMobCitac) zatvoriCitac();
+  ucitajPostu("nova"); poCrtaj("mlc");
 }
+function poOtvoriSusjedni(korak){
+  if (!PO || !PO.mailovi.length) return;
+  var ids = PO.mailovi.map(function(m){ return m.id; }), i = poMail ? ids.indexOf(poMail.id) : -1;
+  var n = i < 0 ? 0 : Math.min(ids.length - 1, Math.max(0, i + korak));
+  if (i === n && poMail) return;
+  otvoriMail(ids[n]);
+  setTimeout(function(){ var r = document.querySelector('.po-m[data-mail="' + ids[n] + '"]'); if (r) r.scrollIntoView({block: "nearest"}); }, 0);
+}
+// Radnja iz alatne trake čitača ili brzih gumba: trajno brisanje traži potvrdu, ostalo ide odmah.
+function poRadnjaNaMail(id, radnja){
+  if (radnja === "trajno") {
+    if (poMail && poMail.id === id) { poPotvrda = "trajno"; poCrtaj("c"); }
+    else { poOdabrano = {}; poOdabrano[id] = true; poPotvrda = "trajno-odabrano"; poCrtaj("l"); }
+    return;
+  }
+  poRadi([id], radnja);
+}
+
 function veziPostu(){
-  var f = document.getElementById("posta-trazi");
-  if (f) f.addEventListener("submit", function(ev){ ev.preventDefault(); poTrazi = f.t.value.trim(); PO = null; crtaj(); });
-  var pop = document.querySelector(".posta-popis");
-  if (pop) pop.addEventListener("click", function(ev){ var b = ev.target.closest("[data-mail]"); if (b) { otvoriMail(Number(b.dataset.mail)); if (innerWidth <= 900) setTimeout(function(){ var c = document.querySelector('[aria-live="polite"]'); if (c) c.scrollIntoView({block: "start"}); }, 0); } });
-  var st = document.getElementById("posta-starije");
-  if (st) st.addEventListener("click", function(){ st.disabled = true; ucitajPostu(true); });
-  var pr = document.getElementById("posta-prikaz");
-  if (pr) pr.addEventListener("click", function(){ poTekst = !poTekst; crtaj(); });
-  var np = document.getElementById("posta-neprocitano");
-  if (np) np.addEventListener("click", function(){
-    var id = poMail.id; np.disabled = true;
-    postaPost("/api/posta/procitano", {id: id, procitano: false}).then(function(){
-      PO.mailovi.forEach(function(m){ if (m.id === id && m.procitano) { m.procitano = false; if (m.mapa !== "spam") PO.neprocitano++; } });
-      poMail = null; poBedz(); crtaj();
-    }).catch(function(err){ np.disabled = false; poPoruka = "Nije spremljeno: " + err.message; crtaj(); });
+  var app = document.getElementById("po-app");
+  if (!app || app.dataset.vezano) return;
+  app.dataset.vezano = "1";
+  poCrtaj("lc");
+  app.addEventListener("click", function(ev){
+    var t = ev.target, b;
+    if ((b = t.closest("[data-odaberi]"))) return; // promjena kvačice ide preko "change"
+    if ((b = t.closest("[data-mapa]"))) { if (b.dataset.mapa !== poMapa || poPrikaz !== "mail") poPromijeniMapu(b.dataset.mapa); return; }
+    if ((b = t.closest("[data-adresa]"))) { if (b.dataset.adresa !== poAdresa) poPromijeniMapu(poMapa, b.dataset.adresa); return; }
+    if ((b = t.closest("[data-prikaz]"))) { poPrikaz = "blokirani"; poMail = null; if (poMob() && !poMobCitac) { poMobCitac = true; try { history.pushState({poCitac: 1}, "", location.hash); } catch (x) {} } poCrtaj("mlc"); return; }
+    if ((b = t.closest("[data-zvjezdica]"))) { var zm = poNadji(Number(b.dataset.zvjezdica)); if (zm) poRadi([zm.id], zm.oznaceno ? "odznaci" : "oznaci"); return; }
+    if ((b = t.closest("[data-brzo]"))) { poRadnjaNaMail(Number(b.dataset.id), b.dataset.brzo); return; }
+    if ((b = t.closest("[data-otvori]"))) { otvoriMail(Number(b.dataset.otvori)); return; }
+    if ((b = t.closest("[data-skupno]"))) {
+      var ids = Object.keys(poOdabrano).map(Number);
+      if (b.dataset.skupno === "trajno") { poPotvrda = "trajno-odabrano"; poCrtaj("l"); } else poRadi(ids, b.dataset.skupno);
+      return;
+    }
+    if ((b = t.closest("[data-radnja]"))) { var r = b.dataset.radnja; if (poMail) { poRadnjaNaMail(poMail.id, r); } return; }
+    if ((b = t.closest("[data-pregled]"))) {
+      var p = (poMail.privitci || []).filter(function(x){ return x.i === Number(b.dataset.pregled); })[0];
+      if (p) { poPregled = {id: poMail.id, i: p.i, naziv: p.naziv, vrsta: p.pregled}; poCrtaj(""); var z = document.querySelector('.po-lb-g [data-akcija="zatvori-pregled"]'); if (z) z.focus(); }
+      return;
+    }
+    if ((b = t.closest("[data-blokiraj]"))) { b.disabled = true; blokiraj(b.dataset.blokiraj).catch(function(err){ poPoruka = "Nije blokirano: " + err.message; poPotvrda = ""; poCrtaj("c"); }); return; }
+    if ((b = t.closest("[data-odblokiraj]"))) {
+      b.disabled = true;
+      postaPost("/api/posta/odblokiraj", {uzorak: b.dataset.odblokiraj}).then(function(){ blPoruka = "Odblokirano: " + b.dataset.odblokiraj + ". Postojeći mailovi ostaju u Spamu, vrati ih s Nije spam."; BL = null; poCrtaj("mc"); })
+        .catch(function(err){ b.disabled = false; blPoruka = "Nije odblokirano: " + err.message; poCrtaj("c"); });
+      return;
+    }
+    if ((b = t.closest("[data-akcija]"))) {
+      var a = b.dataset.akcija;
+      if (a === "zatvori-pregled" && b.classList.contains("po-lb") && t !== b) return; // klik unutar pregleda
+      var vise = t.closest("details.po-vise"); if (vise) vise.open = false;
+      if (a === "osvjezi") { b.classList.add("vrti"); ucitajPostu(PO ? "osvjezi" : "nova"); setTimeout(function(){ b.classList.remove("vrti"); }, 600); }
+      else if (a === "starije") { b.disabled = true; b.textContent = "Učitavam…"; ucitajPostu("starije"); }
+      else if (a === "natrag") { if (poPrikaz === "blokirani") { poPrikaz = "mail"; poCrtaj("m"); } zatvoriCitac(); }
+      else if (a === "tekst") { poTekst = !poTekst; poCrtaj("c"); }
+      else if (a === "blokiraj") { poPotvrda = poPotvrda === "blokiraj" ? "" : "blokiraj"; poCrtaj("c"); }
+      else if (a === "odustani") { poPotvrda = ""; poCrtaj("lc"); }
+      else if (a === "trajno-mail") { b.disabled = true; poObrisiTrajno([poMail.id]); }
+      else if (a === "trajno-da") { b.disabled = true; poObrisiTrajno(Object.keys(poOdabrano)); }
+      else if (a === "isprazni") { poPotvrda = "isprazni"; poCrtaj("l"); }
+      else if (a === "isprazni-da") { b.disabled = true; poObrisiTrajno(null); }
+      else if (a === "odznaci-sve") { poOdabrano = {}; poPotvrda = ""; poCrtaj("l"); }
+      else if (a === "zatvori-pregled") { poPregled = null; poCrtaj(""); }
+      else if (a === "ponisti") { poToast && poToast.ponisti && poToast.ponisti(); }
+    }
   });
-  document.querySelectorAll("[data-mapa]").forEach(function(b){ b.addEventListener("click", function(){ if (poMapa === b.dataset.mapa) return; poMapa = b.dataset.mapa; poMail = null; PO = null; crtaj(); }); });
-  var pm = document.getElementById("posta-premjesti");
-  if (pm) pm.addEventListener("click", function(){
-    var id = poMail.id; pm.disabled = true;
-    postaPost("/api/posta/mapa", {id: id, mapa: pm.dataset.u}).then(function(){ poMail = null; PO = null; crtaj(); })
-      .catch(function(err){ pm.disabled = false; poPoruka = "Nije premješteno: " + err.message; crtaj(); });
+  app.addEventListener("change", function(ev){
+    var t = ev.target;
+    if (t.dataset.odaberi) { if (t.checked) poOdabrano[t.dataset.odaberi] = true; else delete poOdabrano[t.dataset.odaberi]; if (poPotvrda === "trajno-odabrano" || poPotvrda === "isprazni") poPotvrda = ""; poCrtaj("l"); }
+    else if (t.id === "po-sve") { poOdabrano = {}; if (t.checked && PO) PO.mailovi.forEach(function(m){ poOdabrano[m.id] = true; }); poPotvrda = ""; poCrtaj("l"); }
+    else if (t.id === "po-adresa-m") poPromijeniMapu(poMapa, t.value);
   });
-  var bl = document.getElementById("posta-blokiraj");
-  if (bl) bl.addEventListener("click", function(){ poBlokiraj = !poBlokiraj; poBrisi = false; crtaj(); });
-  var obl = document.getElementById("posta-odustani-bl");
-  if (obl) obl.addEventListener("click", function(){ poBlokiraj = false; crtaj(); });
-  document.querySelectorAll("[data-blokiraj]").forEach(function(b){ b.addEventListener("click", function(){
-    b.disabled = true; blokiraj(b.dataset.blokiraj).catch(function(err){ b.disabled = false; poPoruka = "Nije blokirano: " + err.message; poBlokiraj = false; crtaj(); });
-  }); });
-  document.querySelectorAll("[data-odblokiraj]").forEach(function(b){ b.addEventListener("click", function(){
-    b.disabled = true;
-    postaPost("/api/posta/odblokiraj", {uzorak: b.dataset.odblokiraj}).then(function(){ blPoruka = "Odblokirano: " + b.dataset.odblokiraj + ". Postojeći mailovi ostaju u Spamu, premjesti ih s Nije spam."; BL = null; crtaj(); })
-      .catch(function(err){ b.disabled = false; blPoruka = "Nije odblokirano: " + err.message; crtaj(); });
-  }); });
-  var nf = document.getElementById("blokiraj-novi");
-  if (nf) nf.addEventListener("submit", function(ev){ ev.preventDefault(); var u = nf.u.value.trim(); if (!u) return; blokiraj(u).catch(function(err){ blPoruka = "Nije blokirano: " + err.message; crtaj(); }); });
-  var br_ = document.getElementById("posta-brisi");
-  if (br_) br_.addEventListener("click", function(){ poBrisi = true; poBlokiraj = false; crtaj(); });
-  var od = document.getElementById("posta-odustani");
-  if (od) od.addEventListener("click", function(){ poBrisi = false; crtaj(); });
-  var ob = document.getElementById("posta-obrisi");
-  if (ob) ob.addEventListener("click", function(){
-    var id = poMail.id; ob.disabled = true; ob.textContent = "Brišem…";
-    postaPost("/api/posta/obrisi", {id: id}).then(function(){
-      PO.mailovi = PO.mailovi.filter(function(m){ if (m.id === id) { PO.ukupno--; if (m.mapa === "spam") PO.spam--; else if (!m.procitano) PO.neprocitano--; } return m.id !== id; });
-      poMail = null; poBrisi = false; poBedz(); crtaj();
-    }).catch(function(err){ poBrisi = false; poPoruka = "Nije obrisano: " + err.message; crtaj(); });
+  app.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    if (ev.target.id === "po-trazi") { poTrazi = ev.target.t.value.trim(); PO = null; poOdabrano = {}; ucitajPostu("nova"); poCrtaj("l"); ev.target.t.blur(); }
+    if (ev.target.id === "blokiraj-novi") { var u = ev.target.u.value.trim(); if (u) blokiraj(u).catch(function(err){ blPoruka = "Nije blokirano: " + err.message; poCrtaj("c"); }); }
   });
+  // Brisanje pretrage (x u polju) odmah vraća cijeli popis.
+  app.addEventListener("input", function(ev){ if (ev.target.id === "po-trazi-polje" && !ev.target.value && poTrazi) { poTrazi = ""; PO = null; ucitajPostu("nova"); poCrtaj("l"); } });
 }
+// Tipkovnički prečaci (kao u Gmailu), samo na ekranu Pošta i kad se ne piše u polje.
+document.addEventListener("keydown", function(ev){
+  if (ekran !== "posta" || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  var t = ev.target;
+  if (ev.key === "Escape") {
+    if (poPregled) { poPregled = null; poCrtaj(""); }
+    else if (poPotvrda) { poPotvrda = ""; poCrtaj("lc"); }
+    else if (Object.keys(poOdabrano).length) { poOdabrano = {}; poCrtaj("l"); }
+    else if (poMobCitac) zatvoriCitac();
+    return;
+  }
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable || poPregled) return;
+  var k = ev.key;
+  if (k === "/") { ev.preventDefault(); var p = document.getElementById("po-trazi-polje"); if (p) { p.focus(); p.select(); } }
+  else if (k === "j" || k === "ArrowDown" && t === document.body) { ev.preventDefault(); poOtvoriSusjedni(1); }
+  else if (k === "k" || k === "ArrowUp" && t === document.body) { ev.preventDefault(); poOtvoriSusjedni(-1); }
+  else if (!poMail || poMail.ucitavam || poPrikaz !== "mail") return;
+  else if (k === "e") poRadnjaNaMail(poMail.id, poMail.mapa === "ulazni" ? "arhiva" : "ulazni");
+  else if (k === "#" || k === "Delete") poRadnjaNaMail(poMail.id, poMail.mapa === "spam" || poMail.mapa === "obrisano" ? "trajno" : "obrisano");
+  else if (k === "s") poRadi([poMail.id], poMail.oznaceno ? "odznaci" : "oznaci");
+  else if (k === "u") poRadi([poMail.id], "neprocitano");
+  else if (k === "!" && (poMail.mapa === "ulazni" || poMail.mapa === "arhiva")) poRadi([poMail.id], "spam");
+  else if (k === "x") { if (poOdabrano[poMail.id]) delete poOdabrano[poMail.id]; else poOdabrano[poMail.id] = true; poCrtaj("l"); }
+});
+// Svake minute provjeri ima li nove pošte (i za broj uz Pošta u izborniku), osim dok je kartica skrivena ili traje pretraga.
+setInterval(function(){ if (!document.hidden && PO && !poTrazi && !poUcitava) ucitajPostu("osvjezi"); }, 60 * 1000);
+document.addEventListener("visibilitychange", function(){ if (!document.hidden && PO && !poTrazi && !poUcitava) ucitajPostu("osvjezi"); });
 
 // ---------- Obavijesti (popis svih obavijesti mailom) ----------
 var OB = null, obGreska = "";
@@ -921,9 +1469,9 @@ function obavijesti(){
   return h;
 }
 
-setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); if (PO && !poTrazi) ucitajPostu(); }, 10 * 60 * 1000);
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); }, 10 * 60 * 1000);
 // Broj nepročitanih mailova uz Pošta u izborniku. Mora biti ovdje, nakon što su varijable Pošte postavljene.
-if (!PO) ucitajPostu();
+if (!PO) ucitajPostu("nova");
 })();
 </script>
 </body>

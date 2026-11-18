@@ -18,7 +18,10 @@
 // - GET /api/posta/html?id=…  HTML mail za okvir na stranici, bez skripti i vanjskih slika (Access)
 // - GET /api/posta/privitak?id=…&i=…  preuzimanje privitka (Access)
 // - GET /api/posta/eml?id=…  cijeli izvorni mail (.eml) (Access)
-// - POST /api/posta/procitano, POST /api/posta/obrisi, POST /api/posta/mapa (ulazni ili spam)  (Access)
+// - GET /api/posta?mapa=…&adresa=…  mape ulazni, arhiva, spam, obrisano, oznaceno; adresa = na koju je mail stigao
+// - GET /api/posta/privitak?id=…&i=…&pregled=1  slika ili PDF za pregled na stranici (Access)
+// - POST /api/posta/procitano, POST /api/posta/obrisi, POST /api/posta/mapa (ulazni, arhiva, spam, obrisano)  (Access)
+// - POST /api/posta/skupno {ids, radnja}, POST /api/posta/obrisi-trajno {mapa, ids?}  skupne radnje (Access)
 // - GET /api/posta/blokirani, POST /api/posta/blokiraj, POST /api/posta/odblokiraj  blokirani pošiljatelji (Access)
 // - email            svaki mail spremi u sandučić (R2 + baza), a izvode CAMT.053 i uveze, vidi primiMail
 // - cron u 5:00 UTC  (6:00 zimi, 7:00 ljeti po hrvatskom vremenu) skuplja podatke iz izvora
@@ -32,7 +35,7 @@
 import STRANICA from "./stranica.html";
 import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
 import { citajCamt053 } from "./camt.js";
-import { adrese, izOmotnice, jeZip, posiljateljDopusten, privitci, procitajMail, xmlIzZipa } from "./mail.js";
+import { adrese, idsIz, izOmotnice, jeZip, posiljateljDopusten, privitci, procitajMail, vrstaZaPregled, xmlIzZipa } from "./mail.js";
 import { DOMENA_NADZORA, POPIS_OBAVIJESTI, sastaviUpozorenja } from "./upozorenja.js";
 
 export default {
@@ -470,6 +473,10 @@ function bajtoviUBase64(b) {
 }
 
 const SLIKE_UZ_HTML = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+const MAPE = ["ulazni", "arhiva", "spam", "obrisano"];
+const MAPE_POPISA = [...MAPE, "oznaceno"];
+const RADNJE = [...MAPE, "procitano", "neprocitano", "oznaci", "odznaci"];
+
 const NAJVISE_SLIKA = 8 * 1024 * 1024;
 
 async function posta(req, url, env) {
@@ -480,8 +487,26 @@ async function posta(req, url, env) {
   if (req.method === "GET" && put === "/api/posta") {
     const prije = Number(url.searchParams.get("prije"));
     const trazi = (url.searchParams.get("trazi") || "").slice(0, 200);
-    const mapa = url.searchParams.get("mapa") === "spam" ? "spam" : "ulazni";
-    return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_popis", { p_kljuc: env.NADZOR_KLJUC, p_trazi: trazi, p_prije_id: Number.isInteger(prije) && prije > 0 ? prije : null, p_mapa: mapa }));
+    const mapa = MAPE_POPISA.includes(url.searchParams.get("mapa")) ? url.searchParams.get("mapa") : "ulazni";
+    const adresa = (url.searchParams.get("adresa") || "").trim().toLowerCase();
+    if (adresa && (adresa.length > 320 || !/^[^\s@]+@[^\s@]+$/.test(adresa))) return json({ greska: "Neispravna adresa." }, 400);
+    return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_popis", { p_kljuc: env.NADZOR_KLJUC, p_trazi: trazi, p_prije_id: Number.isInteger(prije) && prije > 0 ? prije : null, p_mapa: mapa, p_adresa: adresa }));
+  }
+  if (req.method === "POST" && put === "/api/posta/skupno") {
+    const b = await req.json().catch(() => ({}));
+    const ids = idsIz(b.ids);
+    if (!ids || !RADNJE.includes(b.radnja)) return json({ greska: "Neispravan zahtjev." }, 400);
+    const promijenjeno = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_skupno", { p_kljuc: env.NADZOR_KLJUC, p_ids: ids, p_radnja: b.radnja });
+    return json({ ok: true, promijenjeno });
+  }
+  if (req.method === "POST" && put === "/api/posta/obrisi-trajno") {
+    // Samo iz Obrisanog ili Spama. Bez ids se prazni cijela mapa.
+    const b = await req.json().catch(() => ({}));
+    const ids = b.ids === undefined ? null : idsIz(b.ids);
+    if ((b.ids !== undefined && !ids) || !["obrisano", "spam"].includes(b.mapa)) return json({ greska: "Neispravan zahtjev." }, 400);
+    const kljucevi = (await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_obrisi_trajno", { p_kljuc: env.NADZOR_KLJUC, p_ids: ids, p_mapa: b.mapa })) || [];
+    if (env.POSTA) for (let i = 0; i < kljucevi.length; i += 1000) await env.POSTA.delete(kljucevi.slice(i, i + 1000)).catch(console.error);
+    return json({ ok: true, obrisano: kljucevi.length });
   }
   if (req.method === "GET" && put === "/api/posta/blokirani") {
     return json({ blokirani: await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_blokirani", { p_kljuc: env.NADZOR_KLJUC }) });
@@ -489,7 +514,7 @@ async function posta(req, url, env) {
   if (req.method === "POST" && put === "/api/posta/mapa") {
     const b = await req.json().catch(() => ({}));
     const pid = Number(b.id);
-    if (!Number.isInteger(pid) || pid <= 0 || !["ulazni", "spam"].includes(b.mapa)) return json({ greska: "Neispravan zahtjev." }, 400);
+    if (!Number.isInteger(pid) || pid <= 0 || !MAPE.includes(b.mapa)) return json({ greska: "Neispravan zahtjev." }, 400);
     const ok = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_mapa", { p_kljuc: env.NADZOR_KLJUC, p_id: pid, p_mapa: b.mapa });
     if (!ok) return json({ greska: "Mail više ne postoji. Osvježi stranicu." }, 404);
     return json({ ok: true });
@@ -517,7 +542,7 @@ async function posta(req, url, env) {
       const obj = await env.POSTA.get(meta.r2_kljuc);
       if (obj) {
         const m = procitajMail(new Uint8Array(await obj.arrayBuffer()));
-        privitci = m.privitci.filter((p) => !p.cid || !m.html || !m.html.includes("cid:" + p.cid)).map((p) => ({ i: p.i, naziv: p.naziv, vrsta: p.vrsta, velicina: p.bajtovi().length }));
+        privitci = m.privitci.filter((p) => !p.cid || !m.html || !m.html.includes("cid:" + p.cid)).map((p) => { const b = p.bajtovi(); return { i: p.i, naziv: p.naziv, vrsta: p.vrsta, velicina: b.length, pregled: vrstaZaPregled(b) }; });
       }
     }
     const { r2_kljuc, ...ostalo } = meta;
@@ -556,6 +581,15 @@ async function posta(req, url, env) {
     if (!meta || !raw) return new Response("Mail nije pronađen.", { status: 404 });
     const p = procitajMail(raw).privitci.find((x) => x.i === i);
     if (!p) return new Response("Privitak nije pronađen.", { status: 404 });
+    if (url.searchParams.get("pregled") === "1") {
+      // Pregled na stranici: samo slike i PDF, prepoznati po sadržaju, ne po vrsti koju je napisao pošiljatelj.
+      const b = p.bajtovi(), vrsta = vrstaZaPregled(b);
+      if (!vrsta) return new Response("Ovaj privitak nema pregled. Preuzmi ga.", { status: 415 });
+      const zastita = vrsta === "application/pdf"
+        ? { "x-frame-options": "SAMEORIGIN" }  // preglednikov PDF čitač ne radi uz CSP sandbox
+        : { "content-security-policy": "sandbox; default-src 'none'; img-src 'self'" };
+      return new Response(b, { headers: { ...STROGO, ...zastita, "content-type": vrsta, "content-disposition": nazivZaPreuzimanje(p.naziv).replace(/^attachment/, "inline") } });
+    }
     return new Response(p.bajtovi(), {
       headers: { ...STROGO, "content-type": "application/octet-stream", "content-disposition": nazivZaPreuzimanje(p.naziv), "content-security-policy": "sandbox; default-src 'none'" },
     });

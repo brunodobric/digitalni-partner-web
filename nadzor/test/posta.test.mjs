@@ -1,7 +1,7 @@
 // Pokretanje: node --test nadzor/test/*.test.mjs (iz korijena repozitorija)
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { adrese, privitci, procitajMail, tekstIzHtmla } from "../src/mail.js";
+import { adrese, idsIz, privitci, procitajMail, tekstIzHtmla, vrstaZaPregled } from "../src/mail.js";
 
 const b64 = (b) => Buffer.from(b).toString("base64").replace(/.{76}/g, "$&\r\n");
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
@@ -96,4 +96,24 @@ test("privitci i dalje vraća samo dijelove s imenom datoteke", () => {
 test("tekstIzHtmla i adrese", () => {
   assert.equal(tekstIzHtmla("<div>a<br>b</div>&#269;&#x107;"), "a\n\nb\n\nčć");
   assert.deepEqual(adrese('"Ana" <Ana@Primjer.hr>, ivo@primjer.hr'), ["ana@primjer.hr", "ivo@primjer.hr"]);
+});
+
+test("idsIz prima samo popis pozitivnih cijelih brojeva (najviše 500)", () => {
+  assert.deepEqual(idsIz([3, "4", 3]), [3, 4]);
+  assert.equal(idsIz([]), null);
+  assert.equal(idsIz([1, -2]), null);
+  assert.equal(idsIz([1.5]), null);
+  assert.equal(idsIz("1,2"), null);
+  assert.equal(idsIz(Array.from({ length: 501 }, (_, i) => i + 1)), null);
+});
+
+test("vrstaZaPregled prepoznaje slike i PDF po sadržaju, ne po nazivu", () => {
+  assert.equal(vrstaZaPregled(PNG), "image/png");
+  assert.equal(vrstaZaPregled(Buffer.from([0xff, 0xd8, 0xff, 0xe0])), "image/jpeg");
+  assert.equal(vrstaZaPregled(Buffer.from("GIF89a")), "image/gif");
+  assert.equal(vrstaZaPregled(Buffer.from("RIFF\0\0\0\0WEBPVP8 ")), "image/webp");
+  assert.equal(vrstaZaPregled(Buffer.from("%PDF-1.7\n")), "application/pdf");
+  assert.equal(vrstaZaPregled(Buffer.from("<svg onload=alert(1)>")), null);
+  assert.equal(vrstaZaPregled(Buffer.from("<html><script>")), null);
+  assert.equal(vrstaZaPregled(new Uint8Array(0)), null);
 });
