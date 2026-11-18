@@ -3,6 +3,7 @@
 //
 // privitci(bajtovi) -> [{ naziv, vrsta, bajtovi }]  (svi listovi poruke koji imaju ime datoteke)
 // xmlIzZipa(bajtovi) -> Promise<[{ naziv, bajtovi }]>  (samo datoteke koje završavaju na .xml)
+// procitajMail(bajtovi) -> { zaglavlja, naslov, od, za, ..., tekst, html, privitci }  (za sandučić, ekran Pošta)
 
 // Bajtovi u "binarni" string (jedan znak = jedan bajt) i natrag, da pomaci ostanu točni.
 function uTekst(b) {
@@ -77,7 +78,8 @@ function parametri(v) {
   return dijelovi;
 }
 
-function dio(tekst, izlaz, dubina) {
+// Svi listovi poruke (dijelovi koji nisu multipart), redom kako su u mailu.
+function listovi(tekst, izlaz, dubina) {
   if (dubina > 10) return;
   const kraj = /\r?\n\r?\n/.exec(tekst);
   const glava = kraj ? tekst.slice(0, kraj.index) : tekst;
@@ -89,23 +91,133 @@ function dio(tekst, izlaz, dubina) {
     const komadi = tijelo.split(granica);
     for (let i = 1; i < komadi.length; i++) {
       if (komadi[i].startsWith("--")) break;
-      dio(komadi[i].replace(/^[ \t]*\r?\n/, "").replace(/\r?\n$/, ""), izlaz, dubina + 1);
+      listovi(komadi[i].replace(/^[ \t]*\r?\n/, "").replace(/\r?\n$/, ""), izlaz, dubina + 1);
     }
     return;
   }
-  if (ct.vrijednost === "message/rfc822") return dio(tijelo, izlaz, dubina + 1);
+  if (ct.vrijednost === "message/rfc822") return listovi(tijelo, izlaz, dubina + 1);
   const cd = parametri(z["content-disposition"] || "");
-  const naziv = cd.filename || ct.name;
-  if (!naziv) return;
   const kod = (z["content-transfer-encoding"] || "").toLowerCase();
-  const bajtovi = kod === "base64" ? base64(tijelo) : kod === "quoted-printable" ? quotedPrintable(tijelo) : uBajtove(tijelo);
-  izlaz.push({ naziv, vrsta: ct.vrijednost, bajtovi });
+  const bajtovi = () => kod === "base64" ? base64(tijelo) : kod === "quoted-printable" ? quotedPrintable(tijelo) : uBajtove(tijelo);
+  izlaz.push({
+    naziv: cd.filename || ct.name || "",
+    vrsta: ct.vrijednost || "text/plain",
+    charset: ct.charset || "",
+    privitak: cd.vrijednost === "attachment",
+    cid: (z["content-id"] || "").replace(/^\s*<|>\s*$/g, ""),
+    bajtovi,
+  });
 }
 
 export function privitci(bajtovi) {
-  const izlaz = [];
-  dio(uTekst(bajtovi), izlaz, 0);
-  return izlaz;
+  const svi = [];
+  listovi(uTekst(bajtovi), svi, 0);
+  return svi.filter((l) => l.naziv).map((l) => ({ naziv: l.naziv, vrsta: l.vrsta, bajtovi: l.bajtovi() }));
+}
+
+function dekodirajTekst(b, charset) {
+  const kod = (charset || "utf-8").toLowerCase();
+  try {
+    return new TextDecoder(kod).decode(b);
+  } catch (_) {
+    // Nepoznat charset: probaj UTF-8, a ako ne prođe, latin1 (svaki bajt je znak).
+    try {
+      return new TextDecoder("utf-8", { fatal: true }).decode(b);
+    } catch (_) {
+      return uTekst(b);
+    }
+  }
+}
+
+// Zaglavlja su pročitana bajt po bajt; ako je pošiljatelj u njih upisao UTF-8 bez kodiranja (RFC 6532), vrati ga u prava slova.
+function utf8AkoMoze(s) {
+  if (!/[\x80-\xff]/.test(s)) return s;
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(uBajtove(s));
+  } catch (_) {
+    return s;
+  }
+}
+
+const ENTITETI = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+
+// Grubi tekst iz HTML-a: za pretraživanje i za mail koji nema tekstualni dio.
+export function tekstIzHtmla(html) {
+  return html
+    .replace(/<(script|style|head)\b[\s\S]*?<\/\1\s*>/gi, " ")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|tr|li|h[1-6]|table|blockquote)\s*>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (c, k) => {
+      if (k[0] === "#") {
+        const n = k[1] === "x" || k[1] === "X" ? parseInt(k.slice(2), 16) : parseInt(k.slice(1), 10);
+        try { return String.fromCodePoint(n); } catch (_) { return c; }
+      }
+      return ENTITETI[k.toLowerCase()] ?? c;
+    })
+    .replace(/[ \t\u00a0]+/g, " ")
+    .replace(/ *\n[ \n]*/g, "\n\n")
+    .trim();
+}
+
+// Adrese iz zaglavlja ("Ime <a@b.hr>, c@d.hr") -> ["a@b.hr", "c@d.hr"].
+export function adrese(v) {
+  return (String(v || "").match(/[^\s<>",;:()]+@[^\s<>",;:()]+/g) || []).map((a) => a.toLowerCase());
+}
+
+// Rezultati SPF, DKIM i DMARC iz zaglavlja Authentication-Results (Cloudflare ga dodaje), npr. "spf=pass dkim=pass dmarc=pass".
+function provjeraPosiljatelja(v) {
+  const t = String(v || "");
+  return ["spf", "dkim", "dmarc"].map((k) => {
+    const m = new RegExp("\\b" + k + "=([a-z]+)", "i").exec(t);
+    return m ? k + "=" + m[1].toLowerCase() : "";
+  }).filter(Boolean).join(" ");
+}
+
+// Cijeli mail za sandučić: dekodirana zaglavlja, tekst, HTML i privitci (s bajtovima na zahtjev).
+// Dio bez imena datoteke koji je text/plain ili text/html smatra se tijelom poruke (prvi takav),
+// a slike u HTML-u (Content-ID) i svi ostali dijelovi su privitci.
+export function procitajMail(bajtovi) {
+  const tekst = uTekst(bajtovi);
+  const kraj = /\r?\n\r?\n/.exec(tekst);
+  const z = zaglavlja(kraj ? tekst.slice(0, kraj.index) : tekst);
+  const svi = [];
+  listovi(tekst, svi, 0);
+  let obicni = null, html = null;
+  const priv = [];
+  for (const l of svi) {
+    if (!l.naziv && !l.privitak && l.vrsta === "text/plain" && obicni === null) obicni = dekodirajTekst(l.bajtovi(), l.charset);
+    else if (!l.naziv && !l.privitak && l.vrsta === "text/html" && html === null) html = dekodirajTekst(l.bajtovi(), l.charset);
+    else priv.push(l);
+  }
+  const h = (k) => dekodirajRijeci(utf8AkoMoze(z[k] || ""));
+  let poslano = null;
+  const d = Date.parse(z["date"] || "");
+  if (!isNaN(d)) poslano = new Date(d).toISOString();
+  return {
+    zaglavlja: z,
+    od: h("from"),
+    za: h("to"),
+    kopija: h("cc"),
+    odgovor_na: h("reply-to"),
+    naslov: h("subject"),
+    poslano,
+    message_id: (z["message-id"] || "").trim(),
+    provjera: provjeraPosiljatelja(z["authentication-results"]),
+    tekst: obicni !== null ? obicni.replace(/\r\n/g, "\n") : (html !== null ? tekstIzHtmla(html) : ""),
+    html,
+    privitci: priv.map((l, i) => ({
+      i,
+      naziv: l.naziv || (l.cid ? "slika-" + (i + 1) : "dio-" + (i + 1)) + (l.naziv ? "" : nastavak(l.vrsta)),
+      vrsta: l.vrsta,
+      cid: l.cid,
+      bajtovi: l.bajtovi,
+    })),
+  };
+}
+
+function nastavak(vrsta) {
+  return { "image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp", "text/plain": ".txt", "text/html": ".html", "text/calendar": ".ics", "message/delivery-status": ".txt" }[vrsta] || "";
 }
 
 export function jeZip(b) {

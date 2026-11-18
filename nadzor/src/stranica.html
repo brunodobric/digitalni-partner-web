@@ -105,6 +105,31 @@ svg text{font-family:Manrope,sans-serif}
   nav button{text-align:left;font-size:16px;min-height:48px;padding:0 12px}
   nav button[aria-selected=true]::after{left:12px;right:auto;width:24px;bottom:8px}
 }
+/* Pošta: popis lijevo, mail desno; na mobitelu jedno ispod drugog */
+.bedz{display:inline-block;min-width:18px;margin-left:6px;padding:0 5px;border-radius:999px;background:var(--zlato);color:var(--oniks);font-size:11px;font-weight:700;line-height:18px;text-align:center}
+.posta{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.posta{grid-template-columns:1fr}}
+.posta-popis{padding:8px;gap:2px}
+.posta-popis button.mail{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:3px solid transparent;width:100%}
+.posta-popis button.mail:hover{background:var(--pozadina)}
+.posta-popis button.mail:focus-visible{outline:2px solid var(--zlato)}
+.posta-popis button.mail[aria-current=true]{background:var(--smaragd-svj)}
+.posta-popis button.mail.novo{border-left-color:var(--zlato)}
+.posta-popis button.mail.novo .od,.posta-popis button.mail.novo .ns{font-weight:700}
+.mail .gore{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.mail .od{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail .ns{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail .is{font-size:12.5px;color:var(--grafit);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mail-glava{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}
+.mail-glava dt{color:var(--grafit)}.mail-glava dd{margin:0;word-break:break-word}
+.mail-tekst{white-space:pre-wrap;word-break:break-word;font:inherit;font-size:14.5px;margin:0}
+iframe.mail-html{width:100%;height:70vh;border:1px solid var(--linija-svj);border-radius:8px;background:#fff}
+.alati{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+a.tiho{font:600 13px Manrope,sans-serif;color:var(--grafit);border:1px solid var(--linija);border-radius:8px;padding:0 12px;min-height:32px;display:inline-flex;align-items:center;text-decoration:none}
+a.tiho:hover{color:var(--oniks);background:var(--pozadina)}
+.privitci{display:flex;flex-wrap:wrap;gap:8px}
+.privitci a{display:inline-flex;gap:6px;align-items:center;font-size:13.5px;padding:6px 10px;border:1px solid var(--linija);border-radius:8px;text-decoration:none;color:var(--oniks)}
+.privitci a:hover{background:var(--pozadina)}
 @media (prefers-reduced-motion:reduce){.izb span{transition:none}}
 </style>
 </head>
@@ -120,6 +145,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
     <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
     <button role="tab" data-ekran="knjige" aria-selected="false">Knjige</button>
+    <button role="tab" data-ekran="posta" aria-selected="false">Pošta<span class="bedz" id="posta-bedz" hidden></span></button>
     <button role="tab" data-ekran="obavijesti" aria-selected="false">Obavijesti</button>
   </nav>
 </div></header>
@@ -150,12 +176,12 @@ function ucitaj(){
 
 // Označi odabrani ekran u izborniku i upiši njegov naziv uz logo (vidi se samo na mobitelu)
 function oznaci(){
-  document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); if (b.dataset.ekran === ekran) document.getElementById("ekran-m").textContent = b.textContent; });
+  document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); if (b.dataset.ekran === ekran) document.getElementById("ekran-m").textContent = b.firstChild.textContent; });
 }
 
 function crtaj(){
   oznaci();
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige, posta: postaEkran, obavijesti: obavijesti}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
@@ -163,6 +189,7 @@ function crtaj(){
   if (ekran === "vjencanja") { veziKorisnike(); var izd = document.getElementById("izvori-dana"); if (izd) izd.addEventListener("change", function(){ izDana = Number(izd.value); izGreska = ""; crtaj(); }); }
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
+  if (ekran === "posta") veziPostu();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
   document.getElementById("osvjezeno").textContent = dijelovi.length ? "Zadnje osvježavanje · " + dijelovi.join(" · ") : "Prikupljači se još nisu pokrenuli.";
   document.getElementById("korisnik").textContent = D.korisnik ? "Prijavljen: " + D.korisnik : "";
@@ -697,6 +724,117 @@ document.addEventListener("click", function(ev){ if (!zaglavlje.contains(ev.targ
 addEventListener("resize", function(){ if (innerWidth > 640) izbornik(false); });
 oznaci();
 ucitaj();
+ucitajPostu(); // broj nepročitanih mailova uz Pošta u izborniku
+// ---------- Pošta (sandučić za dolazne mailove) ----------
+var PO = null, poGreska = "", poTrazi = "", poMail = null, poMailGreska = "", poPoruka = "", poTekst = false, poBrisi = false, poStarije = false;
+function poBedz(){ var b = document.getElementById("posta-bedz"); if (!b || !PO) return; b.hidden = !PO.neprocitano; b.textContent = PO.neprocitano > 99 ? "99+" : String(PO.neprocitano); }
+function ucitajPostu(starije){
+  var q = "/api/posta?trazi=" + encodeURIComponent(poTrazi) + (starije && PO && PO.mailovi.length ? "&prije=" + PO.mailovi[PO.mailovi.length - 1].id : "");
+  fetch(q, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ poStarije = j.mailovi.length === 50; if (starije && PO) { j.mailovi = PO.mailovi.concat(j.mailovi); } PO = j; poGreska = ""; poBedz(); if (ekran === "posta" && D) crtaj(); })
+    .catch(function(err){ poGreska = err.message; if (ekran === "posta" && D) crtaj(); });
+}
+function otvoriMail(id){
+  poMail = {id: id, ucitavam: true}; poMailGreska = ""; poTekst = false; poBrisi = false; poPoruka = "";
+  if (ekran === "posta" && D) crtaj();
+  fetch("/api/posta/poruka?id=" + id, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){
+      if (!poMail || poMail.id !== id) return;
+      poMail = j;
+      PO && PO.mailovi.forEach(function(m){ if (m.id === id && !m.procitano) { m.procitano = true; PO.neprocitano = Math.max(0, PO.neprocitano - 1); } });
+      poBedz(); if (ekran === "posta" && D) crtaj();
+    })
+    .catch(function(err){ poMailGreska = err.message; if (ekran === "posta" && D) crtaj(); });
+}
+function imeIzAdrese(s){ var m = /^\s*"?([^"<]*?)"?\s*<[^>]+>/.exec(s || ""); return (m && m[1].trim()) || String(s || "").replace(/[<>]/g, "").trim() || "(nepoznat pošiljatelj)"; }
+function kadaMail(t){
+  if (!t) return "";
+  var d = new Date(t), sad = new Date();
+  if (d.toDateString() === sad.toDateString()) return d.toLocaleTimeString("hr-HR", {hour:"2-digit", minute:"2-digit"});
+  return d.getFullYear() === sad.getFullYear() ? d.getDate() + ". " + (d.getMonth() + 1) + "." : d.getDate() + ". " + (d.getMonth() + 1) + ". " + d.getFullYear() + ".";
+}
+function velicinaF(b){ b = Number(b || 0); return b < 1024 ? b + " B" : (b < 1048576 ? Math.round(b / 1024) + " KB" : (b / 1048576).toLocaleString("hr-HR", {maximumFractionDigits: 1}) + " MB"); }
+function postaEkran(){
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Mail · banka.digitalnipartner.hr</p><h1>Pošta</h1></div>';
+  if (poGreska) return h + '<section class="panel"><p class="prazno">Pošta se nije učitala (' + e(poGreska) + '). Osvježi stranicu za minutu.</p></section>';
+  if (!PO) { ucitajPostu(); return h + '<section class="panel"><p class="prazno">Učitavam poštu…</p></section>'; }
+  h += '<form class="filtri" id="posta-trazi" role="search"><label style="flex:1 1 260px">Traži po pošiljatelju, naslovu ili tekstu<input type="search" name="t" value="' + e(poTrazi) + '" autocomplete="off"></label><button class="gumb" type="submit">Traži</button>'
+    + '<span class="src" style="align-self:center">' + br(PO.ukupno) + ' mailova, ' + br(PO.neprocitano) + ' nepročitanih</span></form>';
+  h += '<div class="posta"><section class="panel posta-popis" aria-label="Popis mailova">';
+  if (!PO.mailovi.length) h += '<p class="prazno" style="padding:12px">' + (poTrazi ? 'Nijedan mail ne odgovara pretrazi.' : 'Još nema mailova. Svaki mail koji stigne na adresu @banka.digitalnipartner.hr pojavit će se ovdje.') + '</p>';
+  h += PO.mailovi.map(function(m){
+    var od = imeIzAdrese(m.od || m.omotnica_od);
+    return '<button type="button" class="mail' + (m.procitano ? '' : ' novo') + '" data-mail="' + m.id + '"' + (poMail && poMail.id === m.id ? ' aria-current="true"' : '') + '>'
+      + '<span class="gore"><span class="od">' + e(od) + '</span><span class="src nw">' + (m.broj_privitaka ? '📎 ' : '') + e(kadaMail(m.poslano || m.primljeno)) + '</span></span>'
+      + '<span class="ns">' + e(m.naslov || "(bez naslova)") + '</span>'
+      + '<span class="is">' + (m.izvod != null ? '<span class="oznaka ' + (/^nije/.test(m.izvod) ? 'lose' : 'ok') + '" style="margin-right:6px">izvod</span>' : '') + e(m.isjecak) + '</span></button>';
+  }).join("");
+  if (poStarije) h += '<button type="button" class="tiho" id="posta-starije" style="margin:8px">Učitaj starije</button>';
+  h += '</section><section class="panel" aria-live="polite">' + citacMaila() + '</section></div>';
+  return h;
+}
+function citacMaila(){
+  if (poMailGreska) return '<p class="prazno">Mail se nije učitao (' + e(poMailGreska) + ').</p>';
+  if (!poMail) return '<p class="prazno">Odaberi mail s popisa.</p>';
+  if (poMail.ucitavam) return '<p class="prazno">Učitavam mail…</p>';
+  var m = poMail, h = '<h2 style="font-size:19px;line-height:1.3">' + e(m.naslov || "(bez naslova)") + '</h2>';
+  h += '<dl class="mail-glava"><dt>Od</dt><dd>' + e(m.od || m.omotnica_od) + (m.omotnica_od && m.od.toLowerCase().indexOf(m.omotnica_od.toLowerCase()) < 0 ? ' <span class="src">(poslao ' + e(m.omotnica_od) + ')</span>' : '') + '</dd>'
+    + '<dt>Za</dt><dd>' + e(m.za || m.omotnica_za) + '</dd>'
+    + (m.kopija ? '<dt>Kopija</dt><dd>' + e(m.kopija) + '</dd>' : '')
+    + (m.odgovor_na ? '<dt>Odgovor na</dt><dd>' + e(m.odgovor_na) + '</dd>' : '')
+    + '<dt>Poslano</dt><dd>' + e(vrijeme(m.poslano || m.primljeno)) + (m.poslano ? ' <span class="src">· stiglo ' + e(vrijeme(m.primljeno)) + '</span>' : '') + '</dd>'
+    + (m.provjera ? '<dt>Provjera</dt><dd>' + m.provjera.split(" ").map(function(x){ var p = x.split("="); return '<span class="oznaka ' + (p[1] === "pass" ? "ok" : (p[1] === "none" || p[1] === "neutral" ? "ceka" : "lose")) + '" style="margin-right:4px">' + e(p[0].toUpperCase() + " " + p[1]) + '</span>'; }).join("") + '</dd>' : '')
+    + (m.izvod != null ? '<dt>Izvod</dt><dd>' + e(m.izvod) + '</dd>' : '')
+    + '</dl>';
+  var adr = (m.adrese_od || [])[0];
+  h += '<div class="alati">'
+    + (adr ? '<a class="tiho" href="mailto:' + e(encodeURIComponent(adr).replace(/%40/g, "@")) + '?subject=' + e(encodeURIComponent("Re: " + (m.naslov || ""))) + '">Odgovori u svom mailu</a>' : '')
+    + (m.ima_html ? '<button type="button" class="tiho" id="posta-prikaz">' + (poTekst ? 'Prikaži oblikovano' : 'Prikaži samo tekst') + '</button>' : '')
+    + '<button type="button" class="tiho" id="posta-neprocitano">Označi kao nepročitano</button>'
+    + '<a class="tiho" href="/api/posta/eml?id=' + m.id + '">Preuzmi .eml</a>'
+    + '<button type="button" class="tiho" id="posta-brisi" style="color:var(--crvena)">Obriši</button>'
+    + '<span class="src" id="posta-poruka">' + e(poPoruka) + '</span></div>';
+  if (poBrisi) h += '<div class="potvrda-tekst" style="background:var(--crvena-svj);padding:12px 14px;border-radius:8px"><span>Obrisati ovaj mail? Briše se i izvorna datoteka s privicima, i ne vraća se.</span><div><button type="button" class="tiho" id="posta-odustani">Odustani</button><button type="button" class="gumb opasno" id="posta-obrisi">Obriši</button></div></div>';
+  if (m.privitci && m.privitci.length) h += '<div class="privitci">' + m.privitci.map(function(p){ return '<a href="/api/posta/privitak?id=' + m.id + '&amp;i=' + p.i + '" download>📎 ' + e(p.naziv) + ' <span class="src">' + velicinaF(p.velicina) + '</span></a>'; }).join("") + '</div>';
+  if (m.ima_html && !poTekst) h += '<iframe class="mail-html" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" title="Sadržaj maila" src="/api/posta/html?id=' + m.id + '"></iframe><p class="src">Vanjske slike su blokirane, da pošiljatelj ne vidi kad si otvorio mail.</p>';
+  else h += '<pre class="mail-tekst">' + (m.tekst ? e(m.tekst) : '<span class="prazno">Mail nema teksta.</span>') + '</pre>';
+  return h;
+}
+function postaPost(put, tijelo){
+  return fetch(put, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(tijelo)})
+    .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); });
+}
+function veziPostu(){
+  var f = document.getElementById("posta-trazi");
+  if (f) f.addEventListener("submit", function(ev){ ev.preventDefault(); poTrazi = f.t.value.trim(); PO = null; crtaj(); });
+  var pop = document.querySelector(".posta-popis");
+  if (pop) pop.addEventListener("click", function(ev){ var b = ev.target.closest("[data-mail]"); if (b) { otvoriMail(Number(b.dataset.mail)); if (innerWidth <= 900) setTimeout(function(){ var c = document.querySelector('[aria-live="polite"]'); if (c) c.scrollIntoView({block: "start"}); }, 0); } });
+  var st = document.getElementById("posta-starije");
+  if (st) st.addEventListener("click", function(){ st.disabled = true; ucitajPostu(true); });
+  var pr = document.getElementById("posta-prikaz");
+  if (pr) pr.addEventListener("click", function(){ poTekst = !poTekst; crtaj(); });
+  var np = document.getElementById("posta-neprocitano");
+  if (np) np.addEventListener("click", function(){
+    var id = poMail.id; np.disabled = true;
+    postaPost("/api/posta/procitano", {id: id, procitano: false}).then(function(){
+      PO.mailovi.forEach(function(m){ if (m.id === id && m.procitano) { m.procitano = false; PO.neprocitano++; } });
+      poMail = null; poBedz(); crtaj();
+    }).catch(function(err){ np.disabled = false; poPoruka = "Nije spremljeno: " + err.message; crtaj(); });
+  });
+  var br_ = document.getElementById("posta-brisi");
+  if (br_) br_.addEventListener("click", function(){ poBrisi = true; crtaj(); });
+  var od = document.getElementById("posta-odustani");
+  if (od) od.addEventListener("click", function(){ poBrisi = false; crtaj(); });
+  var ob = document.getElementById("posta-obrisi");
+  if (ob) ob.addEventListener("click", function(){
+    var id = poMail.id; ob.disabled = true; ob.textContent = "Brišem…";
+    postaPost("/api/posta/obrisi", {id: id}).then(function(){
+      PO.mailovi = PO.mailovi.filter(function(m){ if (m.id === id) { PO.ukupno--; if (!m.procitano) PO.neprocitano--; } return m.id !== id; });
+      poMail = null; poBrisi = false; poBedz(); crtaj();
+    }).catch(function(err){ poBrisi = false; poPoruka = "Nije obrisano: " + err.message; crtaj(); });
+  });
+}
+
 // ---------- Obavijesti (popis svih obavijesti mailom) ----------
 var OB = null, obGreska = "";
 var OB_UVJET = {mail: "treba RESEND_KEY i OBAVIJEST_NA", iban: "treba IZVODI_IBAN", fisk: "treba ključ za fisk-racun"};
@@ -732,7 +870,7 @@ function obavijesti(){
   return h;
 }
 
-setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); }, 10 * 60 * 1000);
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); if (PO && !poTrazi) ucitajPostu(); }, 10 * 60 * 1000);
 })();
 </script>
 </body>
