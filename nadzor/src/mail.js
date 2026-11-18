@@ -316,3 +316,21 @@ export function izOmotnice(b) {
   if (/encoding\s*=\s*["']base64["']/i.test(atributi)) return base64(sadrzaj);
   return uBajtove(sadrzaj.trim());
 }
+
+// Popis id-jeva iz zahtjeva: 1 do 500 pozitivnih cijelih brojeva, inače null.
+export function idsIz(x) {
+  if (!Array.isArray(x) || !x.length || x.length > 500) return null;
+  const ids = x.map(Number);
+  return ids.every((n) => Number.isInteger(n) && n > 0) ? [...new Set(ids)] : null;
+}
+
+// Vrsta privitka po prvim bajtovima (slike i PDF), za pregled na stranici. SVG se namjerno ne prikazuje (može imati skriptu).
+export function vrstaZaPregled(b) {
+  const p = (...x) => x.every((v, i) => b[i] === v);
+  if (p(0x89, 0x50, 0x4e, 0x47)) return "image/png";
+  if (p(0xff, 0xd8, 0xff)) return "image/jpeg";
+  if (p(0x47, 0x49, 0x46, 0x38)) return "image/gif";
+  if (p(0x52, 0x49, 0x46, 0x46) && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return "image/webp";
+  if (p(0x25, 0x50, 0x44, 0x46, 0x2d)) return "application/pdf";
+  return null;
+}
