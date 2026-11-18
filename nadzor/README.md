@@ -28,7 +28,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Knjiga prometa (KPR) i PO-SD (ekran Knjige) | `sql/09-knjige.sql` |
 | Izvor upita s weba (UTM oznake ili stranica s koje je posjetitelj došao), u mailu i u stupcu Izvor | `../js/izvor.js`, `sql/11-izvor-upita.sql` |
 | Otkud dolaze kupci Kuverte (posjete, registracije i kupnje po izvoru, ekran Kuverta) i stupac Izvor uz korisnike, pokreće se u projektu MyWeddingInvite nakon njegove migracije 024 | `sql/12-kuverta-izvori.sql`, ruta `/api/izvori` |
-| Sandučić za dolazne mailove (ekran Pošta): spremanje, popis, čitanje, privici | `src/index.js` (`spremiUSanducic`, `posta`), `src/mail.js` (`procitajMail`), `sql/14-posta.sql`, R2 bucket `dp-nadzor-posta` |
+| Sandučić za dolazne mailove (ekran Pošta): spremanje, popis, čitanje, privici | `src/index.js` (`spremiUSanducic`, `posta`), `src/mail.js` (`procitajMail`), `sql/14-posta.sql`, `sql/15-posta-spam.sql` (Spam i blokirani), R2 bucket `dp-nadzor-posta` |
 | Testovi s izmišljenim izvodima | `test/` (`node --test nadzor/test/*.test.mjs`) |
 
 Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U bazama je spremljen samo njegov SHA-256 sažetak. Tablice imaju uključen RLS bez pravila, pa ih javni ključ ne može čitati izravno.
@@ -77,6 +77,8 @@ Svaki mail koji Cloudflare Email Routing preda Workeru (`email` u `src/index.js`
 - zaglavlja, tekst (do 100.000 znakova), popis privitaka i rezultat SPF/DKIM/DMARC provjere idu u tablicu `posta` (`sql/14-posta.sql`).
 
 Mail na adresu za izvode (`IZVODI_ADRESA`, inače svaka `izvodi@…`) se nakon spremanja i uvozi kao izvod, a ishod uvoza piše uz mail. Ako spremanje ne uspije, uvoz izvoda ide dalje, a greška se upiše kao „posta” u dnu dashboarda.
+
+Mail ide u mapu **Spam** ako je pošiljatelj blokiran ili ako ne prođe provjeru pošiljatelja (DMARC fail, ili SPF fail/softfail bez DKIM pass i DMARC pass, iz zaglavlja Authentication-Results koje dodaje Cloudflare). Uz mail u Spamu piše razlog. Gumbi „Premjesti u Spam” i „Nije spam” premještaju ručno, a „Blokiraj pošiljatelja” blokira adresu ili cijelu domenu i premjesti njihove dosadašnje mailove u Spam. Popis blokiranih je na dnu ekrana (`sql/15-posta-spam.sql`). Izvodi se uvoze bez obzira na mapu.
 
 Na ekranu Pošta je popis s pretraživanjem (pošiljatelj, primatelj, naslov, tekst), mail s privicima, preuzimanje izvornog .eml, označavanje nepročitanim i brisanje (briše i datoteku u R2). Broj nepročitanih stoji uz Pošta u izborniku.
 
