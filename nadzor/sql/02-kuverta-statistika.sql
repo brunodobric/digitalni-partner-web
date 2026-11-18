@@ -50,18 +50,33 @@ begin
       ) c on c.mj = g.mj
     ),
     'iduca', (
+      -- Ista vjenčanja kao u grafu: pozivnice, plus rasporedi sjedenja bez pozivnice za isti datum.
       select coalesce(jsonb_agg(x order by x->>'datum'), '[]'::jsonb) from (
-        select jsonb_build_object(
-          'datum', i.event_date,
-          'objavljena', i.published,
-          'potvrde', (select count(*) from public.rsvps r where r.invitation_id = i.id),
-          'dolazi', (select coalesce(sum(r.adults + r.children), 0) from public.rsvps r where r.invitation_id = i.id and r.attending),
-          'ima_album', exists (select 1 from public.albums a where a.invitation_id = i.id),
-          'stolovi', (select count(*) from public.seating_tables t join public.seating_plans p on p.id = t.plan_id where p.owner_id = i.owner_id)
-        ) x
-        from public.invitations i
-        where i.event_date >= v_danas
-        order by i.event_date
+        select x from (
+          select i.event_date d, jsonb_build_object(
+            'datum', i.event_date,
+            'objavljena', i.published,
+            'potvrde', (select count(*) from public.rsvps r where r.invitation_id = i.id),
+            'dolazi', (select coalesce(sum(r.adults + r.children), 0) from public.rsvps r where r.invitation_id = i.id and r.attending),
+            'ima_album', exists (select 1 from public.albums a where a.invitation_id = i.id),
+            'stolovi', (select count(*) from public.seating_tables t join public.seating_plans p on p.id = t.plan_id where p.owner_id = i.owner_id)
+          ) x
+          from public.invitations i
+          where i.event_date >= v_danas
+          union all
+          select sp.event_date, jsonb_build_object(
+            'datum', sp.event_date,
+            'objavljena', null,
+            'potvrde', 0,
+            'dolazi', 0,
+            'ima_album', false,
+            'stolovi', (select count(*) from public.seating_tables t where t.plan_id = sp.id)
+          )
+          from public.seating_plans sp
+          where sp.event_date >= v_danas
+            and not exists (select 1 from public.invitations i where i.owner_id = sp.owner_id and i.event_date = sp.event_date)
+        ) u
+        order by d
         limit 10
       ) y
     )
