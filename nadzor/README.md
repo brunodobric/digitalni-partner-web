@@ -28,7 +28,6 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Knjiga prometa (KPR) i PO-SD (ekran Knjige) | `sql/09-knjige.sql` |
 | Izvor upita s weba (UTM oznake ili stranica s koje je posjetitelj došao), u mailu i u stupcu Izvor | `../js/izvor.js`, `sql/11-izvor-upita.sql` |
 | Otkud dolaze kupci Kuverte (posjete, registracije i kupnje po izvoru, ekran Kuverta) i stupac Izvor uz korisnike, pokreće se u projektu MyWeddingInvite nakon njegove migracije 024 | `sql/12-kuverta-izvori.sql`, ruta `/api/izvori` |
-| Sandučić za dolazne mailove (ekran Pošta): spremanje, popis, čitanje, privici | `src/index.js` (`spremiUSanducic`, `posta`), `src/mail.js` (`procitajMail`), `sql/14-posta.sql`, `sql/15-posta-spam.sql` (Spam i blokirani), `sql/16-posta-mape.sql` (Arhiva, Obrisano, zvjezdica, filtar po adresi, skupne radnje), R2 bucket `dp-nadzor-posta` |
 | Testovi s izmišljenim izvodima | `test/` (`node --test nadzor/test/*.test.mjs`) |
 
 Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U bazama je spremljen samo njegov SHA-256 sažetak. Tablice imaju uključen RLS bez pravila, pa ih javni ključ ne može čitati izravno.
@@ -42,7 +41,6 @@ Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U 
 | `RESEND_KEY`, `OBAVIJEST_NA` | Mail o svakom novom upitu s weba i upozorenja | ne |
 | `IZVODI_IBAN` | IBAN-i (odvojeni zarezom) za koje se primaju izvodi mailom. Bez nje se mail ne uvozi | za uvoz mailom |
 | `IZVODI_POSILJATELJI` | Adrese ili domene pošiljatelja izvoda, npr. `@pbz.hr`. Prazno pušta svakoga | preporučeno |
-| `POSTA_KOPIJA` | Adresa na koju se proslijedi kopija svakog dolaznog maila (sigurnosna kopija dok sandučić ne dokaže da radi). Mora biti potvrđena u Email Routingu | ne |
 | `IZVODI_ADRESA` | Adrese (odvojene zarezom) čija se pošta uvozi kao izvod. Prazno znači svaka adresa `izvodi@…` | ne |
 | `IZVODI_PROSLIJEDI` | Adresa na koju se mail s izvodom proslijedi nakon uvoza (mora biti potvrđena u Email Routingu) | ne |
 | `FISK_CITANJE_TOKEN` | PDF računa na ekranu Računi i provjera isteka certifikata. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun). Stari naziv `FISK_TOKEN` radi kao rezerva | ne, bez nje popis radi, a PDF ne |
@@ -61,38 +59,14 @@ Izvod u formatu CAMT.053 (ISO 20022, XML) preuzme se iz internetskog bankarstva 
 
 ### Izvodi mailom
 
-PBZ šalje dnevni izvod izravno na `izvodi@banka.digitalnipartner.hr` (MX glavne domene ostaje na Zohu). Taj poddomen ima Cloudflare Email Routing (MX samo za `banka.`, pa ostala pošta ostaje na Zohu), a pravilo ga šalje Workeru dp-nadzor. Worker (`email` u `src/index.js`) mail najprije spremi u sandučić (ekran Pošta), a onda:
+PBZ šalje dnevni izvod izravno na `izvodi@banka.digitalnipartner.hr`. Taj poddomen ima Cloudflare Email Routing (MX samo za `banka.`; mail glavne domene od 19. 11. 2026. ide na iCloud+), a pravilo ga šalje Workeru dp-nadzor. Worker (`email` u `src/index.js`) mail koji nije na adresu za izvode (`IZVODI_ADRESA`, inače svaka `izvodi@…`) odbaci, a za izvod:
 
-1. po potrebi proslijedi mail na `IZVODI_PROSLIJEDI`, da izvod ostane i u pošti,
-2. provjeri pošiljatelja (`IZVODI_POSILJATELJI`, u omotnici ili u zaglavlju From, jer Zoho kod prosljeđivanja mijenja omotnicu) i da je izvod za račun iz `IZVODI_IBAN`,
+1. po potrebi proslijedi mail na `IZVODI_PROSLIJEDI`, da izvod ostane i u pošti (adresa mora biti potvrđena u Email Routingu),
+2. provjeri pošiljatelja (`IZVODI_POSILJATELJI`, u omotnici ili u zaglavlju From, jer prosljeđivanje mijenja omotnicu) i da je izvod za račun iz `IZVODI_IBAN`,
 3. uveze svaki XML ili ZIP privitak, isto kao ručni uvoz,
 4. upiše ishod kao „izvodi-mail” (vidi se u dnu dashboarda), a kad nešto ne uspije, pošalje obavijest na `OBAVIJEST_NA` (ako je postavljen `RESEND_KEY`).
 
 Postavljanje: `npx wrangler secret put IME` iz mape `nadzor/`.
-
-## Ekran Pošta (sandučić)
-
-Svaki mail koji Cloudflare Email Routing preda Workeru (`email` u `src/index.js`) spremi se u sandučić, bez obzira na adresu:
-
-- cijeli izvorni mail (.eml, s privicima) ide u R2, bucket `dp-nadzor-posta` (binding `POSTA`), ključ `posta/GGGG/MM/<uuid>.eml`,
-- zaglavlja, tekst (do 100.000 znakova), popis privitaka i rezultat SPF/DKIM/DMARC provjere idu u tablicu `posta` (`sql/14-posta.sql`).
-
-Mail na adresu za izvode (`IZVODI_ADRESA`, inače svaka `izvodi@…`) se nakon spremanja i uvozi kao izvod, a ishod uvoza piše uz mail. Ako spremanje ne uspije, uvoz izvoda ide dalje, a greška se upiše kao „posta” u dnu dashboarda.
-
-Mail ide u mapu **Spam** ako je pošiljatelj blokiran ili ako ne prođe provjeru pošiljatelja (DMARC fail, ili SPF fail/softfail bez DKIM pass i DMARC pass, iz zaglavlja Authentication-Results koje dodaje Cloudflare). Uz mail u Spamu piše razlog. Gumbi „Premjesti u Spam” i „Nije spam” premještaju ručno, a „Blokiraj pošiljatelja” blokira adresu ili cijelu domenu i premjesti njihove dosadašnje mailove u Spam. Popis blokiranih otvara se s „Blokirani” u lijevom stupcu (`sql/15-posta-spam.sql`). Izvodi se uvoze bez obzira na mapu.
-
-Pošta izgleda kao mail aplikacija u tri stupca: lijevo mape (Ulazna pošta, Označeno, Arhiva, Spam, Obrisano), adrese na koje mail stiže (filtar) i blokirani pošiljatelji; u sredini popis grupiran po danima; desno otvoreni mail. Na mobitelu je vidljiv popis ili mail, a mape su u traci na dnu.
-
-- Brze radnje kad mišem prijeđeš preko maila, i skupne radnje za označene kvačicom (arhiviraj, pročitano, Spam, obriši). Premještanje se može poništiti iz obavijesti na dnu.
-- Obriši premješta u Obrisano; trajno se briše (i datoteka u R2) tek iz Obrisanog ili Spama, uz potvrdu, pojedinačno ili gumbom Isprazni.
-- Privici imaju karticu s pregledom za slike i PDF (`/api/posta/privitak?pregled=1`, vrsta se prepoznaje po sadržaju, SVG se ne prikazuje).
-- Prečaci: j/k sljedeći i prethodni, e arhiviraj, # obriši, s zvjezdica, u nepročitano, x odaberi, / traži, Esc zatvori.
-- Popis se sam osvježava svake minute; novi mail na vrhu kratko zasvijetli. Broj nepročitanih stoji uz Pošta u izborniku.
-- Odgovori i Proslijedi zasad otvaraju vlastiti mail program (mailto).
-
-Sigurnost: HTML mail se prikazuje u okviru sa `sandbox` (bez skripti), a adresa `/api/posta/html` šalje i CSP `sandbox; default-src 'none'; img-src data:`, pa se skripte ne izvrše ni kad se otvori izravno. Vanjske slike su blokirane (praćenje otvaranja), a slike iz samog maila (`cid:`) ugrade se kao `data:`. Privici se uvijek preuzimaju kao datoteka (`application/octet-stream`, `attachment`), nikad se ne otvaraju na adresi dashboarda.
-
-Koje adrese stižu u sandučić određuje Email Routing: od 18. 11. 2026. MX glavne domene je na Cloudflareu (više ne na Zohu), a pravila šalju Workeru `info@`, `izvodi@` i `bruno.dobric@digitalnipartner.hr` te `izvodi@banka.digitalnipartner.hr`. Nova adresa = novo pravilo „adresa → Worker dp-nadzor”. Zoho i dalje može slati (SPF uključuje `zohomail.eu`). Slanje mailova nije dio sandučića; „Odgovori u svom mailu” otvara vlastiti mail program.
 
 ## Upozorenja mailom
 
