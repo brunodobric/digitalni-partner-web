@@ -338,7 +338,7 @@ function vjencanja(){
 
 // ---------- Otkud dolaze kupci (na ekranu Kuverta) ----------
 var IZ = null, izGreska = "", izDana = 30, izUcitavam = -1;
-var IZVOR_IME = {instagram: "Instagram", facebook: "Facebook", meta: "Meta (FB/IG, bez oznake)", google: "Google", bing: "Bing", chatgpt: "ChatGPT", perplexity: "Perplexity", claude: "Claude", gemini: "Gemini", tiktok: "TikTok", potpis: "Potpis na pozivnici", preporuka: "Preporuka", drugo: "Drugo", nepoznato: "Nepoznato"};
+var IZVOR_IME = {instagram: "Instagram", facebook: "Facebook", meta: "Meta (FB/IG, bez oznake)", google: "Google", bing: "Bing", chatgpt: "ChatGPT", perplexity: "Perplexity", claude: "Claude", gemini: "Gemini", tiktok: "TikTok", pinterest: "Pinterest", potpis: "Potpis na pozivnici", preporuka: "Preporuka", drugo: "Drugo", nepoznato: "Nepoznato"};
 function imeIzvora(x){ return IZVOR_IME[x] || x; }
 function ucitajIzvore(){
   if (izUcitavam === izDana) return;
@@ -365,6 +365,7 @@ function izvoriKuverte(){
   if (pk.length) h += '<h2 style="margin-top:18px;font-size:16px">Po kampanji</h2><div class="skrol"><table class="num"><thead><tr><th>Izvor</th><th>Medij</th><th>Kampanja</th><th class="r">Posjete</th></tr></thead><tbody>'
     + pk.map(function(x){ return '<tr><td class="nw">' + e(imeIzvora(x.izvor)) + '</td><td>' + e(x.medij || "–") + '</td><td>' + e(x.kampanja || "–") + '</td><td class="r">' + br(x.posjete) + '</td></tr>'; }).join("") + '</tbody></table></div>';
   h += grupeKuverte();
+  h += pinterestKuverte();
   h += '<p class="src">Posjete se broje bez kolačića (oznake utm u poveznici ili stranica s koje je posjetitelj došao). Izvor registracije je zapamćen samo kad je posjetitelj prihvatio kolačiće, a inače njegov odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih.</p></section>';
   return h;
 }
@@ -378,6 +379,18 @@ function grupeKuverte(){
   return h + '<div class="skrol"><table class="num"><thead><tr><th>Grupa</th><th>Mreža</th><th>Kampanja</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
     + pg.map(function(x){ return '<tr><td class="nw" style="font-weight:600">' + e(x.grupa || "bez imena") + '</td><td class="nw">' + e(imeIzvora(x.izvor)) + '</td><td>' + e(x.kampanja || "–") + '</td><td class="r">' + br(x.posjete) + '</td><td class="r">' + br(x.registracije) + '</td><td class="r">' + br(x.kupnje) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; }).join("")
     + '</tbody></table></div><p class="src">Ime grupe je oznaka utm_content iz poveznice. Nova grupa se pojavi sama čim netko dođe s njezinom poveznicom. Registracije i kupnje su po izvoru računa, kao u tablici gore.</p>';
+}
+
+// Pinterest: profil (utm_medium=profil) i pojedini pinovi (utm_medium=pin, ime pina u utm_content).
+function pinterestKuverte(){
+  var h = '<h2 style="margin-top:18px;font-size:16px">Pinterest</h2>';
+  if (IZ.pinterest_greska) return h + '<p class="prazno">Pinterest se nije učitao (' + e(IZ.pinterest_greska) + '). Ako piše da funkcija ne postoji, u projektu MyWeddingInvite treba pokrenuti sql/19-kuverta-oznake.sql.</p>';
+  var pp = IZ.po_pinterestu || [];
+  if (!pp.length) return h + '<p class="prazno">U ovom razdoblju još nitko nije došao s Pinteresta.</p>';
+  var ime = function(x){ return x.oglas ? x.oglas : (x.medij === "profil" ? "Profil" : x.medij === "pin" ? "pin bez imena" : "bez oznake (" + (x.medij || "–") + ")"); };
+  return h + '<div class="skrol"><table class="num"><thead><tr><th>Pin</th><th>Medij</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
+    + pp.map(function(x){ return '<tr><td class="nw" style="font-weight:600">' + e(ime(x)) + '</td><td>' + e(x.medij || "–") + '</td><td class="r">' + br(x.posjete) + '</td><td class="r">' + br(x.registracije) + '</td><td class="r">' + br(x.kupnje) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Pin je oznaka utm_content iz poveznice (utm_medium=pin), a poveznica s profila ima utm_medium=profil. „Bez oznake” su posjete s pinterest.com bez utm oznaka.</p>';
 }
 
 // ---------- Korisnici Kuverte (na ekranu Kuverta) ----------
