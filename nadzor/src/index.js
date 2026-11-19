@@ -13,17 +13,7 @@
 // - POST /api/kpr-stavka  uključi ili isključi stavku izvoda iz KPR-a (Access)
 // - POST /api/izvod  uvoz jednog izvoda CAMT.053 (XML u tijelu zahtjeva) (Access)
 // - POST /upit       javni prijem upita s kontakt obrasca na webu (bez prijave, samo s dopuštene adrese)
-// - GET /api/posta?trazi=…&prije=…  sandučić: popis dolaznih mailova (Access)
-// - GET /api/posta/poruka?id=…  jedan mail: zaglavlja, tekst, privitci; označi ga pročitanim (Access)
-// - GET /api/posta/html?id=…  HTML mail za okvir na stranici, bez skripti i vanjskih slika (Access)
-// - GET /api/posta/privitak?id=…&i=…  preuzimanje privitka (Access)
-// - GET /api/posta/eml?id=…  cijeli izvorni mail (.eml) (Access)
-// - GET /api/posta?mapa=…&adresa=…  mape ulazni, arhiva, spam, obrisano, oznaceno; adresa = na koju je mail stigao
-// - GET /api/posta/privitak?id=…&i=…&pregled=1  slika ili PDF za pregled na stranici (Access)
-// - POST /api/posta/procitano, POST /api/posta/obrisi, POST /api/posta/mapa (ulazni, arhiva, spam, obrisano)  (Access)
-// - POST /api/posta/skupno {ids, radnja}, POST /api/posta/obrisi-trajno {mapa, ids?}  skupne radnje (Access)
-// - GET /api/posta/blokirani, POST /api/posta/blokiraj, POST /api/posta/odblokiraj  blokirani pošiljatelji (Access)
-// - email            svaki mail spremi u sandučić (R2 + baza), a izvode CAMT.053 i uveze, vidi primiMail
+// - email            mail na izvodi@banka… (Email Routing) uvozi kao izvod CAMT.053, vidi primiMail
 // - cron u 5:00 UTC  (6:00 zimi, 7:00 ljeti po hrvatskom vremenu) skuplja podatke iz izvora
 // - cron svaki sat   provjerava upozorenja i šalje mail za svako novo (vidi provjeriUpozorenja)
 //
@@ -35,7 +25,7 @@
 import STRANICA from "./stranica.html";
 import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i početni zaslon
 import { citajCamt053 } from "./camt.js";
-import { adrese, idsIz, izOmotnice, jeZip, posiljateljDopusten, privitci, procitajMail, vrstaZaPregled, xmlIzZipa } from "./mail.js";
+import { izOmotnice, jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
 import { DOMENA_NADZORA, POPIS_OBAVIJESTI, sastaviUpozorenja } from "./upozorenja.js";
 
 export default {
@@ -100,7 +90,6 @@ export default {
         return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_banka", { p_kljuc: env.NADZOR_KLJUC }));
       }
       if (req.method === "POST" && url.pathname === "/api/izvod") return await uvezIzvod(req, env);
-      if (url.pathname === "/api/posta" || url.pathname.startsWith("/api/posta/")) return await posta(req, url, env);
       if (req.method === "GET" && url.pathname === "/api/knjige") {
         const godina = Number(url.searchParams.get("godina")) || new Date().getUTCFullYear();
         const okolina = ["produkcija", "test", "sve"].includes(url.searchParams.get("okolina")) ? url.searchParams.get("okolina") : "produkcija";
@@ -137,34 +126,18 @@ export default {
     ctx.waitUntil((event.cron === JUTARNJI_CRON ? prikupi(env) : Promise.resolve()).then(() => provjeriUpozorenja(env)));
   },
 
-  // Mail stiže preko Cloudflare Email Routinga: svaki se spremi u sandučić (ekran Pošta),
-  // a onaj na adresu za izvode (IZVODI_ADRESA) se i uvozi kao izvod.
+  // Mail stiže preko Cloudflare Email Routinga (poddomena banka.): onaj na adresu za izvode
+  // (IZVODI_ADRESA) se uvozi kao izvod, a ostali se odbace.
   async email(poruka, env) {
+    if (!jeAdresaZaIzvode(poruka.to, env)) return;
     let raw = null;
     try {
       raw = poruka.rawSize > NAJVECI_MAIL ? null : new Uint8Array(await new Response(poruka.raw).arrayBuffer());
     } catch (e) {
       console.error("mail", e);
     }
-    let id = null;
     try {
-      id = await spremiUSanducic(poruka, raw, env);
-    } catch (e) {
-      console.error("posta", e);
-      await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_zapis", { p_kljuc: env.NADZOR_KLJUC, p_izvor: "posta", p_uspjeh: false, p_poruka: String(e.message || e).slice(0, 300) }).catch(console.error);
-    }
-    // Sigurnosna kopija svakog maila na privatnu adresu (POSTA_KOPIJA, mora biti potvrđena u Email Routingu).
-    if (env.POSTA_KOPIJA) {
-      try {
-        await poruka.forward(env.POSTA_KOPIJA);
-      } catch (e) {
-        console.error("posta-kopija", e);
-      }
-    }
-    if (!jeAdresaZaIzvode(poruka.to, env)) return;
-    try {
-      const ishod = await primiMail(poruka, raw, env);
-      if (id && ishod) await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_izvod", { p_kljuc: env.NADZOR_KLJUC, p_id: id, p_izvod: ishod }).catch(console.error);
+      await primiMail(poruka, raw, env);
     } catch (e) {
       console.error("izvodi-mail", e);
     }
@@ -325,21 +298,17 @@ function popis(v) {
   return String(v || "").split(",").map((x) => x.trim()).filter(Boolean);
 }
 
-// Vraća kratki ishod (isti tekst koji ide u zapis "izvodi-mail"), da se vidi i uz mail u sandučiću.
 async function primiMail(poruka, raw, env) {
   const od = String(poruka.from || "").toLowerCase();
-  let ishod = "";
   const zapisi = (uspjeh, tekst) => {
-    ishod = (uspjeh ? "" : "nije uvezeno: ") + tekst;
     return rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_zapis", { p_kljuc: env.NADZOR_KLJUC, p_izvor: "izvodi-mail", p_uspjeh: uspjeh, p_poruka: tekst }).catch(console.error);
   };
   const javi = (tekst) => env.RESEND_KEY && env.OBAVIJEST_NA ? posaljiMail(env, "Izvod iz banke nije uvezen", tekst) : null;
   await primiIzvod(poruka, raw, env, od, zapisi, javi);
-  return ishod;
 }
 
 async function primiIzvod(poruka, raw, env, od, zapisi, javi) {
-  if (env.IZVODI_PROSLIJEDI && env.IZVODI_PROSLIJEDI !== env.POSTA_KOPIJA) {
+  if (env.IZVODI_PROSLIJEDI) {
     try {
       await poruka.forward(env.IZVODI_PROSLIJEDI);
     } catch (e) {
@@ -405,221 +374,12 @@ async function posaljiMail(env, naslov, tekst) {
   }
 }
 
-// ---------- Sandučić (ekran Pošta) ----------
-// Svaki mail koji Email Routing preda Workeru spremi se cijeli u R2 (binding POSTA, bucket dp-nadzor-posta,
-// ključ posta/GGGG/MM/<uuid>.eml), a zaglavlja, tekst i popis privitaka u tablicu posta (sql/14-posta.sql).
-// Privici se ne spremaju zasebno: pri preuzimanju se izvade iz .eml datoteke.
 // IZVODI_ADRESA (neobavezno): adrese odvojene zarezom koje se uvoze kao izvodi. Bez nje vrijedi svaka adresa "izvodi@…".
 
 function jeAdresaZaIzvode(za, env) {
   const a = String(za || "").trim().toLowerCase();
   const popisAdresa = popis(env.IZVODI_ADRESA).map((x) => x.toLowerCase());
   return popisAdresa.length ? popisAdresa.includes(a) : a.startsWith("izvodi@");
-}
-
-const NAJVISE_TEKSTA = 100000;
-
-async function spremiUSanducic(poruka, raw, env) {
-  if (!env.POSTA) throw new Error("Worker nema R2 binding POSTA, pa se mail nije spremio u sandučić.");
-  const sada = new Date();
-  const kljuc = "posta/" + sada.toISOString().slice(0, 7).replace("-", "/") + "/" + crypto.randomUUID() + ".eml";
-  let m;
-  if (raw) {
-    await env.POSTA.put(kljuc, raw, {
-      httpMetadata: { contentType: "message/rfc822" },
-      customMetadata: { od: String(poruka.from || "").slice(0, 200), za: String(poruka.to || "").slice(0, 200) },
-    });
-    m = procitajMail(raw);
-  } else {
-    // Prevelik mail (iznad 25 MB) ostaje bez datoteke, samo sa zaglavljima.
-    m = { od: poruka.headers.get("from") || "", za: poruka.headers.get("to") || "", naslov: poruka.headers.get("subject") || "", kopija: "", odgovor_na: "", poslano: null, message_id: "", provjera: "", tekst: "(Mail je veći od 25 MB, pa nije spremljen.)", html: null, privitci: [] };
-  }
-  return await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_upis", {
-    p_kljuc: env.NADZOR_KLJUC,
-    p_mail: {
-      r2_kljuc: kljuc,
-      omotnica_od: String(poruka.from || ""),
-      omotnica_za: String(poruka.to || ""),
-      od: m.od, za: m.za, kopija: m.kopija, odgovor_na: m.odgovor_na, naslov: m.naslov, poslano: m.poslano,
-      message_id: m.message_id, provjera: m.provjera,
-      adresa: adrese(m.od)[0] || String(poruka.from || "").toLowerCase(),
-      velicina: Number(poruka.rawSize || (raw ? raw.length : 0)),
-      tekst: m.tekst.slice(0, NAJVISE_TEKSTA),
-      ima_html: m.html !== null,
-      privitci: m.privitci.filter((p) => !p.cid || !m.html || !m.html.includes("cid:" + p.cid)).map((p) => ({ naziv: p.naziv, vrsta: p.vrsta, velicina: p.bajtovi().length })),
-    },
-  });
-}
-
-// Zaglavlja za sadržaj iz tuđeg maila: nikad se ne izvršava na adresi dashboarda.
-const STROGO = { "x-content-type-options": "nosniff", "referrer-policy": "no-referrer", "cache-control": "private, no-store" };
-
-async function ucitajMail(env, id) {
-  const meta = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_jedna", { p_kljuc: env.NADZOR_KLJUC, p_id: id, p_oznaci_procitano: false });
-  if (!meta) return { meta: null };
-  const obj = env.POSTA ? await env.POSTA.get(meta.r2_kljuc) : null;
-  return { meta, raw: obj ? new Uint8Array(await obj.arrayBuffer()) : null };
-}
-
-function nazivZaPreuzimanje(naziv) {
-  const cist = String(naziv || "privitak").replace(/[\r\n"\\/]/g, "_").slice(0, 150);
-  return 'attachment; filename="' + cist.replace(/[^\x20-\x7e]/g, "_") + '"; filename*=UTF-8\'\'' + encodeURIComponent(cist);
-}
-
-function bajtoviUBase64(b) {
-  let s = "";
-  for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
-  return btoa(s);
-}
-
-const SLIKE_UZ_HTML = ["image/png", "image/jpeg", "image/gif", "image/webp"];
-const MAPE = ["ulazni", "arhiva", "spam", "obrisano"];
-const MAPE_POPISA = [...MAPE, "oznaceno"];
-const RADNJE = [...MAPE, "procitano", "neprocitano", "oznaci", "odznaci"];
-
-const NAJVISE_SLIKA = 8 * 1024 * 1024;
-
-async function posta(req, url, env) {
-  const put = url.pathname;
-  const id = Number(url.searchParams.get("id"));
-  const imaId = Number.isInteger(id) && id > 0;
-
-  if (req.method === "GET" && put === "/api/posta") {
-    const prije = Number(url.searchParams.get("prije"));
-    const trazi = (url.searchParams.get("trazi") || "").slice(0, 200);
-    const mapa = MAPE_POPISA.includes(url.searchParams.get("mapa")) ? url.searchParams.get("mapa") : "ulazni";
-    const adresa = (url.searchParams.get("adresa") || "").trim().toLowerCase();
-    if (adresa && (adresa.length > 320 || !/^[^\s@]+@[^\s@]+$/.test(adresa))) return json({ greska: "Neispravna adresa." }, 400);
-    return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_popis", { p_kljuc: env.NADZOR_KLJUC, p_trazi: trazi, p_prije_id: Number.isInteger(prije) && prije > 0 ? prije : null, p_mapa: mapa, p_adresa: adresa }));
-  }
-  if (req.method === "POST" && put === "/api/posta/skupno") {
-    const b = await req.json().catch(() => ({}));
-    const ids = idsIz(b.ids);
-    if (!ids || !RADNJE.includes(b.radnja)) return json({ greska: "Neispravan zahtjev." }, 400);
-    const promijenjeno = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_skupno", { p_kljuc: env.NADZOR_KLJUC, p_ids: ids, p_radnja: b.radnja });
-    return json({ ok: true, promijenjeno });
-  }
-  if (req.method === "POST" && put === "/api/posta/obrisi-trajno") {
-    // Samo iz Obrisanog ili Spama. Bez ids se prazni cijela mapa.
-    const b = await req.json().catch(() => ({}));
-    const ids = b.ids === undefined ? null : idsIz(b.ids);
-    if ((b.ids !== undefined && !ids) || !["obrisano", "spam"].includes(b.mapa)) return json({ greska: "Neispravan zahtjev." }, 400);
-    const kljucevi = (await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_obrisi_trajno", { p_kljuc: env.NADZOR_KLJUC, p_ids: ids, p_mapa: b.mapa })) || [];
-    if (env.POSTA) for (let i = 0; i < kljucevi.length; i += 1000) await env.POSTA.delete(kljucevi.slice(i, i + 1000)).catch(console.error);
-    return json({ ok: true, obrisano: kljucevi.length });
-  }
-  if (req.method === "GET" && put === "/api/posta/blokirani") {
-    return json({ blokirani: await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_blokirani", { p_kljuc: env.NADZOR_KLJUC }) });
-  }
-  if (req.method === "POST" && put === "/api/posta/mapa") {
-    const b = await req.json().catch(() => ({}));
-    const pid = Number(b.id);
-    if (!Number.isInteger(pid) || pid <= 0 || !MAPE.includes(b.mapa)) return json({ greska: "Neispravan zahtjev." }, 400);
-    const ok = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_mapa", { p_kljuc: env.NADZOR_KLJUC, p_id: pid, p_mapa: b.mapa });
-    if (!ok) return json({ greska: "Mail više ne postoji. Osvježi stranicu." }, 404);
-    return json({ ok: true });
-  }
-  if (req.method === "POST" && (put === "/api/posta/blokiraj" || put === "/api/posta/odblokiraj")) {
-    const b = await req.json().catch(() => ({}));
-    const uzorak = String(b.uzorak || "").trim().toLowerCase();
-    if (!/^([^\s@]+@[^\s@]+\.[^\s@]+|@[^\s@]+\.[^\s@]+)$/.test(uzorak) || uzorak.length > 320) return json({ greska: "Upiši adresu (ime@domena.hr) ili domenu (@domena.hr)." }, 400);
-    if (put === "/api/posta/odblokiraj") {
-      await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_odblokiraj", { p_kljuc: env.NADZOR_KLJUC, p_uzorak: uzorak });
-      return json({ ok: true });
-    }
-    // Vlastite adrese se ne mogu blokirati, da sva pošta ne završi u Spamu.
-    if (/@(banka\.)?digitalnipartner\.hr$/.test(uzorak) || uzorak === "@digitalnipartner.hr") return json({ greska: "Vlastitu domenu ne možeš blokirati." }, 400);
-    const premjesteno = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_blokiraj", { p_kljuc: env.NADZOR_KLJUC, p_uzorak: uzorak });
-    return json({ ok: true, premjesteno });
-  }
-  if (req.method === "GET" && put === "/api/posta/poruka") {
-    if (!imaId) return json({ greska: "Nepoznat mail." }, 400);
-    const meta = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_jedna", { p_kljuc: env.NADZOR_KLJUC, p_id: id, p_oznaci_procitano: true });
-    if (!meta) return json({ greska: "Mail više ne postoji. Osvježi stranicu." }, 404);
-    // Privici s indeksom iz .eml datoteke (za preuzimanje); slike koje su dio HTML-a se ne nabrajaju.
-    let privitci = [];
-    if (env.POSTA) {
-      const obj = await env.POSTA.get(meta.r2_kljuc);
-      if (obj) {
-        const m = procitajMail(new Uint8Array(await obj.arrayBuffer()));
-        privitci = m.privitci.filter((p) => !p.cid || !m.html || !m.html.includes("cid:" + p.cid)).map((p) => { const b = p.bajtovi(); return { i: p.i, naziv: p.naziv, vrsta: p.vrsta, velicina: b.length, pregled: vrstaZaPregled(b) }; });
-      }
-    }
-    const { r2_kljuc, ...ostalo } = meta;
-    return json({ ...ostalo, privitci, adrese_od: adrese(meta.odgovor_na || meta.od) });
-  }
-  if (req.method === "GET" && put === "/api/posta/html") {
-    if (!imaId) return new Response("Nepoznat mail.", { status: 400 });
-    const { meta, raw } = await ucitajMail(env, id);
-    if (!meta || !raw) return new Response("Mail nije pronađen.", { status: 404 });
-    const m = procitajMail(raw);
-    let html = m.html || "";
-    // Slike iz samog maila (cid:) idu kao data: adrese; vanjske slike blokira CSP (praćenje otvaranja).
-    let ukupno = 0;
-    for (const p of m.privitci) {
-      if (!p.cid || !SLIKE_UZ_HTML.includes(p.vrsta) || !html.includes("cid:" + p.cid)) continue;
-      const b = p.bajtovi();
-      ukupno += b.length;
-      if (ukupno > NAJVISE_SLIKA) break;
-      html = html.split("cid:" + p.cid).join("data:" + p.vrsta + ";base64," + bajtoviUBase64(b));
-    }
-    const glava = '<meta charset="utf-8"><base target="_blank"><style>body{margin:0;padding:16px;font:15px/1.5 system-ui,sans-serif;color:#0B0B0C;background:#fff;word-wrap:break-word}img{max-width:100%;height:auto}</style>';
-    return new Response("<!doctype html>" + glava + html, {
-      headers: {
-        ...STROGO,
-        "content-type": "text/html; charset=utf-8",
-        // sandbox bez allow-scripts: skripte iz maila se ne izvršavaju ni kad se adresa otvori izravno.
-        "content-security-policy": "sandbox allow-popups allow-popups-to-escape-sandbox; default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:; frame-ancestors 'self'",
-        "x-frame-options": "SAMEORIGIN",
-      },
-    });
-  }
-  if (req.method === "GET" && put === "/api/posta/privitak") {
-    const i = Number(url.searchParams.get("i"));
-    if (!imaId || !Number.isInteger(i) || i < 0) return new Response("Nepoznat privitak.", { status: 400 });
-    const { meta, raw } = await ucitajMail(env, id);
-    if (!meta || !raw) return new Response("Mail nije pronađen.", { status: 404 });
-    const p = procitajMail(raw).privitci.find((x) => x.i === i);
-    if (!p) return new Response("Privitak nije pronađen.", { status: 404 });
-    if (url.searchParams.get("pregled") === "1") {
-      // Pregled na stranici: samo slike i PDF, prepoznati po sadržaju, ne po vrsti koju je napisao pošiljatelj.
-      const b = p.bajtovi(), vrsta = vrstaZaPregled(b);
-      if (!vrsta) return new Response("Ovaj privitak nema pregled. Preuzmi ga.", { status: 415 });
-      const zastita = vrsta === "application/pdf"
-        ? { "x-frame-options": "SAMEORIGIN" }  // preglednikov PDF čitač ne radi uz CSP sandbox
-        : { "content-security-policy": "sandbox; default-src 'none'; img-src 'self'" };
-      return new Response(b, { headers: { ...STROGO, ...zastita, "content-type": vrsta, "content-disposition": nazivZaPreuzimanje(p.naziv).replace(/^attachment/, "inline") } });
-    }
-    return new Response(p.bajtovi(), {
-      headers: { ...STROGO, "content-type": "application/octet-stream", "content-disposition": nazivZaPreuzimanje(p.naziv), "content-security-policy": "sandbox; default-src 'none'" },
-    });
-  }
-  if (req.method === "GET" && put === "/api/posta/eml") {
-    if (!imaId) return new Response("Nepoznat mail.", { status: 400 });
-    const { meta, raw } = await ucitajMail(env, id);
-    if (!meta || !raw) return new Response("Mail nije pronađen.", { status: 404 });
-    return new Response(raw, {
-      headers: { ...STROGO, "content-type": "application/octet-stream", "content-disposition": nazivZaPreuzimanje("mail-" + id + ".eml"), "content-security-policy": "sandbox; default-src 'none'" },
-    });
-  }
-  if (req.method === "POST" && put === "/api/posta/procitano") {
-    const b = await req.json().catch(() => ({}));
-    const pid = Number(b.id);
-    if (!Number.isInteger(pid) || pid <= 0 || typeof b.procitano !== "boolean") return json({ greska: "Neispravan zahtjev." }, 400);
-    const ok = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_procitano", { p_kljuc: env.NADZOR_KLJUC, p_id: pid, p_procitano: b.procitano });
-    if (!ok) return json({ greska: "Mail više ne postoji. Osvježi stranicu." }, 404);
-    return json({ ok: true });
-  }
-  if (req.method === "POST" && put === "/api/posta/obrisi") {
-    const b = await req.json().catch(() => ({}));
-    const pid = Number(b.id);
-    if (!Number.isInteger(pid) || pid <= 0) return json({ greska: "Nepoznat mail." }, 400);
-    const kljuc = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_posta_obrisi", { p_kljuc: env.NADZOR_KLJUC, p_id: pid });
-    if (!kljuc) return json({ greska: "Mail više ne postoji. Osvježi stranicu." }, 404);
-    if (env.POSTA) await env.POSTA.delete(kljuc).catch(console.error);
-    return json({ ok: true });
-  }
-  return new Response("Nema te stranice.", { status: 404 });
 }
 
 // ---------- Javni prijem upita s weba ----------
