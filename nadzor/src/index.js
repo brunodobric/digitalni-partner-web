@@ -89,8 +89,9 @@ export default {
           // grupe se čitaju starom funkcijom iz sql/18, a ostatak sekcije radi normalno.
           rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", args).catch(greska),
         ]);
-        let po_grupi = [], grupe_greska = "", po_pinterestu = [], pinterest_greska = "";
+        let po_grupi = [], grupe_greska = "", po_pinterestu = [], pinterest_greska = "", po_oznaci = [];
         if (Array.isArray(oznake)) {
+          po_oznaci = oznake;
           po_grupi = oznake.filter((x) => x.medij === "grupa").map((x) => ({ ...x, grupa: x.oglas }));
           po_pinterestu = oznake.filter((x) => x.izvor === "pinterest");
         } else {
@@ -98,7 +99,7 @@ export default {
           const grupe = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_grupe", args).catch(greska);
           if (Array.isArray(grupe)) po_grupi = grupe; else grupe_greska = grupe.greska;
         }
-        return json({ ...izvori, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana });
+        return json({ ...izvori, po_oznaci, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
