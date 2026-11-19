@@ -358,19 +358,26 @@ function ucitajIzvore(){
     .catch(function(err){ izUcitavam = -1; izGreska = err.message; if (ekran === "vjencanja") crtaj(); });
 }
 var izOtvoreni = {};
-var IZ_VRSTA = {grupa: "grupa", pin: "pin", profil: "profil", social: "bez oznake", organic: "pretraga", referral: "poveznica", ai: "AI", fbclid: "bez oznake", paid: "oglas", cpc: "oglas"};
+var IZ_VRSTA = {grupa: "grupa", pin: "pin", profil: "profil", social: "bez oznake", organic: "pretraga", referral: "poveznica", ai: "AI", fbclid: "bez oznake", paid: "oglas", paid_social: "oglas", cpc: "oglas"};
 function postotak(a, b){ return b > 0 ? (a / b * 100).toLocaleString("hr-HR", {maximumFractionDigits: a / b < .1 ? 1 : 0}) + " %" : "–"; }
-// Retci ispod izvora: grupe, pinovi i oglasi (po_oznaci, sve brojke), a uz njih kampanje koje nemaju utm_content (samo posjete).
-function djecaIzvora(izvor){
-  var d = (IZ.po_oznaci || []).filter(function(x){ return x.izvor === izvor; }).map(function(x){
-    return {ime: x.oglas || (x.medij === "profil" ? "Profil" : x.kampanja || "bez oznake"), vrsta: IZ_VRSTA[x.medij] || x.medij || "", kampanja: x.oglas ? x.kampanja : "", posjete: x.posjete, registracije: x.registracije, kupnje: x.kupnje, prihod: x.prihod, sve: true};
+// Retci ispod izvora: sve oznake poveznica (po_oznaci, sql/20) sa svim brojkama; kampanje koje u po_oznaci
+// nedostaju (dok sql/20 nije pokrenut) samo s posjetama; ostatak registracija i kupnji izvora (odgovor na
+// pitanje „Kako ste čuli za Kuvertu?”, bez oznake) u zasebnom retku, da se retci zbroje u izvor.
+function djecaIzvora(x){
+  var izvor = x.izvor;
+  var d = (IZ.po_oznaci || []).filter(function(o){ return o.izvor === izvor; }).map(function(o){
+    return {ime: o.oglas || o.kampanja || (o.medij === "profil" ? "Profil" : "bez kampanje"), vrsta: IZ_VRSTA[o.medij] || o.medij || "bez oznake", kampanja: o.oglas ? o.kampanja : "", posjete: o.posjete, registracije: o.registracije, kupnje: o.kupnje, prihod: o.prihod, sve: true};
   });
-  var ima = {}; (IZ.po_oznaci || []).forEach(function(x){ ima[x.izvor + "|" + x.medij + "|" + x.kampanja] = 1; });
-  (IZ.po_kampanji || []).forEach(function(x){
-    if (x.izvor !== izvor || ima[x.izvor + "|" + x.medij + "|" + x.kampanja]) return;
-    d.push({ime: x.kampanja || "bez kampanje", vrsta: IZ_VRSTA[x.medij] || x.medij || "", kampanja: "", posjete: x.posjete, sve: false});
+  var ima = {}; (IZ.po_oznaci || []).forEach(function(o){ ima[o.izvor + "|" + o.medij + "|" + o.kampanja] = 1; });
+  (IZ.po_kampanji || []).forEach(function(o){
+    if (o.izvor !== izvor || ima[o.izvor + "|" + o.medij + "|" + o.kampanja]) return;
+    d.push({ime: o.kampanja || "bez kampanje", vrsta: IZ_VRSTA[o.medij] || o.medij || "bez oznake", kampanja: "", posjete: o.posjete, sve: false});
   });
-  return d.sort(function(a, b){ return (Number(b.prihod) || 0) - (Number(a.prihod) || 0) || (b.registracije || 0) - (a.registracije || 0) || b.posjete - a.posjete; });
+  var r = x.registracije, k = x.kupnje, e2 = Number(x.prihod);
+  d.forEach(function(c){ if (c.sve) { r -= c.registracije; k -= c.kupnje; e2 -= Number(c.prihod); } });
+  d.sort(function(a, b){ return (Number(b.prihod) || 0) - (Number(a.prihod) || 0) || (b.registracije || 0) - (a.registracije || 0) || b.posjete - a.posjete; });
+  if (d.length && (r > 0 || k > 0)) d.push({ime: "Odgovor „Kako ste čuli”", vrsta: "", kampanja: "", posjete: null, registracije: Math.max(0, r), kupnje: Math.max(0, k), prihod: Math.max(0, e2), sve: true, ostatak: true});
+  return d;
 }
 function izvoriKuverte(){
   var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2>'
@@ -388,9 +395,9 @@ function izvoriKuverte(){
   var maxP = Math.max(1, Math.max.apply(null, pi.map(function(x){ return x.posjete; })));
   var redak = '';
   pi.forEach(function(x){
-    var dj = djecaIzvora(x.izvor), otv = !!izOtvoreni[x.izvor];
-    var vrste = {}; dj.forEach(function(d){ vrste[d.vrsta] = (vrste[d.vrsta] || 0) + 1; });
-    var opis = Object.keys(vrste).map(function(v){ var n = vrste[v]; return n + " " + ({grupa: n === 1 ? "grupa" : n < 5 ? "grupe" : "grupa", pin: n === 1 ? "pin" : n < 5 ? "pina" : "pinova"}[v] || v); }).join(", ");
+    var dj = djecaIzvora(x), otv = !!izOtvoreni[x.izvor];
+    var vrste = {}; dj.forEach(function(d){ if (!d.ostatak) vrste[d.vrsta] = (vrste[d.vrsta] || 0) + 1; });
+    var opis = Object.keys(vrste).map(function(v){ var n = vrste[v]; return n + " " + ({grupa: n === 1 ? "grupa" : n < 5 ? "grupe" : "grupa", pin: n === 1 ? "pin" : n < 5 ? "pina" : "pinova", oglas: n === 1 ? "oglas" : "oglasa", poveznica: n === 1 ? "poveznica" : n < 5 ? "poveznice" : "poveznica"}[v] || v); }).join(", ");
     redak += '<tr class="iz-red">'
       + '<td>' + (dj.length ? '<button type="button" class="iz-otvori" data-izvor="' + e(x.izvor) + '" aria-expanded="' + otv + '"><span aria-hidden="true">' + (otv ? "▾" : "▸") + '</span>' + e(imeIzvora(x.izvor)) + '</button><span class="src iz-opis">' + e(opis) + '</span>' : '<span class="iz-ime">' + e(imeIzvora(x.izvor)) + '</span>') + '</td>'
       + '<td class="r"><div class="iz-posj"><span class="trak"><i style="width:' + (x.posjete / maxP * 100) + '%"></i></span>' + br(x.posjete) + '</div></td>'
@@ -398,17 +405,17 @@ function izvoriKuverte(){
       + '<td class="r">' + br(x.kupnje) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>';
     if (otv) dj.forEach(function(d){
       redak += '<tr class="iz-dijete"><td><span class="iz-ime2">' + e(d.ime) + '</span>' + (d.vrsta ? '<span class="oznaka ceka">' + e(d.vrsta) + '</span>' : '') + (d.kampanja ? '<span class="src"> · ' + e(d.kampanja) + '</span>' : '') + '</td>'
-        + '<td class="r">' + br(d.posjete) + '</td>'
-        + (d.sve ? '<td class="r">' + br(d.registracije) + '</td><td class="r src">' + postotak(d.registracije, d.posjete) + '</td><td class="r">' + br(d.kupnje) + '</td><td class="r nw">' + (Number(d.prihod) > 0 ? eur(d.prihod, true) : "–") + '</td>' : '<td class="r src">–</td><td></td><td class="r src">–</td><td class="r src">–</td>')
+        + '<td class="r' + (d.posjete == null ? ' src' : '') + '">' + (d.posjete == null ? "–" : br(d.posjete)) + '</td>'
+        + (d.sve ? '<td class="r">' + br(d.registracije) + '</td><td class="r src">' + (d.posjete == null ? "" : postotak(d.registracije, d.posjete)) + '</td><td class="r">' + br(d.kupnje) + '</td><td class="r nw">' + (Number(d.prihod) > 0 ? eur(d.prihod, true) : "–") + '</td>' : '<td class="r src">–</td><td></td><td class="r src">–</td><td class="r src">–</td>')
         + '</tr>';
     });
   });
   h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Reg. / posjete</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>' + redak + '</tbody></table></div>';
-  if (IZ.pinterest_greska || IZ.grupe_greska) h += '<p class="src">Grupe i pinovi se nisu učitali (' + e(IZ.pinterest_greska || IZ.grupe_greska) + '). U projektu MyWeddingInvite treba pokrenuti sql/19-kuverta-oznake.sql.</p>';
+  if (IZ.pinterest_greska || IZ.grupe_greska) h += '<p class="src">Grupe i pinovi se nisu učitali (' + e(IZ.pinterest_greska || IZ.grupe_greska) + '). U projektu MyWeddingInvite treba pokrenuti sql/20-kuverta-oznake-sve.sql.</p>';
   var pd = IZ.po_danu || [], mx = Math.max(4, Math.max.apply(null, pd.map(function(x){ return x.posjete; }))), sl = 680 / Math.max(1, pd.length), s = "";
   pd.forEach(function(x, i){ var hh = x.posjete / mx * 50; s += '<rect x="' + (32 + i * sl + sl * .15) + '" y="' + (60 - hh) + '" width="' + (sl * .7) + '" height="' + hh + '" rx="1.5" fill="#C6A15B"><title>' + datum(x.dan) + ': ' + x.posjete + '</title></rect>'; });
   if (pd.length) h += '<div><p class="src" style="margin-bottom:4px">Posjete po danu, zadnjih 30 dana (najviše ' + br(mx === 4 ? Math.max.apply(null, pd.map(function(x){ return x.posjete; })) : mx) + ' u danu)</p><svg viewBox="0 0 720 66" role="img" aria-label="Posjete s poznatim izvorom po danu, zadnjih 30 dana" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="60" y2="60" stroke="rgba(11,11,12,.14)"/>' + s + '</svg><div class="src" style="display:flex;justify-content:space-between;padding:0 8px 0 32px"><span>' + datum(pd[0].dan) + '</span><span>' + datum(pd[pd.length - 1].dan) + '</span></div></div>';
-  h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjete se broje bez kolačića: oznake utm u poveznici ili stranica s koje je posjetitelj došao. Grupa je poveznica s utm_medium=grupa, a pin poveznica s utm_medium=pin; ime je utm_content. Izvor registracije je oznaka s kojom je korisnik došao, a ako je nema, odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih. Kampanje bez imena grupe ili pina imaju samo posjete.</p></details></section>';
+  h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjete se broje bez kolačića: oznake utm u poveznici ili stranica s koje je posjetitelj došao. Grupa je poveznica s utm_medium=grupa, a pin poveznica s utm_medium=pin; ime je utm_content. Izvor registracije je oznaka s kojom je korisnik došao, a ako je nema, odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih. Ispod izvora su sve oznake poveznica (grupe, pinovi, oglasi, kampanje). Registracije bez oznake, za koje znamo samo odgovor na pitanje „Kako ste čuli za Kuvertu?”, su u retku „Odgovor „Kako ste čuli””.</p></details></section>';
   return h;
 }
 

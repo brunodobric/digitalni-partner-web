@@ -85,7 +85,7 @@ export default {
         const greska = (e) => ({ greska: e.message });
         const [izvori, oznake] = await Promise.all([
           rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", args),
-          // Po oznaci poveznice (sql/19-kuverta-oznake.sql): grupe i Pinterest. Ako funkcije još nema,
+          // Po oznaci poveznice (sql/20-kuverta-oznake-sve.sql, prije sql/19): sve oznake, grupe i Pinterest. Ako funkcije još nema,
           // grupe se čitaju starom funkcijom iz sql/18, a ostatak sekcije radi normalno.
           rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", args).catch(greska),
         ]);
