@@ -81,8 +81,13 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/api/izvori") {
         const dana = [7, 30, 90, 0].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 30;
-        const izvori = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana });
-        return json({ ...izvori, dana });
+        const args = { p_kljuc: env.NADZOR_KLJUC, p_dana: dana };
+        const [izvori, grupe] = await Promise.all([
+          rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", args),
+          // Grupe (sql/18-kuverta-grupe.sql). Ako funkcije još nema, ostatak sekcije radi normalno.
+          rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_grupe", args).catch((e) => ({ greska: e.message })),
+        ]);
+        return json({ ...izvori, po_grupi: Array.isArray(grupe) ? grupe : [], grupe_greska: Array.isArray(grupe) ? "" : grupe?.greska || "", dana });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
