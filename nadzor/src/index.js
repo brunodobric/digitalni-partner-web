@@ -82,12 +82,23 @@ export default {
       if (req.method === "GET" && url.pathname === "/api/izvori") {
         const dana = [7, 30, 90, 0].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 30;
         const args = { p_kljuc: env.NADZOR_KLJUC, p_dana: dana };
-        const [izvori, grupe] = await Promise.all([
+        const greska = (e) => ({ greska: e.message });
+        const [izvori, oznake] = await Promise.all([
           rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", args),
-          // Grupe (sql/18-kuverta-grupe.sql). Ako funkcije još nema, ostatak sekcije radi normalno.
-          rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_grupe", args).catch((e) => ({ greska: e.message })),
+          // Po oznaci poveznice (sql/19-kuverta-oznake.sql): grupe i Pinterest. Ako funkcije još nema,
+          // grupe se čitaju starom funkcijom iz sql/18, a ostatak sekcije radi normalno.
+          rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", args).catch(greska),
         ]);
-        return json({ ...izvori, po_grupi: Array.isArray(grupe) ? grupe : [], grupe_greska: Array.isArray(grupe) ? "" : grupe?.greska || "", dana });
+        let po_grupi = [], grupe_greska = "", po_pinterestu = [], pinterest_greska = "";
+        if (Array.isArray(oznake)) {
+          po_grupi = oznake.filter((x) => x.medij === "grupa").map((x) => ({ ...x, grupa: x.oglas }));
+          po_pinterestu = oznake.filter((x) => x.izvor === "pinterest");
+        } else {
+          pinterest_greska = oznake.greska;
+          const grupe = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_grupe", args).catch(greska);
+          if (Array.isArray(grupe)) po_grupi = grupe; else grupe_greska = grupe.greska;
+        }
+        return json({ ...izvori, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
