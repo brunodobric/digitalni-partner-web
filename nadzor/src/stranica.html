@@ -364,8 +364,20 @@ function izvoriKuverte(){
   var pk = IZ.po_kampanji || [];
   if (pk.length) h += '<h2 style="margin-top:18px;font-size:16px">Po kampanji</h2><div class="skrol"><table class="num"><thead><tr><th>Izvor</th><th>Medij</th><th>Kampanja</th><th class="r">Posjete</th></tr></thead><tbody>'
     + pk.map(function(x){ return '<tr><td class="nw">' + e(imeIzvora(x.izvor)) + '</td><td>' + e(x.medij || "–") + '</td><td>' + e(x.kampanja || "–") + '</td><td class="r">' + br(x.posjete) + '</td></tr>'; }).join("") + '</tbody></table></div>';
+  h += grupeKuverte();
   h += '<p class="src">Posjete se broje bez kolačića (oznake utm u poveznici ili stranica s koje je posjetitelj došao). Izvor registracije je zapamćen samo kad je posjetitelj prihvatio kolačiće, a inače njegov odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih.</p></section>';
   return h;
+}
+
+// Grupe (poveznice s utm_medium=grupa, ime grupe u utm_content), npr. Facebook grupe za vjenčanja.
+function grupeKuverte(){
+  var h = '<h2 style="margin-top:18px;font-size:16px">Po grupi</h2>';
+  if (IZ.grupe_greska) return h + '<p class="prazno">Grupe se nisu učitale (' + e(IZ.grupe_greska) + '). Ako piše da funkcija ne postoji, u projektu MyWeddingInvite treba pokrenuti migraciju 029_posjete_oglas.sql, pa sql/18-kuverta-grupe.sql.</p>';
+  var pg = IZ.po_grupi || [];
+  if (!pg.length) return h + '<p class="prazno">U ovom razdoblju još nitko nije došao s poveznice iz grupe (oznaka utm_medium=grupa).</p>';
+  return h + '<div class="skrol"><table class="num"><thead><tr><th>Grupa</th><th>Mreža</th><th>Kampanja</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
+    + pg.map(function(x){ return '<tr><td class="nw" style="font-weight:600">' + e(x.grupa || "bez imena") + '</td><td class="nw">' + e(imeIzvora(x.izvor)) + '</td><td>' + e(x.kampanja || "–") + '</td><td class="r">' + br(x.posjete) + '</td><td class="r">' + br(x.registracije) + '</td><td class="r">' + br(x.kupnje) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Ime grupe je oznaka utm_content iz poveznice. Nova grupa se pojavi sama čim netko dođe s njezinom poveznicom. Registracije i kupnje su po izvoru računa, kao u tablici gore.</p>';
 }
 
 // ---------- Korisnici Kuverte (na ekranu Kuverta) ----------
