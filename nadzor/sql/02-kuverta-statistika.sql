@@ -11,6 +11,7 @@ create table if not exists nadzor.kljuc (
   id smallint primary key default 1 check (id = 1),
   sazetak text not null
 );
+alter table nadzor.kljuc enable row level security; -- bez pravila: samo vlasnik (funkcije nadzor_*), vidi 21
 
 create or replace function public.nadzor_statistika(p_kljuc text)
 returns jsonb language plpgsql security definer set search_path = '' stable as $$
