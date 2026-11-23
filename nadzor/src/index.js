@@ -81,14 +81,20 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/api/izvori") {
         const dana = [7, 30, 90, 0].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 30;
-        const args = { p_kljuc: env.NADZOR_KLJUC, p_dana: dana };
+        // Jedan dan (klik na stupac grafa): p_dan postoji tek nakon sql/22, pa se šalje samo kad je dan odabran.
+        const dan = /^\d{4}-\d{2}-\d{2}$/.test(url.searchParams.get("dan") || "") ? url.searchParams.get("dan") : null;
+        const args = { p_kljuc: env.NADZOR_KLJUC, p_dana: dana, ...(dan ? { p_dan: dan } : {}) };
         const greska = (e) => ({ greska: e.message });
         const [izvori, oznake] = await Promise.all([
-          rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", args),
+          rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", args).catch((e) => {
+            if (dan) return { greska_dan: true };
+            throw e;
+          }),
           // Po oznaci poveznice (sql/20-kuverta-oznake-sve.sql, prije sql/19): sve oznake, grupe i Pinterest. Ako funkcije još nema,
           // grupe se čitaju starom funkcijom iz sql/18, a ostatak sekcije radi normalno.
           rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", args).catch(greska),
         ]);
+        if (izvori && izvori.greska_dan) return json({ greska: "Pregled po danu radi kad se u projektu MyWeddingInvite pokrene sql/22-kuverta-aktivnost-i-dani.sql." }, 500);
         let po_grupi = [], grupe_greska = "", po_pinterestu = [], pinterest_greska = "", po_oznaci = [];
         if (Array.isArray(oznake)) {
           po_oznaci = oznake;
@@ -96,10 +102,10 @@ export default {
           po_pinterestu = oznake.filter((x) => x.izvor === "pinterest");
         } else {
           pinterest_greska = oznake.greska;
-          const grupe = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_grupe", args).catch(greska);
+          const grupe = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_grupe", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana }).catch(greska);
           if (Array.isArray(grupe)) po_grupi = grupe; else grupe_greska = grupe.greska;
         }
-        return json({ ...izvori, po_oznaci, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana });
+        return json({ ...izvori, po_oznaci, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana, dan });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);

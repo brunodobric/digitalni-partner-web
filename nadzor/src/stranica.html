@@ -175,7 +175,11 @@ function crtaj(){
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
   if (ekran === "racuni") veziRacune();
-  if (ekran === "vjencanja") { veziKorisnike(); var izd = document.getElementById("izvori-dana"); if (izd) izd.addEventListener("change", function(){ izDana = Number(izd.value); izGreska = ""; crtaj(); }); document.querySelectorAll(".iz-otvori").forEach(function(b){ b.addEventListener("click", function(){ izOtvoreni[b.dataset.izvor] = !izOtvoreni[b.dataset.izvor]; var y = window.scrollY; crtaj(); window.scrollTo(0, y); }); }); }
+  if (ekran === "vjencanja") { veziKorisnike(); var izd = document.getElementById("izvori-dana"); if (izd) izd.addEventListener("change", function(){ izDana = Number(izd.value); izDan = ""; izGreska = ""; crtaj(); });
+    var postaviDan = function(d){ izDan = d; izGreska = ""; var y = window.scrollY; crtaj(); window.scrollTo(0, y); };
+    var idan = document.getElementById("izvori-dan"); if (idan) idan.addEventListener("change", function(){ postaviDan(/^\d{4}-\d{2}-\d{2}$/.test(idan.value) ? idan.value : ""); });
+    var isvi = document.getElementById("izvori-svi-dani"); if (isvi) isvi.addEventListener("click", function(){ postaviDan(""); });
+    var gpd = document.getElementById("graf-po-danu"); if (gpd) gpd.addEventListener("click", function(ev){ var g = ev.target.closest("[data-dan]"); if (g) postaviDan(g.dataset.dan === izDan ? "" : g.dataset.dan); }); document.querySelectorAll(".iz-otvori").forEach(function(b){ b.addEventListener("click", function(){ izOtvoreni[b.dataset.izvor] = !izOtvoreni[b.dataset.izvor]; var y = window.scrollY; crtaj(); window.scrollTo(0, y); }); }); }
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
@@ -338,7 +342,8 @@ function vjencanja(){
   var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Linija 3 · Kuverta</p><h1>Pozivnica, album i raspored sjedenja</h1></div>';
   if (k.greska) return h + '<section class="panel"><p class="prazno">Baza Kuverte trenutno ne odgovara: ' + e(k.greska) + '</p></section>';
   var t = ovaj();
-  h += '<section class="kpi"><div><span class="src">Prihod ovaj mjesec</span><span class="v num">' + eur(t.vjencanja) + '</span></div><div><span class="src">Pozivnice u bazi</span><span class="v num">' + br(k.pozivnice) + '</span><span class="src">' + br(k.pozivnice_objavljene) + ' objavljenih</span></div><div><span class="src">Albumi</span><span class="v num">' + br(k.albumi) + '</span><span class="src">' + br(k.fotografije) + ' datoteka, ' + (Number(k.album_bajtovi) / 1073741824).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + ' GB</span></div><div><span class="src">Rasporedi sjedenja</span><span class="v num">' + br(k.rasporedi) + '</span><span class="src">' + br(k.stolovi) + ' stolova, ' + br(k.gosti_u_rasporedu) + ' gostiju</span></div></section>';
+  var reg30 = K ? K.filter(function(u){ return new Date(u.registriran).getTime() >= Date.now() - 30 * 864e5; }).length : 0;
+  h += '<section class="kpi"><div><span class="src">Registracije ukupno</span><span class="v num">' + (K ? br(K.length) : "…") + '</span><span class="src">' + (K ? br(reg30) + ' u zadnjih 30 dana' : '&nbsp;') + '</span></div><div><span class="src">Prihod ovaj mjesec</span><span class="v num">' + eur(t.vjencanja) + '</span></div><div><span class="src">Pozivnice u bazi</span><span class="v num">' + br(k.pozivnice) + '</span><span class="src">' + br(k.pozivnice_objavljene) + ' objavljenih</span></div><div><span class="src">Albumi</span><span class="v num">' + br(k.albumi) + '</span><span class="src">' + br(k.fotografije) + ' datoteka, ' + (Number(k.album_bajtovi) / 1073741824).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + ' GB</span></div><div><span class="src">Rasporedi sjedenja</span><span class="v num">' + br(k.rasporedi) + '</span><span class="src">' + br(k.stolovi) + ' stolova, ' + br(k.gosti_u_rasporedu) + ' gostiju</span></div></section>';
   var id = k.iduca || [];
   h += '<section class="panel"><h2>Iduća vjenčanja</h2>' + (id.length ? '<div class="skrol"><table class="num"><thead><tr><th>Datum</th><th>Objavljena</th><th class="r">Potvrde</th><th class="r">Gostiju dolazi</th><th>Album</th><th class="r">Stolova</th></tr></thead><tbody>' + id.map(function(v){ return '<tr><td class="nw" style="font-weight:600">' + datumG(v.datum) + '</td><td>' + (v.objavljena == null ? "samo raspored" : (v.objavljena ? "da" : "ne")) + '</td><td class="r">' + v.potvrde + '</td><td class="r">' + v.dolazi + '</td><td>' + (v.ima_album ? "da" : "ne") + '</td><td class="r">' + v.stolovi + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Nema pozivnica s datumom u budućnosti.</p>') + '<p class="src">Imena parova i gostiju se ne prenose u dashboard, samo brojevi.</p></section>';
   h += izvoriKuverte();
@@ -347,15 +352,17 @@ function vjencanja(){
 }
 
 // ---------- Otkud dolaze kupci (na ekranu Kuverta) ----------
-var IZ = null, izGreska = "", izDana = 30, izUcitavam = -1;
+var IZ = null, izGreska = "", izDana = 30, izDan = "", izUcitavam = "";
+function izKljuc(){ return izDana + "|" + izDan; }
 var IZVOR_IME = {instagram: "Instagram", facebook: "Facebook", meta: "Meta (FB/IG, bez oznake)", google: "Google", bing: "Bing", chatgpt: "ChatGPT", perplexity: "Perplexity", claude: "Claude", gemini: "Gemini", tiktok: "TikTok", pinterest: "Pinterest", potpis: "Potpis na pozivnici", preporuka: "Preporuka", drugo: "Drugo", nepoznato: "Nepoznato"};
 function imeIzvora(x){ return IZVOR_IME[x] || x; }
 function ucitajIzvore(){
-  if (izUcitavam === izDana) return;
-  izUcitavam = izDana;
-  fetch("/api/izvori?dana=" + izDana, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ izUcitavam = -1; if (j.dana !== izDana) return; IZ = j; izGreska = ""; if (ekran === "vjencanja") crtaj(); })
-    .catch(function(err){ izUcitavam = -1; izGreska = err.message; if (ekran === "vjencanja") crtaj(); });
+  var kl = izKljuc();
+  if (izUcitavam === kl) return;
+  izUcitavam = kl;
+  fetch("/api/izvori?dana=" + izDana + (izDan ? "&dan=" + izDan : ""), {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ izUcitavam = ""; if (j.dana + "|" + (j.dan || "") !== izKljuc()) return; IZ = j; izGreska = ""; if (ekran === "vjencanja") crtaj(); })
+    .catch(function(err){ izUcitavam = ""; izGreska = err.message; if (ekran === "vjencanja") crtaj(); });
 }
 var izOtvoreni = {};
 var IZ_VRSTA = {grupa: "grupa", pin: "pin", profil: "profil", social: "bez oznake", organic: "pretraga", referral: "poveznica", ai: "AI", fbclid: "bez oznake", paid: "oglas", paid_social: "oglas", cpc: "oglas"};
@@ -379,11 +386,36 @@ function djecaIzvora(x){
   if (d.length && (r > 0 || k > 0)) d.push({ime: "Odgovor „Kako ste čuli”", vrsta: "", kampanja: "", posjete: null, registracije: Math.max(0, r), kupnje: Math.max(0, k), prihod: Math.max(0, e2), sve: true, ostatak: true});
   return d;
 }
+// Posjete (zlatno) i registracije (zeleno) po danu. Klik na stupac prikaže samo taj dan, ponovni klik vraća razdoblje.
+function grafPoDanu(){
+  var pd = IZ.po_danu || [];
+  if (!pd.length) return "";
+  var imaReg = pd.some(function(x){ return x.registracije != null; });
+  var mx = Math.max(4, Math.max.apply(null, pd.map(function(x){ return Math.max(x.posjete, x.registracije || 0); })));
+  var sl = 680 / pd.length, s = "";
+  pd.forEach(function(x, i){
+    var dan = String(x.dan).slice(0, 10), x0 = 32 + i * sl, odabran = dan === izDan, w = imaReg ? sl * .34 : sl * .7;
+    var hp = x.posjete / mx * 74, hr = (x.registracije || 0) / mx * 74, bljedo = izDan && !odabran ? ' opacity=".4"' : '';
+    s += '<g data-dan="' + dan + '" style="cursor:pointer"><title>' + datum(x.dan) + ': ' + x.posjete + ' posjeta' + (imaReg ? ', ' + x.registracije + ' registracija' : '') + '</title>'
+      + '<rect x="' + x0 + '" y="0" width="' + sl + '" height="84" fill="' + (odabran ? 'rgba(198,161,91,.18)' : 'transparent') + '"/>'
+      + '<rect x="' + (x0 + sl * .14) + '" y="' + (80 - hp) + '" width="' + w + '" height="' + hp + '" rx="1.5" fill="#C6A15B"' + bljedo + '/>'
+      + (imaReg ? '<rect x="' + (x0 + sl * .52) + '" y="' + (80 - hr) + '" width="' + w + '" height="' + hr + '" rx="1.5" fill="#0F3B33"' + bljedo + '/>' : '')
+      + '</g>';
+  });
+  var najP = Math.max.apply(null, pd.map(function(x){ return x.posjete; }));
+  return '<div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:4px"><p class="src">Po danu, zadnjih ' + pd.length + ' dana (najviše ' + br(najP) + ' posjeta u danu). Klikni stupac i vidiš samo taj dan.</p>'
+    + '<div class="legenda"><span><i style="background:#C6A15B"></i>Posjete</span>' + (imaReg ? '<span><i style="background:#0F3B33"></i>Registracije</span>' : '') + '</div></div>'
+    + '<svg id="graf-po-danu" viewBox="0 0 720 86" role="img" aria-label="Posjete i registracije po danu" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="80" y2="80" stroke="rgba(11,11,12,.14)"/>' + s + '</svg>'
+    + '<div class="src" style="display:flex;justify-content:space-between;padding:0 8px 0 32px"><span>' + datum(pd[0].dan) + '</span><span>' + datum(pd[pd.length - 1].dan) + '</span></div>'
+    + (imaReg ? '' : '<p class="src">Registracije u grafu i pregled jednog dana rade kad se u projektu MyWeddingInvite pokrene sql/22-kuverta-aktivnost-i-dani.sql.</p>') + '</div>';
+}
 function izvoriKuverte(){
-  var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2>'
-    + '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="izvori-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === izDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label></div>';
+  var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">'
+    + '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="izvori-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === izDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label>'
+    + '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Dan<input type="date" id="izvori-dan" value="' + izDan + '" max="' + D.danas + '"></label>'
+    + (izDan ? '<button type="button" class="tiho" id="izvori-svi-dani">Svi dani</button>' : '') + '</div></div>';
   if (izGreska) return h + '<p class="prazno">Izvori se nisu učitali (' + e(izGreska) + '). Ako piše da funkcija ne postoji, u projektu MyWeddingInvite treba pokrenuti sql/12-kuverta-izvori.sql.</p></section>';
-  if (!IZ || IZ.dana !== izDana) { ucitajIzvore(); return h + '<p class="prazno">Učitavam izvore…</p></section>'; }
+  if (!IZ || IZ.dana + "|" + (IZ.dan || "") !== izKljuc()) { ucitajIzvore(); return h + '<p class="prazno">Učitavam izvore…</p></section>'; }
   var pi = IZ.po_izvoru || [];
   var uk = pi.reduce(function(a, x){ a.p += x.posjete; a.r += x.registracije; a.k += x.kupnje; a.e += Number(x.prihod); return a; }, {p:0, r:0, k:0, e:0});
   h += '<div class="iz-kpi">'
@@ -391,6 +423,8 @@ function izvoriKuverte(){
     + '<div><span class="src">Registracije</span><b class="num">' + br(uk.r) + '</b><span class="src">' + (uk.p ? postotak(uk.r, uk.p) + ' posjeta' : '&nbsp;') + '</span></div>'
     + '<div><span class="src">Kupnje</span><b class="num">' + br(uk.k) + '</b><span class="src">' + (uk.r ? postotak(uk.k, uk.r) + ' registracija' : '&nbsp;') + '</span></div>'
     + '<div><span class="src">Prihod</span><b class="num">' + eur(uk.e) + '</b></div></div>';
+  h += grafPoDanu();
+  if (izDan) h += '<p class="num" style="font-size:14px">Prikazan je samo dan <b>' + datumG(izDan) + '</b> · <b>' + br(uk.p) + '</b> posjeta s poznatim izvorom, <b>' + br(uk.r) + '</b> registracija, <b>' + br(uk.k) + '</b> kupnji. Tablica ispod je za taj dan.</p>';
   if (!pi.length) return h + '<p class="prazno">U ovom razdoblju još nema posjeta s oznakom ni registracija.</p></section>';
   var maxP = Math.max(1, Math.max.apply(null, pi.map(function(x){ return x.posjete; })));
   var redak = '';
@@ -412,9 +446,6 @@ function izvoriKuverte(){
   });
   h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Reg. / posjete</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>' + redak + '</tbody></table></div>';
   if (IZ.pinterest_greska || IZ.grupe_greska) h += '<p class="src">Grupe i pinovi se nisu učitali (' + e(IZ.pinterest_greska || IZ.grupe_greska) + '). U projektu MyWeddingInvite treba pokrenuti sql/20-kuverta-oznake-sve.sql.</p>';
-  var pd = IZ.po_danu || [], mx = Math.max(4, Math.max.apply(null, pd.map(function(x){ return x.posjete; }))), sl = 680 / Math.max(1, pd.length), s = "";
-  pd.forEach(function(x, i){ var hh = x.posjete / mx * 50; s += '<rect x="' + (32 + i * sl + sl * .15) + '" y="' + (60 - hh) + '" width="' + (sl * .7) + '" height="' + hh + '" rx="1.5" fill="#C6A15B"><title>' + datum(x.dan) + ': ' + x.posjete + '</title></rect>'; });
-  if (pd.length) h += '<div><p class="src" style="margin-bottom:4px">Posjete po danu, zadnjih 30 dana (najviše ' + br(mx === 4 ? Math.max.apply(null, pd.map(function(x){ return x.posjete; })) : mx) + ' u danu)</p><svg viewBox="0 0 720 66" role="img" aria-label="Posjete s poznatim izvorom po danu, zadnjih 30 dana" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="60" y2="60" stroke="rgba(11,11,12,.14)"/>' + s + '</svg><div class="src" style="display:flex;justify-content:space-between;padding:0 8px 0 32px"><span>' + datum(pd[0].dan) + '</span><span>' + datum(pd[pd.length - 1].dan) + '</span></div></div>';
   h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjete se broje bez kolačića: oznake utm u poveznici ili stranica s koje je posjetitelj došao. Grupa je poveznica s utm_medium=grupa, a pin poveznica s utm_medium=pin; ime je utm_content. Izvor registracije je oznaka s kojom je korisnik došao, a ako je nema, odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih. Ispod izvora su sve oznake poveznica (grupe, pinovi, oglasi, kampanje). Registracije bez oznake, za koje znamo samo odgovor na pitanje „Kako ste čuli za Kuvertu?”, su u retku „Odgovor „Kako ste čuli””.</p></details></section>';
   return h;
 }
@@ -433,13 +464,16 @@ function korisniciKuverte(){
   if (!K.length) return h + '<p class="prazno">Još nema registriranih korisnika.</p></section>';
   var od30 = Date.now() - 30 * 864e5;
   var novi = K.filter(function(u){ return new Date(u.registriran).getTime() >= od30; }).length;
-  var aktivni = K.filter(function(u){ return u.zadnja_prijava && new Date(u.zadnja_prijava).getTime() >= od30; }).length;
+  function akt(u){ return u.zadnja_aktivnost || u.zadnja_prijava; }
+  var imaAkt = K.some(function(u){ return "zadnja_aktivnost" in u; });
+  var aktivni = K.filter(function(u){ return akt(u) && new Date(akt(u)).getTime() >= od30; }).length;
+  var aktivni7 = K.filter(function(u){ return akt(u) && new Date(akt(u)).getTime() >= Date.now() - 7 * 864e5; }).length;
   var platili = K.filter(function(u){ return Number(u.placeno) > 0; }).length;
   function usl(u){ return [u.pozivnica && "pozivnica", u.album && "album", u.raspored && "raspored"].filter(Boolean).join(", ") || "–"; }
-  h += '<p class="num" style="font-size:14px"><b>' + br(K.length) + '</b> ukupno · <b>' + br(novi) + '</b> novih u zadnjih 30 dana · <b>' + br(aktivni) + '</b> prijavljenih u zadnjih 30 dana · <b>' + br(platili) + '</b> platilo</p>';
-  h += '<div class="skrol"><table class="num"><thead><tr><th>E-mail</th><th>Registriran</th><th>Zadnja prijava</th><th>Izvor</th><th>Napravio</th><th class="r">Plaćeno</th><th></th></tr></thead><tbody id="korisnici">'
-    + K.map(function(u, i){ return '<tr><td class="nw" style="font-weight:600">' + e(u.email || "–") + '</td><td class="nw">' + vrijeme(u.registriran) + '</td><td class="nw">' + (u.zadnja_prijava ? vrijeme(u.zadnja_prijava) : "nikad") + '</td><td class="nw">' + e(u.izvor ? imeIzvora(u.izvor) : "–") + '</td><td>' + e(usl(u)) + '</td><td class="r nw">' + (Number(u.placeno) > 0 ? eur(u.placeno, true) : "–") + '</td><td class="r">' + (u.email ? '<button type="button" class="tiho" data-brisi-korisnika="' + i + '" aria-label="Obriši račun ' + e(u.email) + '">Obriši</button>' : '') + '</td></tr>'; }).join("")
-    + '</tbody></table></div><p class="src">Izvor: Supabase Authentication projekta MyWeddingInvite, najnoviji prvi. Plaćeno je zbroj uplata preko Stripea bez testnih.</p><p id="korisnici-poruka" class="src" role="status">' + e(kPoruka) + '</p></section>';
+  h += '<p class="num" style="font-size:14px"><b>' + br(K.length) + '</b> ukupno · <b>' + br(novi) + '</b> novih u zadnjih 30 dana · ' + (imaAkt ? '<b>' + br(aktivni7) + '</b> aktivnih u zadnjih 7 dana · <b>' + br(aktivni) + '</b> aktivnih u zadnjih 30 dana' : '<b>' + br(aktivni) + '</b> prijavljenih u zadnjih 30 dana') + ' · <b>' + br(platili) + '</b> platilo</p>';
+  h += '<div class="skrol"><table class="num"><thead><tr><th>E-mail</th><th>Registriran</th>' + (imaAkt ? '<th>Zadnja aktivnost</th>' : '') + '<th>Zadnja prijava</th><th>Izvor</th><th>Napravio</th><th class="r">Plaćeno</th><th></th></tr></thead><tbody id="korisnici">'
+    + K.map(function(u, i){ return '<tr><td class="nw" style="font-weight:600">' + e(u.email || "–") + '</td><td class="nw">' + vrijeme(u.registriran) + '</td>' + (imaAkt ? '<td class="nw">' + (akt(u) ? vrijeme(akt(u)) : "nikad") + '</td>' : '') + '<td class="nw">' + (u.zadnja_prijava ? vrijeme(u.zadnja_prijava) : "nikad") + '</td><td class="nw">' + e(u.izvor ? imeIzvora(u.izvor) : "–") + '</td><td>' + e(usl(u)) + '</td><td class="r nw">' + (Number(u.placeno) > 0 ? eur(u.placeno, true) : "–") + '</td><td class="r">' + (u.email ? '<button type="button" class="tiho" data-brisi-korisnika="' + i + '" aria-label="Obriši račun ' + e(u.email) + '">Obriši</button>' : '') + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Izvor: Supabase Authentication projekta MyWeddingInvite, najnoviji prvi. ' + (imaAkt ? 'Zadnja aktivnost je zadnji put kad je korisnik otvorio Kuvertu, i kad ostane prijavljen (točno na oko sat vremena). Zadnja prijava je samo novi upis e-maila i lozinke ili koda.' : 'Za stupac Zadnja aktivnost u projektu MyWeddingInvite treba pokrenuti sql/22-kuverta-aktivnost-i-dani.sql.') + ' Plaćeno je zbroj uplata preko Stripea bez testnih.</p><p id="korisnici-poruka" class="src" role="status">' + e(kPoruka) + '</p></section>';
   return h;
 }
 // Brisanje korisnika: Obriši otvara potvrdu u retku, a račun se briše tek kad se upiše njegov e-mail.
@@ -452,7 +486,7 @@ function veziKorisnike(){
     if (b.dataset.brisiKorisnika) {
       var u = K[Number(b.dataset.brisiKorisnika)]; if (!u) return;
       tr.dataset.stari = tr.innerHTML; tr.className = "potvrda";
-      tr.innerHTML = '<td colspan="7"><div class="potvrda-tekst" style="position:sticky;left:14px;max-width:calc(100vw - 72px)"><span>Obrisati račun <b>' + e(u.email) + '</b>? Brišu se pozivnica, odgovori gostiju, album s datotekama i raspored, i ne vraćaju se. Uplate i računi ostaju. Za potvrdu upiši e-mail.</span><div style="flex-wrap:wrap"><input type="email" autocomplete="off" aria-label="E-mail računa za potvrdu" data-potvrda-email><button type="button" class="tiho" data-odustani>Odustani</button><button type="button" class="gumb opasno" data-obrisi-korisnika="' + b.dataset.brisiKorisnika + '" disabled>Obriši račun</button></div></div></td>';
+      tr.innerHTML = '<td colspan="8"><div class="potvrda-tekst" style="position:sticky;left:14px;max-width:calc(100vw - 72px)"><span>Obrisati račun <b>' + e(u.email) + '</b>? Brišu se pozivnica, odgovori gostiju, album s datotekama i raspored, i ne vraćaju se. Uplate i računi ostaju. Za potvrdu upiši e-mail.</span><div style="flex-wrap:wrap"><input type="email" autocomplete="off" aria-label="E-mail računa za potvrdu" data-potvrda-email><button type="button" class="tiho" data-odustani>Odustani</button><button type="button" class="gumb opasno" data-obrisi-korisnika="' + b.dataset.brisiKorisnika + '" disabled>Obriši račun</button></div></div></td>';
       var inp = tr.querySelector("[data-potvrda-email]"), ob = tr.querySelector("[data-obrisi-korisnika]");
       inp.addEventListener("input", function(){ ob.disabled = inp.value.trim().toLowerCase() !== String(u.email).toLowerCase(); });
       inp.focus();

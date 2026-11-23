@@ -23,6 +23,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Sve oznake poveznica ispod izvora u „Otkud dolaze kupci” (grupe, pinovi, oglasi, kampanje, s registracijama i kupnjama), pokreće se u projektu MyWeddingInvite; zamjenjuje `19` | `sql/20-kuverta-oznake-sve.sql` |
 | RLS na tablici `nadzor.kljuc` (upozorenje Security Advisora), pokreće se u projektu MyWeddingInvite | `sql/21-kuverta-kljuc-rls.sql` |
 | Registrirani korisnici Kuverte (ekran Kuverta), pokreće se u projektu MyWeddingInvite | `sql/06-kuverta-korisnici.sql` |
+| Zadnja aktivnost korisnika (iz osvježavanja sesije, ne samo zadnja prijava), registracije po danu u grafu i pregled jednog dana (klik na stupac ili polje Dan), pokreće se u projektu MyWeddingInvite nakon `12` i `20`; zamjenjuje `nadzor_korisnici` i `nadzor_izvori` iz `12` i `nadzor_oznake` iz `20` | `sql/22-kuverta-aktivnost-i-dani.sql` |
 | Brisanje korisničkog računa Kuverte (gumb Obriši uz korisnika), pokreće se u projektu MyWeddingInvite | migracija `023_nadzor_brisanje_korisnika.sql` u repozitoriju MyWeddingInvite; Worker zove `KUVERTA_WEB/interno/obrisi-korisnika` |
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
