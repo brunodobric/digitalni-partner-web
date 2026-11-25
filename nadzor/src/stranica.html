@@ -131,6 +131,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="usluge" aria-selected="false">Usluge</button>
     <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
     <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
+    <button role="tab" data-ekran="mailovi" aria-selected="false">Mailovi</button>
     <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
     <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
     <button role="tab" data-ekran="knjige" aria-selected="false">Knjige</button>
@@ -170,7 +171,7 @@ function oznaci(){
 
 function crtaj(){
   oznaci();
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti, mailovi: mailoviEkran}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
@@ -182,6 +183,7 @@ function crtaj(){
     var gpd = document.getElementById("graf-po-danu"); if (gpd) gpd.addEventListener("click", function(ev){ var g = ev.target.closest("[data-dan]"); if (g) postaviDan(g.dataset.dan === izDan ? "" : g.dataset.dan); }); document.querySelectorAll(".iz-otvori").forEach(function(b){ b.addEventListener("click", function(){ izOtvoreni[b.dataset.izvor] = !izOtvoreni[b.dataset.izvor]; var y = window.scrollY; crtaj(); window.scrollTo(0, y); }); }); }
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
+  if (ekran === "mailovi") veziMailove();
   var o = D.osvjezavanja, dijelovi = Object.keys(o).map(function(k){ var x = o[k]; return k + ": " + new Date(x.vrijeme).toLocaleString("hr-HR", {day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) + (x.uspjeh ? "" : " (greška)"); });
   document.getElementById("osvjezeno").textContent = dijelovi.length ? "Zadnje osvježavanje · " + dijelovi.join(" · ") : "Prikupljači se još nisu pokrenuli.";
   document.getElementById("korisnik").textContent = D.korisnik ? "Prijavljen: " + D.korisnik : "";
@@ -818,7 +820,234 @@ function obavijesti(){
   return h;
 }
 
-setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); }, 10 * 60 * 1000);
+// ---------- Mailovi (automatski mailovi Kuverte: pravila, kome idu, uređivanje) ----------
+// Pravila su u bazi Kuverte (migracija 033). UR je pravilo otvoreno za uređivanje; polja se upisuju u UR
+// čim se promijene, pa osvježavanje stranice (svakih 10 minuta) ne briše nespremljene izmjene.
+var MO = null, moGreska = "", moPoruka = "", UR = null, urVerzija = "", urPregled = null, urPregledGreska = "", urPoruka = "", urSpremam = false, moFiltar = "";
+var PREDLOSCI = {"vlastiti": "Vlastiti tekst", "podsjetnik-1": "Prvi koraci (kao mail 1)", "podsjetnik-2": "Usluga čeka uplatu (kao mail 2)", "akcija": "Akcija s cjenikom (kao Black Week)"};
+var PREDLOZAK_OPIS = {"vlastiti": "tekst upisan ovdje", "podsjetnik-1": "verzija prema prvoj započetoj usluzi; dok traje akcija, s akcijskim cjenikom", "podsjetnik-2": "verzija prema započetim uslugama, s cijenom i gumbom za plaćanje", "akcija": "cjenik akcije iz koda Kuverte (cijene.ts)"};
+var OKIDACI = {"registracija": "dana nakon registracije", "nakon": "dana nakon drugog maila", "datum": "na datum", "prije_vjencanja": "dana prije vjenčanja"};
+var KOME = {"bez_uplate": "registrirani koji nisu platili", "platili": "oni koji su platili", "svi": "svi registrirani"};
+var USLUGA = {"bilo": "bez obzira na započeto", "pozivnica": "koji su započeli pozivnicu", "album": "koji su započeli album", "raspored": "koji su započeli raspored", "nista": "koji još ništa nisu započeli"};
+var POVEZNICE = {"nadzorna": "Nadzorna ploča", "usluga": "Prva započeta usluga", "placanje-usluga": "Plaćanje prve započete usluge", "placanje-paket": "Plaćanje paketa", "demo": "Primjer pozivnice"};
+var POLJA_MAILA = [["naslov", "Naslov maila (predmet)"], ["preheader", "Kratki tekst uz naslov u popisu mailova"], ["h1", "Veliki naslov u mailu"], ["pod", "Podnaslov"], ["uvod", "Uvodni odlomak"]];
+
+function ucitajMailove(){
+  fetch("/api/mailovi", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ MO = j; moGreska = ""; if (ekran === "mailovi") crtajMailove(); })
+    .catch(function(err){ moGreska = err.message; if (ekran === "mailovi") crtajMailove(); });
+}
+// Crtanje ekrana s istim položajem na stranici (uređivanje je usred stranice).
+function crtajMailove(){ var y = window.scrollY; crtaj(); window.scrollTo(0, y); }
+function api(put, tijelo){
+  return fetch(put, {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(tijelo)})
+    .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); });
+}
+function danaRijecima(n){ n = Number(n); return n + (n % 10 === 1 && n % 100 !== 11 ? " dan" : " dana"); }
+function imePravila(k){ var x = MO && MO.pravila.filter(function(p){ return p.kljuc === k; })[0]; return x ? x.naziv : k; }
+function kadaOpis(p){
+  var sat = " u " + (p.sat || 9) + ":00";
+  if (p.okidac === "registracija") return (Number(p.dana) === 0 ? "isti dan nakon registracije" : danaRijecima(p.dana) + " nakon registracije") + sat;
+  if (p.okidac === "nakon") return danaRijecima(p.dana) + " nakon maila „" + imePravila(p.nakon) + "”" + sat;
+  if (p.okidac === "datum") return (p.datum_do && p.datum_do !== p.datum ? "od " + datumG(p.datum) + " do " + datumG(p.datum_do) : datumG(p.datum)) + sat;
+  if (p.okidac === "prije_vjencanja") return danaRijecima(p.dana) + " prije vjenčanja" + sat;
+  return p.okidac;
+}
+function komeOpis(p){ return (KOME[p.kome] || p.kome) + (p.usluga && p.usluga !== "bilo" ? ", " + (USLUGA[p.usluga] || p.usluga) : ""); }
+function zavrseno(p){ return p.okidac === "datum" && MO && String(p.datum_do || p.datum) < MO.danas; }
+function naRedu(k){ return (MO.na_redu || []).filter(function(x){ return x.pravilo === k; }); }
+
+function mailoviEkran(){
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Kuverta</p><h1>Mailovi</h1></div>';
+  if (moGreska) return h + '<section class="panel"><p class="prazno">' + (/033|PGRST202|nadzor_mailovi/.test(moGreska) ? 'Ekran radi kad se u Supabase projektu <b>MyWeddingInvite</b> (SQL Editor) pokrene migracija <b>033_mail_pravila.sql</b> iz repozitorija MyWeddingInvite.' : 'Mailovi se nisu učitali (' + e(moGreska) + '). Osvježi stranicu za minutu.') + '</p></section>';
+  if (!MO) { ucitajMailove(); return h + '<section class="panel"><p class="prazno">Učitavam mailove…</p></section>'; }
+  var P = MO.pravila || [], R7 = (MO.na_redu || []).filter(function(x){ return dana(x.dan) < 7; });
+  var ukupno = zbroj(P, function(p){ return p.poslano; }), tjedan = zbroj(P, function(p){ return p.poslano_7; });
+  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><p style="margin:0;flex:1 1 420px">Kuverta šalje automatske mailove svako jutro u 9:00 (do 12:00 ponovni pokušaj za ono što nije prošlo). Ide samo onima koji su potvrdili e-mail i nisu se odjavili (odjavljenih: ' + br(MO.odjavljeni) + '). Ista osoba dobiva najviše jedan mail na dan: pravila idu redom s popisa, a sljedeći mail stiže sutra. Slanje radi samo dok je uključena prava naplata (Stripe).</p><button type="button" class="gumb" id="mail-novo">Novo pravilo</button></div>' + (moPoruka ? '<p class="src" role="status">' + e(moPoruka) + '</p>' : '') + '</section>';
+  h += '<section class="kpi"><div><span class="src">Uključena pravila</span><span class="v num">' + br(P.filter(function(p){ return p.aktivno && !zavrseno(p); }).length) + '</span><span class="src">od ' + br(P.length) + '</span></div>'
+    + '<div><span class="src">Na redu idućih 7 dana</span><span class="v num">' + br(R7.length) + '</span><span class="src">mailova</span></div>'
+    + '<div><span class="src">Poslano zadnjih 7 dana</span><span class="v num">' + br(tjedan) + '</span></div>'
+    + '<div><span class="src">Poslano ukupno</span><span class="v num">' + br(ukupno) + '</span></div></section>';
+  h += '<section class="panel"><h2>Pravila</h2><div class="skrol"><table class="num"><thead><tr><th>Mail</th><th>Kada</th><th>Kome</th><th class="r">Na redu</th><th class="r">Poslano</th><th>Stanje</th><th></th></tr></thead><tbody id="mail-pravila">'
+    + P.map(function(p){
+      var stanje = !p.aktivno ? '<span class="oznaka lose">isključeno</span>' : (zavrseno(p) ? '<span class="oznaka ceka">završeno</span>' : '<span class="oznaka ok">uključeno</span>');
+      var otvoreno = UR && UR.kljuc === p.kljuc;
+      return '<tr' + (otvoreno ? ' style="background:var(--smaragd-svj)"' : '') + '><td style="min-width:220px"><b>' + e(p.naziv) + '</b><br><span class="src">' + e(PREDLOSCI[p.predlozak] || p.predlozak) + '</span></td><td style="min-width:180px">' + e(kadaOpis(p)) + '</td><td style="min-width:180px">' + e(komeOpis(p)) + '</td>'
+        + '<td class="r nw">' + br(naRedu(p.kljuc).length) + '<br><span class="src">14 dana</span></td>'
+        + '<td class="r nw">' + br(p.poslano) + '<br><span class="src">' + (p.zadnje ? 'zadnji ' + datum(p.zadnje) : 'još ništa') + '</span></td>'
+        + '<td class="nw">' + stanje + '</td><td class="r nw"><button type="button" class="tiho" data-mail-ukljuci="' + e(p.kljuc) + '">' + (p.aktivno ? 'Isključi' : 'Uključi') + '</button> <button type="button" class="tiho" data-mail-uredi="' + e(p.kljuc) + '">Uredi</button></td></tr>';
+    }).join("") + '</tbody></table></div><p class="src">Na redu je broj ljudi kojima bi pravilo poslalo mail u idućih 14 dana da se ništa ne promijeni. Mail koji ide nakon drugog maila pojavi se tek kad osoba dobije taj prvi.</p></section>';
+  if (UR) h += urednikMaila();
+  h += redMailova();
+  h += '<section class="panel"><h2>Zadnje poslano</h2>' + ((MO.poslano || []).length ? '<div class="skrol"><table class="num"><thead><tr><th>Vrijeme</th><th>Mail</th><th>Kome</th></tr></thead><tbody>'
+    + MO.poslano.slice(0, 50).map(function(x){ return '<tr><td class="nw">' + vrijeme(x.kada) + '</td><td>' + e(imePravila(x.pravilo)) + '</td><td class="nw">' + e(x.email || "(obrisan račun)") + '</td></tr>'; }).join("")
+    + '</tbody></table></div>' : '<p class="prazno">Još nijedan mail nije poslan.</p>') + '</section>';
+  return h;
+}
+
+function redMailova(){
+  var L = (MO.na_redu || []).filter(function(x){ return !moFiltar || x.pravilo === moFiltar; });
+  var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px"><h2>Kome ide idućih 14 dana</h2><label>Mail<select id="mail-filtar"><option value="">Svi mailovi</option>'
+    + MO.pravila.map(function(p){ return '<option value="' + e(p.kljuc) + '"' + (p.kljuc === moFiltar ? ' selected' : '') + '>' + e(p.naziv) + '</option>'; }).join("") + '</select></label></div>';
+  if (!L.length) return h + '<p class="prazno">U idućih 14 dana nitko nije na redu' + (moFiltar ? ' za ovaj mail' : '') + '.</p></section>';
+  function usl(a){ return (a || []).join(", ") || "ništa"; }
+  return h + '<div class="skrol"><table class="num"><thead><tr><th>Dan</th><th>Mail</th><th>Kome</th><th>Započeto</th><th>Vjenčanje</th></tr></thead><tbody>'
+    + L.slice(0, 300).map(function(x){ var d = dana(x.dan); return '<tr><td class="nw">' + (d === 0 ? '<b>danas</b>' : d === 1 ? 'sutra' : datumG(x.dan)) + '</td><td>' + e(imePravila(x.pravilo)) + '</td><td class="nw" style="font-weight:600">' + e(x.email) + '</td><td>' + e(usl(x.usluge)) + '</td><td class="nw">' + (x.vjencanje ? datumG(x.vjencanje) : "–") + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Predviđanje prema današnjem stanju: tko u međuvremenu plati, otključa uslugu ili se odjavi, mail ne dobiva.' + (MO.od !== MO.danas ? ' Današnje slanje je gotovo, pa popis počinje od sutra.' : '') + '</p></section>';
+}
+
+function urPolje(ime, oznaka, vrijednost, zadano, dugo){
+  var ph = zadano ? ' placeholder="' + e(zadano) + '"' : '';
+  return '<label style="grid-column:1/-1">' + e(oznaka) + (dugo ? '<textarea rows="' + dugo + '" data-ur-sadrzaj="' + ime + '"' + ph + ' style="font:inherit;font-size:14px;padding:8px 10px;border:1px solid #D4D1CB;border-radius:8px;resize:vertical">' + e(vrijednost || "") + '</textarea>' : '<input type="text" data-ur-sadrzaj="' + ime + '" value="' + e(vrijednost || "") + '"' + ph + '>') + '</label>';
+}
+function izbor(polje, opcije, vrijednost, oznaka){
+  return '<label>' + e(oznaka) + '<select data-ur="' + polje + '">' + Object.keys(opcije).map(function(k){ return '<option value="' + e(k) + '"' + (String(vrijednost) === k ? ' selected' : '') + '>' + e(opcije[k]) + '</option>'; }).join("") + '</select></label>';
+}
+function sadrzajVerzije(){
+  UR.sadrzaj = UR.sadrzaj || {};
+  if (UR.predlozak === "vlastiti") return UR.sadrzaj;
+  UR.sadrzaj.varijante = UR.sadrzaj.varijante || {};
+  var v = urVerzija || "sve";
+  UR.sadrzaj.varijante[v] = UR.sadrzaj.varijante[v] || {};
+  return UR.sadrzaj.varijante[v];
+}
+
+function urednikMaila(){
+  var novo = !UR.kljuc, P = MO.pravila, s = sadrzajVerzije(), z = (urPregled && urPregled.zadano) || {};
+  var h = '<section class="panel" id="mail-urednik" style="border-color:var(--smaragd)"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>' + (novo ? 'Novo pravilo' : 'Uredi: ' + e(UR.naziv)) + '</h2><button type="button" class="tiho" id="ur-zatvori">Zatvori</button></div>';
+  h += '<div class="red"><div style="flex:1 1 380px;display:flex;flex-direction:column;gap:16px;min-width:0">';
+  h += '<form class="unos" style="border-top:0;padding-top:0" onsubmit="return false">'
+    + '<label style="grid-column:1/-1">Naziv (vidiš ga samo ti)<input type="text" data-ur="naziv" value="' + e(UR.naziv || "") + '" maxlength="120"></label>'
+    + (novo ? izbor("predlozak", PREDLOSCI, UR.predlozak, "Predložak") : '<label>Predložak<input type="text" value="' + e(PREDLOSCI[UR.predlozak] || UR.predlozak) + '" disabled></label>')
+    + '<label style="flex-direction:row;align-items:center;gap:8px;min-height:40px"><input type="checkbox" data-ur="aktivno"' + (UR.aktivno ? ' checked' : '') + ' style="min-height:0;width:18px;height:18px"> Uključeno</label>'
+    + '</form>';
+  h += '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Kada</p><form class="unos" style="border-top:0;padding-top:0" onsubmit="return false">'
+    + izbor("okidac", {"registracija": "Nakon registracije", "nakon": "Nakon drugog maila", "datum": "Na datum", "prije_vjencanja": "Prije vjenčanja"}, UR.okidac, "Okidač")
+    + (UR.okidac === "datum"
+      ? '<label>Od<input type="date" data-ur="datum" value="' + e(UR.datum || "") + '"></label><label>Do (prazno: samo taj dan)<input type="date" data-ur="datum_do" value="' + e(UR.datum_do || "") + '"></label>'
+      : '<label>Broj dana<input type="number" min="0" max="365" data-ur="dana" value="' + e(UR.dana) + '"></label>')
+    + (UR.okidac === "nakon" ? '<label>Nakon maila<select data-ur="nakon">' + P.filter(function(p){ return p.kljuc !== UR.kljuc; }).map(function(p){ return '<option value="' + e(p.kljuc) + '"' + (p.kljuc === UR.nakon ? ' selected' : '') + '>' + e(p.naziv) + '</option>'; }).join("") + '</select></label>' : '')
+    + izbor("sat", {"9": "9:00", "10": "10:00", "11": "11:00", "12": "12:00"}, UR.sat || 9, "Sat")
+    + '<label>Redoslijed<input type="number" min="0" max="999" data-ur="redoslijed" value="' + e(UR.redoslijed) + '" title="Manji broj ide prvi"></label>'
+    + '</form><p class="src">' + e(kadaOpis(UR)) + '. Ako je slanje propušteno, pokušava se još ' + (UR.okidac === "nakon" ? 'tjedan dana' : UR.okidac === "datum" ? 'do kraja razdoblja' : 'dva dana') + '.</p></div>';
+  h += '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Kome</p><form class="unos" style="border-top:0;padding-top:0" onsubmit="return false">'
+    + izbor("kome", {"bez_uplate": "Registrirani koji nisu platili", "platili": "Oni koji su platili", "svi": "Svi registrirani"}, UR.kome, "Tko")
+    + izbor("usluga", {"bilo": "Bez obzira na započeto", "pozivnica": "Započeli pozivnicu", "album": "Započeli album", "raspored": "Započeli raspored", "nista": "Ništa nisu započeli"}, UR.usluga, "Što su započeli")
+    + '</form><p class="src">Uvijek samo potvrđeni e-mailovi, bez odjavljenih, i svakome najviše jednom.' + (UR.kljuc ? ' Sada na redu u idućih 14 dana: <b>' + br(naRedu(UR.kljuc).length) + '</b> (nakon spremanja se osvježi).' : '') + '</p></div>';
+  h += '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Tekst maila</p>';
+  if (UR.predlozak === "vlastiti") {
+    h += '<form class="unos" style="border-top:0;padding-top:0" onsubmit="return false">'
+      + urPolje("naslov", "Naslov maila (predmet)", s.naslov, "npr. {imena}, još {dana} do vjenčanja")
+      + urPolje("preheader", "Kratki tekst uz naslov u popisu mailova", s.preheader, "")
+      + urPolje("h1", "Veliki naslov u mailu (prazno: kao naslov maila)", s.h1, "")
+      + urPolje("pod", "Podnaslov", s.pod, "")
+      + urPolje("tekst", "Tekst (prazan redak započinje novi odlomak)", s.tekst, "", 8)
+      + '<label>Tekst gumba (prazno: bez gumba)<input type="text" data-ur-sadrzaj="gumb" value="' + e(s.gumb || "") + '" maxlength="80"></label>'
+      + '<label>Gumb vodi na<select data-ur-sadrzaj="poveznica">' + Object.keys(POVEZNICE).map(function(k){ return '<option value="' + k + '"' + ((s.poveznica || "nadzorna") === k ? ' selected' : '') + '>' + POVEZNICE[k] + '</option>'; }).join("") + '</select></label>'
+      + '</form>';
+  } else {
+    var verzije = (urPregled && urPregled.verzije) || [];
+    h += '<p class="src">Predložak: ' + e(PREDLOZAK_OPIS[UR.predlozak] || "") + '. Ostatak maila (koraci, cijene, gumbi) dolazi iz koda Kuverte. Prazno polje znači tekst iz koda, a sivo je ispisan sadašnji tekst.</p>'
+      + (verzije.length > 1 ? '<label>Verzija maila<select id="ur-verzija">' + verzije.map(function(v){ return '<option value="' + e(v.kljuc) + '"' + (v.kljuc === urVerzija ? ' selected' : '') + '>' + e(v.naziv) + '</option>'; }).join("") + '</select></label>' : '')
+      + '<form class="unos" style="border-top:0;padding-top:0" onsubmit="return false">'
+      + POLJA_MAILA.map(function(f){ return urPolje(f[0], f[1], s[f[0]], z[f[0]], f[0] === "uvod" ? 5 : 0); }).join("") + '</form>';
+  }
+  h += '<p class="src">U tekst možeš upisati <b>{imena}</b> (npr. Ana i Marko), <b>{datum}</b> (datum vjenčanja) i <b>{dana}</b> (koliko je dana do vjenčanja).</p></div>';
+  h += '<div class="gumbi" style="flex-wrap:wrap"><button type="button" class="gumb" id="ur-spremi"' + (urSpremam ? ' disabled' : '') + '>' + (urSpremam ? 'Spremam…' : 'Spremi') + '</button><button type="button" class="tiho" id="ur-proba" style="min-height:40px">Pošalji probu meni</button>'
+    + (!novo && !UR.ugradeno ? '<button type="button" class="tiho" id="ur-obrisi" style="min-height:40px;color:var(--crvena)">Obriši pravilo</button>' : '') + '</div>'
+    + '<p class="src" role="status" id="ur-poruka">' + e(urPoruka) + '</p>';
+  h += '</div><div style="flex:1 1 420px;display:flex;flex-direction:column;gap:10px;min-width:0"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><p class="lbl">Pregled (primjer: Ana i Marko, vjenčanje za 120 dana)</p><button type="button" class="tiho" id="ur-osvjezi">Osvježi pregled</button></div>'
+    + (urPregledGreska ? '<p class="prazno">' + e(urPregledGreska) + '</p>' : !urPregled ? '<p class="prazno">Slažem pregled…</p>'
+      : '<p style="font-size:14px"><b id="ur-naslov">' + e(urPregled.naslov) + '</b></p><iframe id="ur-iframe" title="Pregled maila" sandbox style="width:100%;height:760px;border:1px solid var(--linija);border-radius:8px;background:#f8f7f4"></iframe>')
+    + '</div></div></section>';
+  return h;
+}
+
+function otvoriUrednik(p){
+  UR = JSON.parse(JSON.stringify(p)); urVerzija = ""; urPregled = null; urPregledGreska = ""; urPoruka = "";
+  osvjeziPregled();
+  crtajMailove();
+  var u = document.getElementById("mail-urednik"); if (u) u.scrollIntoView({behavior: "smooth", block: "start"});
+}
+var pregledBroj = 0, pregledTimer = null;
+function osvjeziPregled(){
+  if (!UR) return;
+  var broj = ++pregledBroj;
+  api("/api/mail-pregled", {pravilo: UR, verzija: urVerzija}).then(function(j){
+    if (broj !== pregledBroj || !UR) return;
+    urPregled = j; urPregledGreska = ""; urVerzija = j.verzija || urVerzija;
+    if (!document.getElementById("ur-iframe") || document.activeElement === document.body) crtajMailove(); else postaviIframe();
+    // Zadani tekst iz koda (placeholderi) osvježi i bez ponovnog crtanja.
+    document.querySelectorAll("[data-ur-sadrzaj]").forEach(function(el){ var z = (j.zadano || {})[el.dataset.urSadrzaj]; if (z && el.placeholder !== z) el.placeholder = z; });
+  }).catch(function(err){ if (broj !== pregledBroj) return; urPregledGreska = "Pregled nije uspio: " + err.message; crtajMailove(); });
+}
+function postaviIframe(){ var f = document.getElementById("ur-iframe"), n = document.getElementById("ur-naslov"); if (f && urPregled) f.srcdoc = urPregled.html; if (n && urPregled) n.textContent = urPregled.naslov; }
+
+function veziMailove(){
+  var nb = document.getElementById("mail-novo");
+  if (nb) nb.addEventListener("click", function(){ otvoriUrednik({kljuc: "", naziv: "", predlozak: "vlastiti", okidac: "registracija", dana: 7, nakon: "", datum: "", datum_do: "", sat: 9, kome: "bez_uplate", usluga: "bilo", sadrzaj: {}, aktivno: false, redoslijed: 100}); });
+  var fl = document.getElementById("mail-filtar");
+  if (fl) fl.addEventListener("change", function(){ moFiltar = fl.value; crtajMailove(); });
+  var tb = document.getElementById("mail-pravila");
+  if (tb) tb.addEventListener("click", function(ev){
+    var b = ev.target.closest("button"); if (!b) return;
+    var k = b.dataset.mailUredi || b.dataset.mailUkljuci, p = MO.pravila.filter(function(x){ return x.kljuc === k; })[0]; if (!p) return;
+    if (b.dataset.mailUredi) return otvoriUrednik(p);
+    b.disabled = true;
+    api("/api/mail-spremi", {pravilo: {kljuc: p.kljuc, aktivno: !p.aktivno}}).then(function(){ moPoruka = "„" + p.naziv + "” je " + (p.aktivno ? "isključeno." : "uključeno."); if (UR && UR.kljuc === p.kljuc) UR.aktivno = !p.aktivno; ucitajMailove(); })
+      .catch(function(err){ b.disabled = false; moPoruka = "Nije spremljeno: " + err.message; crtajMailove(); });
+  });
+  if (!UR) return;
+  postaviIframe();
+  document.getElementById("ur-zatvori").addEventListener("click", function(){ UR = null; urPregled = null; crtajMailove(); });
+  document.querySelectorAll("[data-ur]").forEach(function(el){
+    el.addEventListener("change", function(){
+      var k = el.dataset.ur, v = el.type === "checkbox" ? el.checked : el.value;
+      if (k === "dana" || k === "redoslijed" || k === "sat") v = Number(v);
+      UR[k] = v;
+      if (k === "okidac" && v === "nakon" && !UR.nakon) { var prvi = MO.pravila.filter(function(p){ return p.kljuc !== UR.kljuc; })[0]; UR.nakon = prvi ? prvi.kljuc : ""; }
+      if (k === "okidac" && v === "datum" && !UR.datum) UR.datum = MO.od;
+      if (k === "predlozak") { urVerzija = ""; urPregled = null; osvjeziPregled(); }
+      crtajMailove();
+    });
+  });
+  document.querySelectorAll("[data-ur-sadrzaj]").forEach(function(el){
+    el.addEventListener("input", function(){
+      var s = sadrzajVerzije(), k = el.dataset.urSadrzaj;
+      if (el.value.trim()) s[k] = el.value; else delete s[k];
+      clearTimeout(pregledTimer); pregledTimer = setTimeout(osvjeziPregled, 700);
+    });
+    if (el.tagName === "SELECT") el.addEventListener("change", function(){ el.dispatchEvent(new Event("input")); });
+  });
+  var uv = document.getElementById("ur-verzija");
+  if (uv) uv.addEventListener("change", function(){ urVerzija = uv.value; urPregled = null; osvjeziPregled(); crtajMailove(); });
+  document.getElementById("ur-osvjezi").addEventListener("click", osvjeziPregled);
+  document.getElementById("ur-spremi").addEventListener("click", function(){
+    if (!String(UR.naziv || "").trim()) { urPoruka = "Upiši naziv pravila."; return crtajMailove(); }
+    if (UR.predlozak === "vlastiti" && !(UR.sadrzaj && String(UR.sadrzaj.tekst || "").trim() && String(UR.sadrzaj.naslov || "").trim())) { urPoruka = "Vlastiti mail treba naslov i tekst."; return crtajMailove(); }
+    urSpremam = true; urPoruka = ""; crtajMailove();
+    // Prazne verzije (otvorene, a bez izmjena) se ne spremaju.
+    var vr = UR.sadrzaj && UR.sadrzaj.varijante; if (vr) Object.keys(vr).forEach(function(k){ if (!Object.keys(vr[k] || {}).length) delete vr[k]; });
+    var tijelo = {}; ["kljuc", "naziv", "predlozak", "okidac", "dana", "nakon", "datum", "datum_do", "sat", "kome", "usluga", "sadrzaj", "aktivno", "redoslijed"].forEach(function(k){ tijelo[k] = UR[k] == null ? "" : UR[k]; });
+    api("/api/mail-spremi", {pravilo: tijelo}).then(function(j){
+      urSpremam = false; UR.kljuc = j.kljuc; urPoruka = "Spremljeno." + (UR.aktivno ? " Pravilo vrijedi od idućeg jutarnjeg slanja." : " Pravilo je isključeno, pa se još ništa ne šalje.");
+      ucitajMailove();
+    }).catch(function(err){ urSpremam = false; urPoruka = "Nije spremljeno: " + err.message; crtajMailove(); });
+  });
+  document.getElementById("ur-proba").addEventListener("click", function(ev){
+    var b = ev.target; b.disabled = true; b.textContent = "Šaljem…";
+    api("/api/mail-pregled", {pravilo: UR, verzija: urVerzija, proba: true}).then(function(j){ urPoruka = "Proba je poslana na " + j.poslano_na + " (s oznakom [PROBA] u naslovu)."; crtajMailove(); })
+      .catch(function(err){ urPoruka = "Proba nije poslana: " + err.message; crtajMailove(); });
+  });
+  var ob = document.getElementById("ur-obrisi");
+  if (ob) ob.addEventListener("click", function(){
+    if (ob.dataset.potvrda !== "1") { ob.dataset.potvrda = "1"; ob.textContent = "Klikni opet za brisanje"; return; }
+    api("/api/mail-obrisi", {kljuc: UR.kljuc}).then(function(){ moPoruka = "Pravilo „" + UR.naziv + "” je obrisano. Već poslani mailovi ostaju u popisu."; UR = null; urPregled = null; ucitajMailove(); })
+      .catch(function(err){ urPoruka = "Nije obrisano: " + err.message; crtajMailove(); });
+  });
+}
+
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); if (MO) ucitajMailove(); }, 10 * 60 * 1000);
 })();
 </script>
 </body>
