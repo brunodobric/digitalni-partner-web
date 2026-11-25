@@ -10,6 +10,9 @@
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
 // - GET /api/knjige?godina=…&okolina=…  knjiga prometa (KPR) i podaci za PO-SD (Access)
 // - GET /api/obavijesti  popis obavijesti mailom, što je uključeno i zadnje poslane (Access)
+// - GET /api/mailovi  automatski mailovi Kuverte: pravila, kome idu idućih 14 dana, zadnje poslano (Access)
+// - POST /api/mail-spremi, /api/mail-obrisi  novo pravilo, izmjena ili brisanje pravila (Access), vidi mailovi
+// - POST /api/mail-pregled  pregled maila ili proba na adresu za probe (Access), Worker Kuverte /interno/mail-pregled
 // - POST /api/kpr-stavka  uključi ili isključi stavku izvoda iz KPR-a (Access)
 // - POST /api/izvod  uvoz jednog izvoda CAMT.053 (XML u tijelu zahtjeva) (Access)
 // - POST /upit       javni prijem upita s kontakt obrasca na webu (bez prijave, samo s dopuštene adrese)
@@ -108,6 +111,10 @@ export default {
         return json({ ...izvori, po_oznaci, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana, dan });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
+      if (url.pathname.startsWith("/api/mail")) {
+        const odgovor = await mailovi(req, url, env);
+        if (odgovor) return odgovor;
+      }
       if (req.method === "GET" && url.pathname === "/api/racun-pdf") return await pdfRacuna(url, env);
       if (req.method === "GET" && url.pathname === "/api/banka") {
         return json(await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_banka", { p_kljuc: env.NADZOR_KLJUC }));
@@ -173,7 +180,7 @@ const SIGURNOSNA_ZAGLAVLJA = {
   "x-frame-options": "DENY",
   "referrer-policy": "no-referrer",
   "x-content-type-options": "nosniff",
-  "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'",
+  "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data: https://kuverta.hr; frame-ancestors 'none'",
 };
 
 function json(obj, status = 200, extra = {}) {
@@ -589,3 +596,66 @@ async function obrisiKorisnika(req, env) {
   console.log("korisnik-obrisi", "obrisan račun Kuverte");
   return json({ ok: true, upozorenja: j.upozorenja || [] });
 }
+
+// ---------- Automatski mailovi Kuverte (ekran Mailovi) ----------
+// Pravila su u bazi Kuverte (migracija 033_mail_pravila.sql u repozitoriju MyWeddingInvite); nadzor ih čita i
+// mijenja preko funkcija nadzor_mail* koje traže NADZOR_KLJUC. Pregled i probu slaže Worker Kuverte, da izgledaju
+// točno kao pravi mail.
+
+const MAIL_POLJA = ["kljuc", "naziv", "predlozak", "okidac", "dana", "nakon", "datum", "datum_do", "sat", "kome", "usluga", "sadrzaj", "aktivno", "redoslijed"];
+
+// Poruka iz PostgRESTa (npr. provjera u tablici) bez tehničkog dijela.
+function porukaBaze(e) {
+  const m = String((e && e.message) || e);
+  const j = m.indexOf("{");
+  try {
+    const x = JSON.parse(m.slice(j));
+    if (x.code === "PGRST202") return "U projektu MyWeddingInvite još nije pokrenuta migracija 033_mail_pravila.sql.";
+    if (x.code === "23514") return "Neka vrijednost nije dopuštena (npr. broj dana ili sat). Provjeri polja.";
+    if (x.code === "23503") return "Pravilo nakon kojeg ide ovaj mail ne postoji.";
+    if (x.code === "22007" || x.code === "22P02") return "Neispravan datum ili broj.";
+    if (x.message) return x.message;
+  } catch (_) {
+    // nije JSON
+  }
+  return m.slice(0, 200);
+}
+
+async function mailovi(req, url, env) {
+  try {
+    if (req.method === "GET" && url.pathname === "/api/mailovi") {
+      return json(await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_mailovi", { p_kljuc: env.NADZOR_KLJUC }));
+    }
+    if (req.method === "POST" && url.pathname === "/api/mail-spremi") {
+      const b = await req.json().catch(() => ({}));
+      const p = {};
+      for (const k of MAIL_POLJA) if (b.pravilo && k in b.pravilo) p[k] = b.pravilo[k];
+      if (p.sadrzaj && (typeof p.sadrzaj !== "object" || JSON.stringify(p.sadrzaj).length > 50000)) return json({ greska: "Tekst maila je predugačak." }, 400);
+      const kljuc = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_mail_spremi", { p_kljuc: env.NADZOR_KLJUC, p });
+      return json({ kljuc });
+    }
+    if (req.method === "POST" && url.pathname === "/api/mail-obrisi") {
+      const b = await req.json().catch(() => ({}));
+      if (typeof b.kljuc !== "string" || !b.kljuc) return json({ greska: "Nepoznato pravilo." }, 400);
+      const ok = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_mail_obrisi", { p_kljuc: env.NADZOR_KLJUC, p_pravilo: b.kljuc });
+      if (!ok) return json({ greska: "Početna pravila se ne brišu, samo isključuju." }, 400);
+      return json({ ok: true });
+    }
+    if (req.method === "POST" && url.pathname === "/api/mail-pregled") {
+      const b = await req.json().catch(() => ({}));
+      const r = await fetch(new URL("/interno/mail-pregled", env.KUVERTA_WEB), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kljuc: env.NADZOR_KLJUC, pravilo: b.pravilo || {}, verzija: b.verzija || "", proba: b.proba === true }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return json({ greska: j.greska || (r.status === 404 ? "Kuverta još nema pregled mailova (treba objaviti novu verziju Kuverte)." : "Kuverta je vratila " + r.status + ".") }, 502);
+      return json(j);
+    }
+  } catch (e) {
+    console.error("mailovi", e);
+    return json({ greska: porukaBaze(e) }, 500);
+  }
+  return null;
+}
+

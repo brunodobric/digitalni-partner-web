@@ -25,6 +25,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Registrirani korisnici Kuverte (ekran Kuverta), pokreće se u projektu MyWeddingInvite | `sql/06-kuverta-korisnici.sql` |
 | Zadnja aktivnost korisnika (iz osvježavanja sesije, ne samo zadnja prijava), registracije po danu u grafu i pregled jednog dana (klik na stupac ili polje Dan), pokreće se u projektu MyWeddingInvite nakon `12` i `20`; zamjenjuje `nadzor_korisnici` i `nadzor_izvori` iz `12` i `nadzor_oznake` iz `20` | `sql/22-kuverta-aktivnost-i-dani.sql` |
 | Brisanje korisničkog računa Kuverte (gumb Obriši uz korisnika), pokreće se u projektu MyWeddingInvite | migracija `023_nadzor_brisanje_korisnika.sql` u repozitoriju MyWeddingInvite; Worker zove `KUVERTA_WEB/interno/obrisi-korisnika` |
+| Ekran **Mailovi**: automatski mailovi Kuverte (pravila: koji mail, kada, kome; kome ide idućih 14 dana; zadnje poslano; uređivanje teksta, nova pravila, pregled i proba). Pravila su u bazi Kuverte, migracija `033_mail_pravila.sql` u repozitoriju MyWeddingInvite (ima i funkcije `nadzor_mail*`); pregled i probu slaže Worker Kuverte na `KUVERTA_WEB/interno/mail-pregled` | `src/stranica.html` (Mailovi), `src/index.js` (`mailovi`) |
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
 | Brisanje troška (olovka uz Dodaj trošak, pa minus uz trošak i potvrda) | `sql/07-brisanje-troska.sql` |
