@@ -51,6 +51,7 @@ Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U 
 | `IZVODI_ADRESA` | Adrese (odvojene zarezom) čija se pošta uvozi kao izvod. Prazno znači svaka adresa `izvodi@…` | ne |
 | `IZVODI_PROSLIJEDI` | Adresa na koju se mail s izvodom proslijedi nakon uvoza (mora biti potvrđena u Email Routingu) | ne |
 | `CESTITKA_KEY` | Javni (publishable) ključ Supabase projekta bozicna-cestitka, za ekran Čestitka | ne, bez nje ekran Čestitka javi da ključ nije postavljen |
+| `META_ADS_TOKEN` | Meta oglasi na ekranu Čestitka: token sistemskog korisnika s dozvolom ads_read (samo čitanje). Uz njega `META_OGLASNI_RACUN` u `wrangler.jsonc` i po želji `META_KAMPANJE` (regularni izraz za imena kampanja, zadano čestitka ili Božić) | ne |
 | `FISK_CITANJE_TOKEN` | PDF računa na ekranu Računi i provjera isteka certifikata. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun). Stari naziv `FISK_TOKEN` radi kao rezerva | ne, bez nje popis radi, a PDF ne |
 
 Ekran Računi čita tablicu `fisk.racuni` (isti Supabase projekt) preko funkcije `nadzor_racuni`, a PDF traži od Edge funkcije `fisk-racun` (repozitorij financijski-softver). Adresa funkcije je `SUPABASE_URL/functions/v1/fisk-racun`, a može se promijeniti varijablom `FISK_URL`.
