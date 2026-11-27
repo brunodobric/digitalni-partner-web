@@ -5,7 +5,7 @@
 // - POST /api/trosak-obrisi  brisanje jednog troška po id-u (Access)
 // - GET /api/racuni  računi iz fiskalizacije (Access)
 // - GET /api/korisnici  registrirani korisnici Kuverte: e-mail, registracija, zadnja prijava (Access)
-// - GET /api/cestitka?dana=…  Božićna čestitka: posjete po izvoru, kupnje i prihod (Access)
+// - GET /api/cestitka?dana=…  Božićna čestitka: posjete po izvoru, kupnje, prihod i Meta oglasi (Access)
 // - POST /api/korisnik-obrisi  brisanje korisničkog računa Kuverte po e-mailu (Access), vidi obrisiKorisnika
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
@@ -116,8 +116,11 @@ export default {
         // migracije 009_posjete_i_nadzor.sql u repozitoriju bozicna-cestitka.
         if (!env.CESTITKA_URL || !env.CESTITKA_KEY) return json({ greska: "Nije postavljen CESTITKA_KEY (javni ključ Supabase projekta bozicna-cestitka)." }, 500);
         const dana = [7, 30, 90, 0].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 30;
-        const c = await rpc(env.CESTITKA_URL, env.CESTITKA_KEY, "nadzor_cestitka", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana });
-        return json({ ...c, dana });
+        const [c, oglasi] = await Promise.all([
+          rpc(env.CESTITKA_URL, env.CESTITKA_KEY, "nadzor_cestitka", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana }),
+          metaOglasi(env, dana).catch((e) => ({ greska: String(e.message || e) })),
+        ]);
+        return json({ ...c, dana, oglasi });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (url.pathname.startsWith("/api/mail")) {
@@ -506,6 +509,37 @@ function b64uBajtovi(s) {
 }
 function b64uTekst(s) {
   return new TextDecoder().decode(b64uBajtovi(s));
+}
+
+// ---------- Meta oglasi (ekran Čestitka) ----------
+// Prikazi, doseg, klikovi i potrošnja po oglasu iz Metinog API-ja za oglase (Insights, razina oglasa).
+// Treba tajnu META_ADS_TOKEN (token sistemskog korisnika s dozvolom ads_read) i META_OGLASNI_RACUN (broj računa).
+// META_KAMPANJE: regularni izraz za imena kampanja čestitke (zadano čestitka ili Božić), jer račun dijeli i Kuverta.
+// Kupnje se spajaju s oglasom preko utm_content={{ad.id}} u parametrima URL-a oglasa.
+async function metaOglasi(env, dana) {
+  const racun = String(env.META_OGLASNI_RACUN || "").replace(/^act_/, "").trim();
+  if (!env.META_ADS_TOKEN || !racun) return { postavljeno: false };
+  const danas = new Date(Date.now() + 36e5).toISOString().slice(0, 10); // otprilike po našem vremenu
+  const parametri = new URLSearchParams({
+    level: "ad",
+    fields: "ad_id,ad_name,campaign_name,impressions,reach,clicks,spend",
+    limit: "500",
+  });
+  if (dana) parametri.set("time_range", JSON.stringify({ since: new Date(Date.now() + 36e5 - (dana - 1) * 864e5).toISOString().slice(0, 10), until: danas }));
+  else parametri.set("date_preset", "maximum");
+  const r = await fetch("https://graph.facebook.com/v26.0/act_" + encodeURIComponent(racun) + "/insights?" + parametri, {
+    headers: { authorization: "Bearer " + env.META_ADS_TOKEN },
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) throw new Error("Meta: " + ((j.error && j.error.message) || r.status));
+  let filtar;
+  try { filtar = new RegExp(env.META_KAMPANJE || "čestit|cestit|božić|bozic", "i"); } catch { filtar = /čestit|cestit|božić|bozic/i; }
+  const broj = (v) => Number(v || 0);
+  const redovi = (j.data || []).filter((x) => filtar.test(x.campaign_name || "") || filtar.test(x.ad_name || "")).map((x) => ({
+    id: x.ad_id, ime: x.ad_name, kampanja: x.campaign_name, prikazi: broj(x.impressions), doseg: broj(x.reach), klikovi: broj(x.clicks), potrosnja: broj(x.spend),
+  }));
+  redovi.sort((a, b) => b.potrosnja - a.potrosnja || b.prikazi - a.prikazi);
+  return { postavljeno: true, redovi };
 }
 
 // ---------- Dnevni prikupljači ----------

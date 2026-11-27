@@ -484,6 +484,28 @@ function grafCestitke(){
     + '<svg viewBox="0 0 720 86" role="img" aria-label="Posjete i kupnje po danu" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="80" y2="80" stroke="rgba(11,11,12,.14)"/>' + s + '</svg>'
     + '<div class="src" style="display:flex;justify-content:space-between;padding:0 8px 0 32px"><span>' + datum(pd[0].dan) + '</span><span>' + datum(pd[pd.length - 1].dan) + '</span></div></div>';
 }
+// Meta oglasi: prikazi, doseg, klikovi i potrošnja (Worker metaOglasi), uz posjete i kupnje istog oglasa (utm_content = ID oglasa).
+function oglasiCestitke(){
+  var o = C.oglasi || {};
+  var h = '<section class="panel"><h2>Meta oglasi</h2>';
+  if (o.greska) return h + '<p class="prazno">Oglasi se nisu učitali (' + e(o.greska) + '). Provjeri token META_ADS_TOKEN i broj računa META_OGLASNI_RACUN na Workeru dp-nadzor.</p></section>';
+  if (!o.postavljeno) return h + '<p class="prazno">Meta oglasi još nisu spojeni. Na Workeru dp-nadzor trebaju tajna META_ADS_TOKEN (dozvola ads_read) i varijabla META_OGLASNI_RACUN.</p></section>';
+  var r = o.redovi || [];
+  if (!r.length) return h + '<p class="prazno">U ovom razdoblju nema prikaza oglasa za čestitku.</p></section>';
+  var po = {}; (C.po_oznaci || []).forEach(function(x){ if (!x.oglas) return; var p = po[x.oglas] || (po[x.oglas] = {posjete: 0, kupnje: 0, prihod: 0}); p.posjete += x.posjete; p.kupnje += x.kupnje; p.prihod += Number(x.prihod); });
+  var uk = r.reduce(function(a, x){ var p = po[x.id] || {}; a.prikazi += x.prikazi; a.klikovi += x.klikovi; a.potrosnja += x.potrosnja; a.kupnje += p.kupnje || 0; a.prihod += p.prihod || 0; return a; }, {prikazi: 0, klikovi: 0, potrosnja: 0, kupnje: 0, prihod: 0});
+  h += '<div class="iz-kpi">'
+    + '<div><span class="src">Prikazi</span><b class="num">' + br(uk.prikazi) + '</b></div>'
+    + '<div><span class="src">Klikovi</span><b class="num">' + br(uk.klikovi) + '</b><span class="src">' + postotak(uk.klikovi, uk.prikazi) + ' prikaza</span></div>'
+    + '<div><span class="src">Potrošnja</span><b class="num">' + eur(uk.potrosnja, true) + '</b></div>'
+    + '<div><span class="src">Kupnje s oglasa</span><b class="num">' + br(uk.kupnje) + '</b><span class="src">' + (uk.kupnje ? eur(uk.potrosnja / uk.kupnje, true) + ' po kupnji' : '&nbsp;') + '</span></div>'
+    + '<div><span class="src">Prihod s oglasa</span><b class="num">' + eur(uk.prihod, true) + '</b></div></div>';
+  h += '<div class="skrol"><table class="num"><thead><tr><th>Oglas</th><th>Kampanja</th><th class="r">Prikazi</th><th class="r">Doseg</th><th class="r">Klikovi</th><th class="r">Potrošnja</th><th class="r">Posjete</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
+    + r.map(function(x){ var p = po[x.id]; return '<tr><td style="font-weight:600;min-width:160px">' + e(x.ime) + '</td><td class="src">' + e(x.kampanja) + '</td><td class="r">' + br(x.prikazi) + '</td><td class="r">' + br(x.doseg) + '</td><td class="r">' + br(x.klikovi) + '</td><td class="r nw">' + eur(x.potrosnja, true) + '</td><td class="r">' + (p ? br(p.posjete) : '–') + '</td><td class="r">' + (p ? br(p.kupnje) : '–') + '</td><td class="r nw">' + (p && p.prihod > 0 ? eur(p.prihod, true) : '–') + '</td></tr>'; }).join("")
+    + '</tbody></table></div>';
+  h += '<p class="src">Doseg je broj različitih ljudi koji su vidjeli oglas. Posjete i kupnje stoje uz oglas kad link oglasa ima utm_content={{ad.id}}; inače je crtica. Iznosi su u valuti oglasnog računa.</p></section>';
+  return h;
+}
 function cestitkaEkran(){
   var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Kuverta · Božićna čestitka</p><h1>bozicna.kuverta.hr</h1></div>';
   var izbor = '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="cestitka-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label>';
@@ -516,6 +538,7 @@ function cestitkaEkran(){
     + po.map(function(o){ return '<tr><td class="nw" style="font-weight:600">' + e(imeIzvoraC(o.izvor)) + '</td><td>' + e(IZ_VRSTA[o.medij] || o.medij || "–") + '</td><td>' + e(o.kampanja || "–") + '</td><td>' + e(o.oglas || "–") + '</td><td class="r">' + br(o.posjete) + '</td><td class="r">' + br(o.kupnje) + '</td><td class="r nw">' + (Number(o.prihod) > 0 ? eur(o.prihod, true) : "–") + '</td></tr>'; }).join("")
     + '</tbody></table></div>';
   h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjeta je ulazak na stranicu: s oznakom utm u poveznici, s vanjske stranice (Instagram, Facebook, Google) ili izravno (upisana adresa, poveznica iz WhatsAppa ili Vibera). Klik unutar stranice, roboti i otvaranje poslane čestitke se ne broje, a ponovno učitavanje stranice broji se kao nova posjeta. Sve se broji bez kolačića. Oznake poveznice: utm_source je izvor, utm_medium medij, utm_campaign kampanja i utm_content oglas, npr. bozicna.kuverta.hr/?utm_source=instagram&amp;utm_medium=paid&amp;utm_campaign=bozic&amp;utm_content=reel-sob. Kupnja je plaćena uplata bez testnih (paket od 5 ili 10 je jedna kupnja), a izvor kupnje je izvor s kojim je kupac došao do uređivača. „Nepoznato” su kupci koji su kod kolačića odabrali „Samo nužni” i kupnje prije uvođenja brojanja.</p></details></section>';
+  h += oglasiCestitke();
   return h;
 }
 
