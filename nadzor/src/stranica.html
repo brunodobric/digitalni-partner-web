@@ -483,7 +483,7 @@ function grafCestitke(){
   pd.forEach(function(x, i){
     var dan = String(x.dan).slice(0, 10), odabran = dan === cDan, bljedo = cDan && !odabran ? ' opacity=".4"' : '';
     var x0 = 32 + i * sl, w = sl * .34, hp = x.posjete / mx * 74, hk = x.kupnje / mk * 74;
-    s += '<g data-dan="' + dan + '" style="cursor:pointer"><title>' + datum(x.dan) + ': ' + br(x.posjete) + ' posjeta, ' + br(x.kupnje) + ' kupnji</title>'
+    s += '<g data-dan="' + dan + '" style="cursor:pointer"><title>' + datum(x.dan) + ': ' + br(x.posjete) + ' posjeta, ' + (x.uredivac !== undefined ? br(x.uredivac) + ' u uređivaču, ' + br(x.spremljene) + ' spremljenih, ' + br(x.placanje) + ' na plaćanju, ' : '') + br(x.kupnje) + ' kupnji</title>'
       + '<rect x="' + x0 + '" y="0" width="' + sl + '" height="84" fill="' + (odabran ? 'rgba(198,161,91,.18)' : 'transparent') + '"/>'
       + '<rect x="' + (x0 + sl * .14) + '" y="' + (80 - hp) + '" width="' + w + '" height="' + hp + '" rx="1.5" fill="#C6A15B"' + bljedo + '/>'
       + '<rect x="' + (x0 + sl * .52) + '" y="' + (80 - hk) + '" width="' + w + '" height="' + hk + '" rx="1.5" fill="#0F3B33"' + bljedo + '/></g>';
@@ -492,6 +492,19 @@ function grafCestitke(){
     + '<div class="legenda"><span><i style="background:#C6A15B"></i>Posjete</span><span><i style="background:#0F3B33"></i>Kupnje</span></div></div>'
     + '<svg id="graf-cestitke" viewBox="0 0 720 86" role="img" aria-label="Posjete i kupnje po danu" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="80" y2="80" stroke="rgba(11,11,12,.14)"/>' + s + '</svg>'
     + '<div class="src" style="display:flex;justify-content:space-between;padding:0 8px 0 32px"><span>' + datum(pd[0].dan) + '</span><span>' + datum(pd[pd.length - 1].dan) + '</span></div></div>';
+}
+// Put do kupnje (migracija 011 u bozicna-cestitka): posjeta, uređivač, spremljena čestitka, plaćanje, kupnja.
+function lijevakCestitke(r, rz){
+  var h = '<section class="panel"><h2>Put do kupnje ' + e(rz) + '</h2>';
+  if (r.uredivac === undefined) return h + '<p class="prazno">Za ovaj prikaz u projektu bozicna-cestitka treba pokrenuti migraciju 011_lijevak_kupnje.sql.</p></section>';
+  var k = [["Posjete", r.posjete, "ulazak na stranicu"], ["Otvorili uređivač", r.uredivac, "otvaranja stranice Napravi"], ["Spremili čestitku", r.spremljene, "nove čestitke"], ["Otvorili plaćanje", r.placanje, "čestitke, svaka jednom"], ["Kupili", r.kupnje, "plaćene uplate"]];
+  var mx = Math.max(1, Number(k[0][1]) || 0);
+  h += '<div class="skrol"><table class="num"><thead><tr><th>Korak</th><th class="r">Broj</th><th class="r">Od prethodnog</th><th class="r">Od posjeta</th></tr></thead><tbody>'
+    + k.map(function(x, i){ var n = Number(x[1]) || 0; return '<tr><td><span style="font-weight:600">' + x[0] + '</span><br><span class="src">' + x[2] + '</span></td>'
+      + '<td class="r"><div class="iz-posj"><span class="trak"><i style="width:' + Math.min(100, n / mx * 100) + '%"></i></span>' + br(n) + '</div></td>'
+      + '<td class="r src">' + (i ? postotak(n, Number(k[i - 1][1]) || 0) : "–") + '</td><td class="r src">' + (i ? postotak(n, Number(k[0][1]) || 0) : "–") + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Uređivač se broji pri svakom otvaranju, i kad ga ista osoba ponovno učita. Plaćanje se broji jednom po čestitci, kad ga kupac prvi put otvori. Po izvoru je u tablici ispod.</p></section>';
+  return h;
 }
 // Meta oglasi: prikazi, doseg, klikovi i potrošnja (Worker metaOglasi), uz posjete i kupnje istog oglasa (utm_content = ID oglasa).
 function oglasiCestitke(){ return metaOglasi(C.oglasi, C.po_oznaci, false, "za čestitku"); }
@@ -533,6 +546,7 @@ function cestitkaEkran(){
     + '<div><span class="src">Kupnje / posjete</span><span class="v num">' + postotak(Number(r.kupnje), Number(r.posjete)) + '</span><span class="src">' + 'napravljeno čestitki: ' + br(r.napravljene) + '</span></div>'
     + '<div><span class="src">Primatelji otvorili</span><span class="v num">' + br(r.otvorene) + '</span><span class="src">' + rz + '</span></div>'
     + '</section>';
+  h += lijevakCestitke(r, rz);
   h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2>' + izbor + '</div>';
   h += '<p class="src">Od početka: ' + br(u.posjete) + ' posjeta, ' + br(u.kupnje) + ' kupnji (' + br(u.komada) + ' čestitki), ' + eur(u.prihod, true) + '.</p>';
   h += grafCestitke();
@@ -541,9 +555,11 @@ function cestitkaEkran(){
   if (!pi.length) h += '<p class="prazno">U ovom razdoblju još nema posjeta ni kupnji.</p>';
   else {
     var maxP = Math.max(1, Math.max.apply(null, pi.map(function(x){ return x.posjete; })));
-    h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th><th class="r">Kupnje</th><th class="r">Kupnje / posjete</th><th class="r">Prihod</th></tr></thead><tbody>'
+    var lj = pi[0].uredivac !== undefined;
+    h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th>' + (lj ? '<th class="r">Uređivač</th><th class="r">Spremili</th><th class="r">Plaćanje</th>' : '') + '<th class="r">Kupnje</th><th class="r">Kupnje / posjete</th><th class="r">Prihod</th></tr></thead><tbody>'
       + pi.map(function(x){ return '<tr class="iz-red"><td><span class="iz-ime">' + e(imeIzvoraC(x.izvor)) + '</span></td>'
         + '<td class="r"><div class="iz-posj"><span class="trak"><i style="width:' + (x.posjete / maxP * 100) + '%"></i></span>' + br(x.posjete) + '</div></td>'
+        + (lj ? '<td class="r">' + br(x.uredivac) + '</td><td class="r">' + br(x.spremljene) + '</td><td class="r">' + br(x.placanje) + '</td>' : '')
         + '<td class="r">' + br(x.kupnje) + '</td><td class="r src">' + postotak(x.kupnje, x.posjete) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; }).join("")
       + '</tbody></table></div>';
   }
