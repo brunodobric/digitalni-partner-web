@@ -8,6 +8,8 @@
 {
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "dp-nadzor",
+  // Varijable upisane u Cloudflareu (npr. CESTITKA_KEY) ostaju nakon objave, kao u Kuverti i čestitci.
+  "keep_vars": true,
   "main": "src/index.js",
   "workers_dev": true,
   "preview_urls": false,
