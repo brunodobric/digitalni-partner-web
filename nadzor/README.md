@@ -26,6 +26,7 @@ Dashboard cijelog obrta: usluge, aplikacije i Kuverta na jednom mjestu. Faza 0 i
 | Zadnja aktivnost korisnika (iz osvježavanja sesije, ne samo zadnja prijava), registracije po danu u grafu i pregled jednog dana (klik na stupac ili polje Dan), pokreće se u projektu MyWeddingInvite nakon `12` i `20`; zamjenjuje `nadzor_korisnici` i `nadzor_izvori` iz `12` i `nadzor_oznake` iz `20` | `sql/22-kuverta-aktivnost-i-dani.sql` |
 | Brisanje korisničkog računa Kuverte (gumb Obriši uz korisnika), pokreće se u projektu MyWeddingInvite | migracija `023_nadzor_brisanje_korisnika.sql` u repozitoriju MyWeddingInvite; Worker zove `KUVERTA_WEB/interno/obrisi-korisnika` |
 | Ekran **Mailovi**: automatski mailovi Kuverte (pravila: koji mail, kada, kome; kome ide idućih 14 dana; zadnje poslano; uređivanje teksta, nova pravila, pregled i proba). Pravila su u bazi Kuverte, migracija `033_mail_pravila.sql` u repozitoriju MyWeddingInvite (ima i funkcije `nadzor_mail*`); pregled i probu slaže Worker Kuverte na `KUVERTA_WEB/interno/mail-pregled` | `src/stranica.html` (Mailovi), `src/index.js` (`mailovi`) |
+| Ekran **Čestitka** (bozicna.kuverta.hr): posjete po izvoru i oznaci poveznice (utm), kupnje, komadi, prihod, napravljene i otvorene čestitke. Čita funkciju `nadzor_cestitka` iz Supabase projekta `bozicna-cestitka` (migracija `009_posjete_i_nadzor.sql` u repozitoriju bozicna-cestitka; u njegov `nadzor.kljuc` ide isti sažetak ključa kao u Kuverti). Adresa je `CESTITKA_URL` u `wrangler.jsonc`, javni ključ tajna `CESTITKA_KEY` | `src/stranica.html` (`cestitkaEkran`), `src/index.js` (`/api/cestitka`) |
 | Čitač bankovnih izvoda CAMT.053 | `src/camt.js` |
 | Izvodi, stavke i stanje računa (ekran Banka) | `sql/05-izvodi.sql` |
 | Brisanje troška (olovka uz Dodaj trošak, pa minus uz trošak i potvrda) | `sql/07-brisanje-troska.sql` |
@@ -49,6 +50,7 @@ Worker zove bazu samo preko funkcija koje traže tajni ključ `NADZOR_KLJUC`. U 
 | `IZVODI_POSILJATELJI` | Adrese ili domene pošiljatelja izvoda, npr. `@pbz.hr`. Prazno pušta svakoga | preporučeno |
 | `IZVODI_ADRESA` | Adrese (odvojene zarezom) čija se pošta uvozi kao izvod. Prazno znači svaka adresa `izvodi@…` | ne |
 | `IZVODI_PROSLIJEDI` | Adresa na koju se mail s izvodom proslijedi nakon uvoza (mora biti potvrđena u Email Routingu) | ne |
+| `CESTITKA_KEY` | Javni (publishable) ključ Supabase projekta bozicna-cestitka, za ekran Čestitka | ne, bez nje ekran Čestitka javi da ključ nije postavljen |
 | `FISK_CITANJE_TOKEN` | PDF računa na ekranu Računi i provjera isteka certifikata. Ista vrijednost kao tajna `FISK_CITANJE_TOKEN` funkcije fisk-racun (smije samo čitati, ne može izdati račun). Stari naziv `FISK_TOKEN` radi kao rezerva | ne, bez nje popis radi, a PDF ne |
 
 Ekran Računi čita tablicu `fisk.racuni` (isti Supabase projekt) preko funkcije `nadzor_racuni`, a PDF traži od Edge funkcije `fisk-racun` (repozitorij financijski-softver). Adresa funkcije je `SUPABASE_URL/functions/v1/fisk-racun`, a može se promijeniti varijablom `FISK_URL`.

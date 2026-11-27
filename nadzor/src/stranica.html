@@ -131,6 +131,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="usluge" aria-selected="false">Usluge</button>
     <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
     <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
+    <button role="tab" data-ekran="cestitka" aria-selected="false">Čestitka</button>
     <button role="tab" data-ekran="mailovi" aria-selected="false">Mailovi</button>
     <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
     <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
@@ -171,7 +172,7 @@ function oznaci(){
 
 function crtaj(){
   oznaci();
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti, mailovi: mailoviEkran}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, cestitka: cestitkaEkran, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti, mailovi: mailoviEkran}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
@@ -181,6 +182,7 @@ function crtaj(){
     var idan = document.getElementById("izvori-dan"); if (idan) idan.addEventListener("change", function(){ postaviDan(/^\d{4}-\d{2}-\d{2}$/.test(idan.value) ? idan.value : ""); });
     var isvi = document.getElementById("izvori-svi-dani"); if (isvi) isvi.addEventListener("click", function(){ postaviDan(""); });
     var gpd = document.getElementById("graf-po-danu"); if (gpd) gpd.addEventListener("click", function(ev){ var g = ev.target.closest("[data-dan]"); if (g) postaviDan(g.dataset.dan === izDan ? "" : g.dataset.dan); }); document.querySelectorAll(".iz-otvori").forEach(function(b){ b.addEventListener("click", function(){ izOtvoreni[b.dataset.izvor] = !izOtvoreni[b.dataset.izvor]; var y = window.scrollY; crtaj(); window.scrollTo(0, y); }); }); }
+  if (ekran === "cestitka") { var cd = document.getElementById("cestitka-dana"); if (cd) cd.addEventListener("change", function(){ cDana = Number(cd.value); cGreska = ""; crtaj(); }); }
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
   if (ekran === "mailovi") veziMailove();
@@ -449,6 +451,71 @@ function izvoriKuverte(){
   h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Reg. / posjete</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>' + redak + '</tbody></table></div>';
   if (IZ.pinterest_greska || IZ.grupe_greska) h += '<p class="src">Grupe i pinovi se nisu učitali (' + e(IZ.pinterest_greska || IZ.grupe_greska) + '). U projektu MyWeddingInvite treba pokrenuti sql/20-kuverta-oznake-sve.sql.</p>';
   h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjete se broje bez kolačića: oznake utm u poveznici ili stranica s koje je posjetitelj došao. Grupa je poveznica s utm_medium=grupa, a pin poveznica s utm_medium=pin; ime je utm_content. Izvor registracije je oznaka s kojom je korisnik došao, a ako je nema, odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih. Ispod izvora su sve oznake poveznica (grupe, pinovi, oglasi, kampanje). Registracije bez oznake, za koje znamo samo odgovor na pitanje „Kako ste čuli za Kuvertu?”, su u retku „Odgovor „Kako ste čuli””.</p></details></section>';
+  return h;
+}
+
+// ---------- Božićna čestitka (bozicna.kuverta.hr) ----------
+// Podaci: /api/cestitka → funkcija nadzor_cestitka u bazi čestitke (migracija 009 u repozitoriju bozicna-cestitka).
+var C = null, cGreska = "", cDana = 30, cUcitavam = -1;
+function ucitajCestitku(){
+  if (cUcitavam === cDana) return;
+  cUcitavam = cDana;
+  fetch("/api/cestitka?dana=" + cDana, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ cUcitavam = -1; if (j.dana !== cDana) return; C = j; cGreska = ""; if (ekran === "cestitka") crtaj(); })
+    .catch(function(err){ cUcitavam = -1; cGreska = err.message; if (ekran === "cestitka") crtaj(); });
+}
+var C_IZVOR = {izravno: "Izravno", cestitka: "Link na dnu poslane čestitke", "kuverta.hr": "Kuverta (kuverta.hr)"};
+function imeIzvoraC(x){ return C_IZVOR[x] || imeIzvora(x); }
+function grafCestitke(){
+  var pd = C.po_danu || [];
+  if (!pd.length) return "";
+  var mx = Math.max(4, Math.max.apply(null, pd.map(function(x){ return x.posjete; })));
+  var mk = Math.max(2, Math.max.apply(null, pd.map(function(x){ return x.kupnje; })));
+  var sl = 680 / pd.length, s = "";
+  pd.forEach(function(x, i){
+    var x0 = 32 + i * sl, w = sl * .34, hp = x.posjete / mx * 74, hk = x.kupnje / mk * 74;
+    s += '<g><title>' + datum(x.dan) + ': ' + br(x.posjete) + ' posjeta, ' + br(x.kupnje) + ' kupnji</title>'
+      + '<rect x="' + x0 + '" y="0" width="' + sl + '" height="84" fill="transparent"/>'
+      + '<rect x="' + (x0 + sl * .14) + '" y="' + (80 - hp) + '" width="' + w + '" height="' + hp + '" rx="1.5" fill="#C6A15B"/>'
+      + '<rect x="' + (x0 + sl * .52) + '" y="' + (80 - hk) + '" width="' + w + '" height="' + hk + '" rx="1.5" fill="#0F3B33"/></g>';
+  });
+  return '<div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:4px"><p class="src">Po danu, zadnjih ' + pd.length + ' dana. Kupnje imaju svoje mjerilo (najviše ' + br(Math.max.apply(null, pd.map(function(x){ return x.kupnje; }))) + ' u danu).</p>'
+    + '<div class="legenda"><span><i style="background:#C6A15B"></i>Posjete</span><span><i style="background:#0F3B33"></i>Kupnje</span></div></div>'
+    + '<svg viewBox="0 0 720 86" role="img" aria-label="Posjete i kupnje po danu" style="width:100%;height:auto;display:block"><line x1="32" x2="712" y1="80" y2="80" stroke="rgba(11,11,12,.14)"/>' + s + '</svg>'
+    + '<div class="src" style="display:flex;justify-content:space-between;padding:0 8px 0 32px"><span>' + datum(pd[0].dan) + '</span><span>' + datum(pd[pd.length - 1].dan) + '</span></div></div>';
+}
+function cestitkaEkran(){
+  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Kuverta · Božićna čestitka</p><h1>bozicna.kuverta.hr</h1></div>';
+  var izbor = '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="cestitka-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label>';
+  if (cGreska) return h + '<section class="panel"><p class="prazno">Podaci čestitke se nisu učitali (' + e(cGreska) + '). Ako piše da funkcija ne postoji ili da je ključ neispravan, u projektu bozicna-cestitka treba pokrenuti migraciju 009_posjete_i_nadzor.sql i upisati ključ u nadzor.kljuc.</p>' + izbor + '</section>';
+  if (!C || C.dana !== cDana) { ucitajCestitku(); return h + '<section class="panel"><p class="prazno">Učitavam čestitku…</p></section>'; }
+  var r = C.razdoblje || {}, u = C.ukupno || {};
+  var rz = cDana ? "u zadnjih " + cDana + " dana" : "od početka";
+  h += '<section class="kpi">'
+    + '<div><span class="src">Posjete ' + rz + '</span><span class="v num">' + br(r.posjete) + '</span><span class="src">danas ' + br(u.danas_posjete) + '</span></div>'
+    + '<div><span class="src">Kupnje ' + rz + '</span><span class="v num">' + br(r.kupnje) + '</span><span class="src">' + br(r.komada) + ' čestitki' + (Number(r.iz_paketa) ? ', ' + br(r.iz_paketa) + ' iskorišteno iz paketa' : '') + ' · danas ' + br(u.danas_kupnje) + '</span></div>'
+    + '<div><span class="src">Prihod ' + rz + '</span><span class="v num">' + eur(r.prihod, true) + '</span><span class="src">prije Stripeove naknade</span></div>'
+    + '<div><span class="src">Kupnje / posjete</span><span class="v num">' + postotak(Number(r.kupnje), Number(r.posjete)) + '</span><span class="src">' + 'napravljeno čestitki: ' + br(r.napravljene) + '</span></div>'
+    + '<div><span class="src">Primatelji otvorili</span><span class="v num">' + br(r.otvorene) + '</span><span class="src">' + rz + '</span></div>'
+    + '</section>';
+  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2>' + izbor + '</div>';
+  h += '<p class="src">Od početka: ' + br(u.posjete) + ' posjeta, ' + br(u.kupnje) + ' kupnji (' + br(u.komada) + ' čestitki), ' + eur(u.prihod, true) + '.</p>';
+  h += grafCestitke();
+  var pi = C.po_izvoru || [];
+  if (!pi.length) h += '<p class="prazno">U ovom razdoblju još nema posjeta ni kupnji.</p>';
+  else {
+    var maxP = Math.max(1, Math.max.apply(null, pi.map(function(x){ return x.posjete; })));
+    h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th><th class="r">Kupnje</th><th class="r">Kupnje / posjete</th><th class="r">Prihod</th></tr></thead><tbody>'
+      + pi.map(function(x){ return '<tr class="iz-red"><td><span class="iz-ime">' + e(imeIzvoraC(x.izvor)) + '</span></td>'
+        + '<td class="r"><div class="iz-posj"><span class="trak"><i style="width:' + (x.posjete / maxP * 100) + '%"></i></span>' + br(x.posjete) + '</div></td>'
+        + '<td class="r">' + br(x.kupnje) + '</td><td class="r src">' + postotak(x.kupnje, x.posjete) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; }).join("")
+      + '</tbody></table></div>';
+  }
+  var po = C.po_oznaci || [];
+  if (po.length) h += '<h2 style="margin-top:8px">Po oznaci poveznice</h2><div class="skrol"><table class="num"><thead><tr><th>Izvor</th><th>Medij</th><th>Kampanja</th><th>Oglas</th><th class="r">Posjete</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
+    + po.map(function(o){ return '<tr><td class="nw" style="font-weight:600">' + e(imeIzvoraC(o.izvor)) + '</td><td>' + e(IZ_VRSTA[o.medij] || o.medij || "–") + '</td><td>' + e(o.kampanja || "–") + '</td><td>' + e(o.oglas || "–") + '</td><td class="r">' + br(o.posjete) + '</td><td class="r">' + br(o.kupnje) + '</td><td class="r nw">' + (Number(o.prihod) > 0 ? eur(o.prihod, true) : "–") + '</td></tr>'; }).join("")
+    + '</tbody></table></div>';
+  h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjeta je ulazak na stranicu: s oznakom utm u poveznici, s vanjske stranice (Instagram, Facebook, Google) ili izravno (upisana adresa, poveznica iz WhatsAppa ili Vibera). Klik unutar stranice, roboti i otvaranje poslane čestitke se ne broje, a ponovno učitavanje stranice broji se kao nova posjeta. Sve se broji bez kolačića. Oznake poveznice: utm_source je izvor, utm_medium medij, utm_campaign kampanja i utm_content oglas, npr. bozicna.kuverta.hr/?utm_source=instagram&amp;utm_medium=paid&amp;utm_campaign=bozic&amp;utm_content=reel-sob. Kupnja je plaćena uplata bez testnih (paket od 5 ili 10 je jedna kupnja), a izvor kupnje je izvor s kojim je kupac došao do uređivača. „Nepoznato” su kupci koji su kod kolačića odabrali „Samo nužni” i kupnje prije uvođenja brojanja.</p></details></section>';
   return h;
 }
 
