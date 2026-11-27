@@ -89,7 +89,8 @@ export default {
         const dan = /^\d{4}-\d{2}-\d{2}$/.test(url.searchParams.get("dan") || "") ? url.searchParams.get("dan") : null;
         const args = { p_kljuc: env.NADZOR_KLJUC, p_dana: dana, ...(dan ? { p_dan: dan } : {}) };
         const greska = (e) => ({ greska: e.message });
-        const [izvori, oznake] = await Promise.all([
+        const danasZg = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Zagreb" });
+        const [izvori, oznake, oglasi, danasIzvori] = await Promise.all([
           rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", args).catch((e) => {
             if (dan) return { greska_dan: true };
             throw e;
@@ -97,7 +98,13 @@ export default {
           // Po oznaci poveznice (sql/20-kuverta-oznake-sve.sql, prije sql/19): sve oznake, grupe i Pinterest. Ako funkcije još nema,
           // grupe se čitaju starom funkcijom iz sql/18, a ostatak sekcije radi normalno.
           rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", args).catch(greska),
+          // Meta oglasi Kuverte: isti oglasni račun, bez kampanja čestitke.
+          metaOglasi(env, { dana, dan, cestitka: false }).catch(greska),
+          // Samo današnji dan (sql/22), za "danas N" ispod zbroja. Bez sql/22 se ne prikazuje.
+          rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_izvori", { p_kljuc: env.NADZOR_KLJUC, p_dana: 1, p_dan: danasZg }).catch(() => null),
         ]);
+        const zbrojDanas = (k) => ((danasIzvori && danasIzvori.po_izvoru) || []).reduce((a, x) => a + Number(x[k] || 0), 0);
+        const danas = danasIzvori && danasIzvori.po_izvoru ? { posjete: zbrojDanas("posjete"), registracije: zbrojDanas("registracije"), kupnje: zbrojDanas("kupnje") } : null;
         if (izvori && izvori.greska_dan) return json({ greska: "Pregled po danu radi kad se u projektu MyWeddingInvite pokrene sql/22-kuverta-aktivnost-i-dani.sql." }, 500);
         let po_grupi = [], grupe_greska = "", po_pinterestu = [], pinterest_greska = "", po_oznaci = [];
         if (Array.isArray(oznake)) {
@@ -109,18 +116,23 @@ export default {
           const grupe = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_grupe", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana }).catch(greska);
           if (Array.isArray(grupe)) po_grupi = grupe; else grupe_greska = grupe.greska;
         }
-        return json({ ...izvori, po_oznaci, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana, dan });
+        return json({ ...izvori, po_oznaci, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana, dan, oglasi, danas });
       }
       if (req.method === "GET" && url.pathname === "/api/cestitka") {
         // Božićna čestitka (bozicna.kuverta.hr): posjete po izvoru i kupnje, funkcija nadzor_cestitka iz
         // migracije 009_posjete_i_nadzor.sql u repozitoriju bozicna-cestitka.
         if (!env.CESTITKA_URL || !env.CESTITKA_KEY) return json({ greska: "Nije postavljen CESTITKA_KEY (javni ključ Supabase projekta bozicna-cestitka)." }, 500);
         const dana = [7, 30, 90, 0].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 30;
+        // Jedan dan (klik na stupac grafa): p_dan postoji od migracije 010 u repozitoriju bozicna-cestitka.
+        const dan = /^\d{4}-\d{2}-\d{2}$/.test(url.searchParams.get("dan") || "") ? url.searchParams.get("dan") : null;
         const [c, oglasi] = await Promise.all([
-          rpc(env.CESTITKA_URL, env.CESTITKA_KEY, "nadzor_cestitka", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana }),
-          metaOglasi(env, dana).catch((e) => ({ greska: String(e.message || e) })),
+          rpc(env.CESTITKA_URL, env.CESTITKA_KEY, "nadzor_cestitka", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana, ...(dan ? { p_dan: dan } : {}) }).catch((e) => {
+            if (dan) throw new Error("Pregled jednog dana radi kad se u projektu bozicna-cestitka pokrene migracija 010_nadzor_po_danu.sql.");
+            throw e;
+          }),
+          metaOglasi(env, { dana, dan, cestitka: true }).catch((e) => ({ greska: String(e.message || e) })),
         ]);
-        return json({ ...c, dana, oglasi });
+        return json({ ...c, dana, dan, oglasi });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (url.pathname.startsWith("/api/mail")) {
@@ -514,18 +526,21 @@ function b64uTekst(s) {
 // ---------- Meta oglasi (ekran Čestitka) ----------
 // Prikazi, doseg, klikovi i potrošnja po oglasu iz Metinog API-ja za oglase (Insights, razina oglasa).
 // Treba tajnu META_ADS_TOKEN (token sistemskog korisnika s dozvolom ads_read) i META_OGLASNI_RACUN (broj računa).
-// META_KAMPANJE: regularni izraz za imena kampanja čestitke (zadano čestitka ili Božić), jer račun dijeli i Kuverta.
+// META_KAMPANJE: regularni izraz za imena kampanja čestitke (zadano čestitka ili Božić). Račun dijeli i Kuverta:
+// ekran Čestitka pokazuje kampanje koje mu odgovaraju (cestitka: true), a ekran Kuverta sve ostale.
 // Kupnje se spajaju s oglasom preko utm_content={{ad.id}} u parametrima URL-a oglasa.
-async function metaOglasi(env, dana) {
+async function metaOglasi(env, { dana, dan = null, cestitka }) {
   const racun = String(env.META_OGLASNI_RACUN || "").replace(/^act_/, "").trim();
   if (!env.META_ADS_TOKEN || !racun) return { postavljeno: false };
-  const danas = new Date(Date.now() + 36e5).toISOString().slice(0, 10); // otprilike po našem vremenu
+  const zg = (ms) => new Date(ms).toLocaleDateString("sv-SE", { timeZone: "Europe/Zagreb" });
+  const danas = zg(Date.now());
   const parametri = new URLSearchParams({
     level: "ad",
     fields: "ad_id,ad_name,campaign_name,impressions,reach,clicks,spend",
     limit: "500",
   });
-  if (dana) parametri.set("time_range", JSON.stringify({ since: new Date(Date.now() + 36e5 - (dana - 1) * 864e5).toISOString().slice(0, 10), until: danas }));
+  if (dan) parametri.set("time_range", JSON.stringify({ since: dan, until: dan }));
+  else if (dana) parametri.set("time_range", JSON.stringify({ since: zg(Date.now() - (dana - 1) * 864e5), until: danas }));
   else parametri.set("date_preset", "maximum");
   const r = await fetch("https://graph.facebook.com/v26.0/act_" + encodeURIComponent(racun) + "/insights?" + parametri, {
     headers: { authorization: "Bearer " + env.META_ADS_TOKEN },
@@ -535,7 +550,8 @@ async function metaOglasi(env, dana) {
   let filtar;
   try { filtar = new RegExp(env.META_KAMPANJE || "čestit|cestit|božić|bozic", "i"); } catch { filtar = /čestit|cestit|božić|bozic/i; }
   const broj = (v) => Number(v || 0);
-  const redovi = (j.data || []).filter((x) => filtar.test(x.campaign_name || "") || filtar.test(x.ad_name || "")).map((x) => ({
+  const jeCestitka = (x) => filtar.test(x.campaign_name || "") || filtar.test(x.ad_name || "");
+  const redovi = (j.data || []).filter((x) => jeCestitka(x) === cestitka).map((x) => ({
     id: x.ad_id, ime: x.ad_name, kampanja: x.campaign_name, prikazi: broj(x.impressions), doseg: broj(x.reach), klikovi: broj(x.clicks), potrosnja: broj(x.spend),
   }));
   redovi.sort((a, b) => b.potrosnja - a.potrosnja || b.prikazi - a.prikazi);
