@@ -5,6 +5,7 @@
 // - POST /api/trosak-obrisi  brisanje jednog troška po id-u (Access)
 // - GET /api/racuni  računi iz fiskalizacije (Access)
 // - GET /api/korisnici  registrirani korisnici Kuverte: e-mail, registracija, zadnja prijava (Access)
+// - GET /api/cestitka?dana=…  Božićna čestitka: posjete po izvoru, kupnje i prihod (Access)
 // - POST /api/korisnik-obrisi  brisanje korisničkog računa Kuverte po e-mailu (Access), vidi obrisiKorisnika
 // - GET /api/racun-pdf?izvor=…&id=…  PDF računa iz servisa fisk-racun (Access)
 // - GET /api/banka   stanje računa, izvodi i promet iz uvezenih izvoda CAMT.053 (Access)
@@ -109,6 +110,14 @@ export default {
           if (Array.isArray(grupe)) po_grupi = grupe; else grupe_greska = grupe.greska;
         }
         return json({ ...izvori, po_oznaci, po_grupi, grupe_greska, po_pinterestu, pinterest_greska, dana, dan });
+      }
+      if (req.method === "GET" && url.pathname === "/api/cestitka") {
+        // Božićna čestitka (bozicna.kuverta.hr): posjete po izvoru i kupnje, funkcija nadzor_cestitka iz
+        // migracije 009_posjete_i_nadzor.sql u repozitoriju bozicna-cestitka.
+        if (!env.CESTITKA_URL || !env.CESTITKA_KEY) return json({ greska: "Nije postavljen CESTITKA_KEY (javni ključ Supabase projekta bozicna-cestitka)." }, 500);
+        const dana = [7, 30, 90, 0].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 30;
+        const c = await rpc(env.CESTITKA_URL, env.CESTITKA_KEY, "nadzor_cestitka", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana });
+        return json({ ...c, dana });
       }
       if (req.method === "POST" && url.pathname === "/api/korisnik-obrisi") return await obrisiKorisnika(req, env);
       if (url.pathname.startsWith("/api/mail")) {
