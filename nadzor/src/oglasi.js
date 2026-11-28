@@ -144,11 +144,11 @@ export async function metaJutro(env, { rpcNadzor, oznakeKuverta, posaljiMail, do
   // 2. Zbroj 7 dana po oglasu (doseg i frekvencija se ne mogu zbrajati po danima) i popis aktivnih oglasa.
   const [zbroj, oglasi, oznake] = await Promise.all([
     sve(env, racun(env) + "/insights", { level: "ad", fields: polja, time_range: JSON.stringify({ since: od7, until: jucer }), limit: "500" }),
-    sve(env, racun(env) + "/ads", { fields: "id,name,effective_status", effective_status: JSON.stringify(["ACTIVE"]), limit: "500" }),
+    sve(env, racun(env) + "/ads", { fields: "id,name,effective_status,campaign{name}", effective_status: JSON.stringify(["ACTIVE"]), limit: "500" }),
     oznakeKuverta().catch(() => []),
   ]);
   const aktivni = new Set(oglasi.map((x) => x.id));
-  const nase = spojiNase(oglasi.map((x) => ({ id: x.id, ime: x.name })), oznake);
+  const nase = spojiNase(oglasi.map((x) => ({ id: x.id, ime: x.name, kampanja: x.campaign && x.campaign.name })), oznake);
   const stanja = ocijeni(zbroj.map(redak), aktivni, nase, p, danas);
   const prijedlozi = stanja.length ? await rpcNadzor("nadzor_meta_stanje_upis", { p_redovi: stanja }) : [];
 
@@ -187,10 +187,13 @@ export function spojiNase(oglasi, oznake) {
     if (!PLACENI.includes(x.medij) || !x.oglas) continue;
     if (ids.has(String(x.oglas))) dodaj(String(x.oglas), x); else bez.push(x);
   }
+  // Crush i ručni linkovi u utm_content stavljaju ime oglasa (npr. "kuverta-9x16.mp4-004---video"), a utm_campaign ime kampanje.
+  // Zato: isto ime bez znakova (prednost oglasu iz iste kampanje), pa ime bez verzije (oglas1 = "Oglas 1 - Paket").
   for (const x of bez) {
-    const kl = norm(x.oglas);
-    // Ručnu oznaku dobije najnoviji oglas tog imena (najveći ID), da se ne broji dvaput.
-    const kandidati = oglasi.filter((a) => norm(baza(a.ime)) === kl).sort((a, b) => (BigInt(b.id) > BigInt(a.id) ? 1 : -1));
+    const kl = norm(x.oglas), kk = norm(x.kampanja);
+    const poredaj = (l) => l.sort((a, b) => (norm(b.kampanja) === kk) - (norm(a.kampanja) === kk) || (BigInt(b.id) > BigInt(a.id) ? 1 : -1));
+    let kandidati = poredaj(oglasi.filter((a) => norm(a.ime) === kl));
+    if (!kandidati.length) kandidati = poredaj(oglasi.filter((a) => norm(baza(a.ime)) === kl));
     if (kandidati.length) dodaj(kandidati[0].id, x);
   }
   return po;
@@ -250,6 +253,8 @@ export async function oglasiPregled(env, { dana, oznakeKuverta, oznakeCestitka, 
   const oglasi = s.oglasi.map((a) => ({ id: a.id, ime: a.name, adset_id: a.adset_id, campaign_id: a.campaign_id, status: a.status, ef: a.effective_status,
     slika: (a.creative && a.creative.thumbnail_url) || "" }));
   const proizvodK = Object.fromEntries(s.kampanje.map((k) => [k.id, k.proizvod]));
+  const imeK = Object.fromEntries(s.kampanje.map((k) => [k.id, k.name]));
+  for (const a of oglasi) a.kampanja = imeK[a.campaign_id] || "";
   const nase = { ...spojiNase(oglasi.filter((a) => proizvodK[a.campaign_id] === "kuverta"), nK), ...spojiNase(oglasi.filter((a) => proizvodK[a.campaign_id] === "cestitka"), nC) };
   const zbrojN = (lista) => lista.reduce((a, x) => { for (const k in a) a[k] += x.n[k]; return a; }, { posjete: 0, registracije: 0, kupnje: 0, prihod: 0 });
   // Bez prometa u razdoblju i bez aktivnog stanja nema smisla prikazivati (stare arhivirane kampanje).

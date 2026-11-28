@@ -69,6 +69,19 @@ test("naše oznake po ID-u oglasa i po imenu (oglas1 = Oglas 1 - Paket)", () => 
     { medij: "grupa", oglas: "130", posjete: 9 },
   ]);
   assert.equal(po["130"].posjete, 5);
-  assert.equal(po["120"].registracije, 2);
-  assert.equal(po["100"], undefined);
+  // Točno ime ima prednost pred imenom bez verzije.
+  assert.equal(po["100"].registracije, 2);
+  assert.equal(po["120"], undefined);
+  const po2 = spojiNase([{ id: "120", ime: "Oglas 1 - Paket" }], [{ medij: "paid", oglas: "oglas1", registracije: 1 }]);
+  assert.equal(po2["120"].registracije, 1);
+});
+
+test("Crush oznake: ime oglasa u utm_content, prednost istoj kampanji", () => {
+  const oglasi = [
+    { id: "200", ime: "kuverta-9x16.mp4 - 004 - video", kampanja: "Crush kuverta.hr - 2026-11-21 13:26" },
+    { id: "300", ime: "kuverta-9x16.mp4 - 004 - video", kampanja: "Crush kuverta.hr - 2026-11-22 22:24" },
+  ];
+  const po = spojiNase(oglasi, [{ medij: "paid", oglas: "kuverta-9x16.mp4-004---video", kampanja: "crush-kuverta-hr---2026-11-21-13-26", posjete: 4, registracije: 1 }]);
+  assert.equal(po["200"].registracije, 1);
+  assert.equal(po["300"], undefined);
 });
