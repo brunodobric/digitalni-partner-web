@@ -108,6 +108,22 @@ export default {
         await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_upit_status", { p_kljuc: env.NADZOR_KLJUC, p_id: Number(b.id), p_status: b.status });
         return json({ ok: true });
       }
+      // Raspored kartica na naslovnoj (sql/25-raspored-naslovne.sql): [[kartica, veličina 1-4], ...], isti na svim uređajima.
+      if (url.pathname === "/api/raspored") {
+        if (req.method === "GET") {
+          const raspored = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_postavka", { p_kljuc: env.NADZOR_KLJUC, p_ime: "naslovna" });
+          return json({ raspored });
+        }
+        if (req.method === "POST") {
+          const izvor = req.headers.get("origin");
+          if (izvor && new URL(izvor).host !== url.host) return json({ greska: "Zahtjev nije s nadzora." }, 403);
+          const r = ((await req.json().catch(() => ({}))) || {}).raspored;
+          const ispravan = Array.isArray(r) && r.length <= 40 && r.every((k) => Array.isArray(k) && k.length === 2 && /^[a-z]{1,30}$/.test(k[0]) && [1, 2, 3, 4].includes(k[1]));
+          if (!ispravan) return json({ greska: "Neispravan raspored." }, 400);
+          await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_postavka_spremi", { p_kljuc: env.NADZOR_KLJUC, p_ime: "naslovna", p_vrijednost: r });
+          return json({ ok: true });
+        }
+      }
       if (req.method === "GET" && url.pathname === "/api/racuni") {
         const racuni = await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_racuni", { p_kljuc: env.NADZOR_KLJUC });
         return json({ racuni });

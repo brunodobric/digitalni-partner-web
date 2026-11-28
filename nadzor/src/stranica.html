@@ -17,17 +17,38 @@ h1,h2,p{margin:0}
 h1{font-size:clamp(24px,3vw,30px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
 h2{font-size:16px;font-weight:700;letter-spacing:-.005em}
 .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
-header{background:var(--smaragd);color:var(--kamen);position:sticky;top:0;z-index:5}
-header .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 32px;min-height:64px}
-.brand{display:flex;align-items:center;gap:12px}
 .mono{width:30px;height:30px;border-radius:7px;background:var(--kamen);color:var(--smaragd);display:grid;place-items:center;font-weight:700;font-size:14px;letter-spacing:-.02em}
 .word{font-size:17px;color:#fff}.word b{font-weight:700}
-.sub{font-size:12.5px;color:rgba(231,228,222,.75);margin-left:4px;padding-left:12px;border-left:1px solid rgba(231,228,222,.3)}
-nav{display:flex;flex-wrap:wrap;gap:4px}
-nav button{background:none;border:0;border-radius:8px;font:600 14px Manrope,sans-serif;color:rgba(231,228,222,.8);padding:0 14px;cursor:pointer;min-height:40px;position:relative}
-nav button:hover{background:rgba(255,255,255,.08);color:#fff}
-nav button[aria-selected=true]{background:rgba(255,255,255,.12);color:#fff}
-nav button[aria-selected=true]::after{content:"";position:absolute;left:14px;right:14px;bottom:4px;height:2px;border-radius:2px;background:var(--zlato)}
+/* Okvir: lijevi izbornik i sadržaj desno. Od 641 do 1100 px izbornik je samo ikone, a na mobitelu je ladica (tipka s tri crte). */
+.okvir{display:grid;grid-template-columns:244px minmax(0,1fr);min-height:100vh}
+.okvir.mali{grid-template-columns:68px minmax(0,1fr)}
+.bocni{background:var(--smaragd);color:var(--kamen);position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding:16px 12px}
+.bi-glava{display:flex;align-items:center;gap:10px;padding:4px 6px 14px}
+.mono{flex:none}
+.bi-ime .word{font-size:16px;line-height:1.2;white-space:nowrap}
+.bi-pod{font-size:12px;color:rgba(231,228,222,.7)}
+.bocni nav{display:flex;flex-direction:column;gap:2px}
+.bi-grupa{font-size:12px;font-weight:600;color:rgba(231,228,222,.55);padding:14px 12px 4px;margin:0}
+.bocni nav button,.bi-sklopi{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:8px;font:600 14px Manrope,sans-serif;color:rgba(231,228,222,.82);padding:0 12px;min-height:40px;cursor:pointer;text-align:left;position:relative}
+.bocni nav button:hover,.bi-sklopi:hover{background:rgba(255,255,255,.08);color:#fff}
+.bocni nav button[aria-current=page]{background:rgba(255,255,255,.13);color:#fff}
+.bocni nav button[aria-current=page]::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:2px;background:var(--zlato)}
+.bocni svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bi-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bi-z{font-size:11.5px;font-weight:700;border-radius:999px;padding:0 7px;line-height:1.6;background:var(--zlato);color:#2A1E06}
+.bi-z.hitno{background:#E8836E;color:#2B0D07}
+.bi-z:empty{display:none}
+.bi-sklopi{margin-top:auto;font-weight:500;color:rgba(231,228,222,.65)}
+.okvir.mali .bi-t,.okvir.mali .bi-ime{display:none}
+.okvir.mali .bi-grupa{font-size:0;padding:0;margin:8px 10px;border-top:1px solid rgba(231,228,222,.18)}
+.okvir.mali .bocni nav button,.okvir.mali .bi-sklopi{justify-content:center;padding:0}
+.okvir.mali .bi-glava{justify-content:center;padding:4px 0 14px}
+.okvir.mali .bi-z:not(:empty){position:absolute;top:5px;right:8px;min-width:8px;height:8px;padding:0;font-size:0}
+.okvir.mali .bi-sklopi svg{transform:scaleX(-1)}
+.glavno{min-width:0;display:flex;flex-direction:column}
+.glavno main{flex:1}
+.traka,.bi-zastor{display:none}
+@media (max-width:1100px){.bi-sklopi{display:none}}
 main .wrap{padding-top:28px;padding-bottom:48px;display:flex;flex-direction:column;gap:20px}
 .lbl{font-size:12.5px;font-weight:600;color:var(--grafit)}
 .panel{background:var(--kartica);border:1px solid var(--linija);border-radius:12px;box-shadow:0 1px 2px rgba(11,11,12,.04);padding:20px 22px;display:flex;flex-direction:column;gap:16px;min-width:0}
@@ -135,51 +156,93 @@ th.m{color:#2A4A8A}th.n{color:var(--smaragd)}
 @media (prefers-reduced-motion:reduce){.og-prek i{transition:none}}
 .jir{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--grafit);word-break:break-all}
 svg text{font-family:Manrope,sans-serif}
-.izb,.ekran-m{display:none}
-@media (max-width:640px){.wrap{padding:0 16px}header .wrap{padding-top:8px;padding-bottom:8px}.sub{display:none}nav button{padding:0 10px}.panel,.zeleno>div,.kpi>div{padding:16px}}
-/* Mobitel: ekrani se otvaraju iz izbornika (tipka s tri crte gore desno), a uz logo piše na kojem si ekranu */
+/* Naslovna: kartice u mreži od 4 stupca (2 do 1100 px, 1 na mobitelu); veličina kartice je broj stupaca */
+.gumbi-n{display:flex;flex-wrap:wrap;gap:8px}
+.gumbi-n .tiho{min-height:40px;font-size:14px;background:var(--kartica)}
+.kt-uredi{background:var(--zlato-svj);border:1px solid #EFE3C8;border-radius:12px;padding:14px 18px;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.kt-dodaj{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.kt-dodaj .tiho{background:var(--kartica)}
+.kt-mreza{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;align-items:stretch}
+.kt{grid-column:span 1;gap:14px}
+.kt-v2{grid-column:span 2}.kt-v3{grid-column:span 3}.kt-v4{grid-column:1/-1}
+.kt.goli{background:none;border:0;box-shadow:none;padding:0}
+.kt-glava{display:flex;align-items:center;gap:8px;min-height:24px}
+.kt-glava h2{flex:1;min-width:0}
+.kt-otvori{font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap}
+.kt-otvori::after{content:" →"}
+.kt-otvori:hover{text-decoration:underline}
+.kt-hvat,.kt-alati{display:none}
+.kt.goli .kt-glava{display:none}
+.kt-mreza.ured .kt{outline:2px dashed rgba(198,161,91,.75);outline-offset:4px}
+.kt-mreza.ured .kt.goli{padding:12px}
+.kt-mreza.ured .kt-glava{display:flex}
+.kt-mreza.ured .kt-hvat{display:grid;place-items:center;width:32px;height:32px;margin:-4px 0 -4px -6px;border:0;border-radius:6px;background:none;color:var(--grafit);font-size:18px;cursor:grab;touch-action:none}
+.kt-mreza.ured .kt-hvat:hover{background:var(--pozadina);color:var(--oniks)}
+.kt-mreza.ured .kt-alati{display:flex;gap:6px}
+.kt-mreza.ured .kt-otvori{display:none}
+.kt-makni{font-size:16px!important;color:var(--crvena)!important;width:32px;padding:0!important}
+.kt.vuce{opacity:.55;outline-style:solid!important}
+.kt.vuce .kt-hvat{cursor:grabbing}
+.kt-tijelo{display:flex;flex-direction:column;gap:12px;min-width:0}
+.kt-broj{font-size:clamp(26px,2.4vw,30px);font-weight:700;letter-spacing:-.02em;line-height:1.15;white-space:nowrap}
+.kt-kpi{grid-template-columns:repeat(auto-fit,minmax(min(100%,98px),1fr));gap:8px}
+.kt-kpi>div{padding:10px 12px}
+.kt-kpi b{font-size:19px;white-space:nowrap}
+.kt-kpi .src{overflow-wrap:anywhere}
+@media (max-width:1100px){.kt-mreza{grid-template-columns:repeat(2,minmax(0,1fr))}.kt-v3{grid-column:1/-1}}
+@media (max-width:640px){.kt-mreza{grid-template-columns:minmax(0,1fr)}.kt-v2,.kt-v3{grid-column:1/-1}}
+@media (max-width:640px){.wrap{padding:0 16px}.panel,.zeleno>div,.kpi>div{padding:16px}.kt.goli{padding:0}}
+/* Mobitel: gore traka s tipkom za izbornik i imenom ekrana, izbornik izlazi slijeva */
 @media (max-width:640px){
-  header .wrap{flex-wrap:nowrap;min-height:56px}
-  .ekran-m{display:block;font-size:13px;color:rgba(231,228,222,.75);padding-left:12px;border-left:1px solid rgba(231,228,222,.3)}
-  .izb{display:grid;place-content:center;gap:5px;width:44px;height:44px;margin-right:-10px;padding:0;border:0;border-radius:8px;background:none;cursor:pointer}
-  .izb span{display:block;width:22px;height:2px;border-radius:1px;background:var(--kamen);transition:transform .2s,opacity .15s}
-  header.otvoren .izb span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-  header.otvoren .izb span:nth-child(2){opacity:0}
-  header.otvoren .izb span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-  nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:2px;background:var(--smaragd);border-top:1px solid rgba(231,228,222,.15);padding:8px 16px 16px;box-shadow:0 12px 24px rgba(11,11,12,.18)}
-  header.otvoren nav{display:flex}
-  nav button{text-align:left;font-size:16px;min-height:48px;padding:0 12px}
-  nav button[aria-selected=true]::after{left:12px;right:auto;width:24px;bottom:8px}
+  .okvir,.okvir.mali{grid-template-columns:minmax(0,1fr)}
+  .bocni{position:fixed;left:0;top:0;bottom:0;width:276px;max-width:86vw;height:auto;z-index:30;transform:translateX(-104%);transition:transform .2s;box-shadow:8px 0 24px rgba(11,11,12,.25);padding-bottom:max(16px,env(safe-area-inset-bottom))}
+  .okvir.otvoren .bocni{transform:none}
+  .okvir.otvoren .bi-zastor{display:block;position:fixed;inset:0;background:rgba(11,11,12,.35);z-index:25}
+  .bocni nav button{min-height:46px;font-size:15px}
+  .traka{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;background:var(--smaragd);color:var(--kamen);padding:0 16px;min-height:56px}
+  .ekran-m{font-size:15px;font-weight:600;color:#fff}
+  .izb{display:grid;place-content:center;gap:5px;width:44px;height:44px;margin-left:-10px;padding:0;border:0;border-radius:8px;background:none;cursor:pointer}
+  .izb span{display:block;width:22px;height:2px;border-radius:1px;background:var(--kamen)}
 }
-@media (prefers-reduced-motion:reduce){.izb span{transition:none}}
+@media (prefers-reduced-motion:reduce){.bocni{transition:none}}
 </style>
 </head>
 <body>
-<header><div class="wrap">
-  <div class="brand"><div class="mono">dp</div><div class="word"><b>digitalni</b>partner</div><div class="sub">nadzor poslovanja</div><div class="ekran-m" id="ekran-m"></div></div>
-  <button class="izb" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="ekrani"><span></span><span></span><span></span></button>
-  <nav role="tablist" aria-label="Ekrani" id="ekrani">
-    <button role="tab" data-ekran="pregled" aria-selected="true">Pregled</button>
-    <button role="tab" data-ekran="usluge" aria-selected="false">Usluge</button>
-    <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
-    <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
-    <button role="tab" data-ekran="cestitka" aria-selected="false">Čestitka</button>
-    <button role="tab" data-ekran="oglasi" aria-selected="false">Oglasi</button>
-    <button role="tab" data-ekran="mailovi" aria-selected="false">Mailovi</button>
-    <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
-    <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
-    <button role="tab" data-ekran="knjige" aria-selected="false">Knjige</button>
-    <button role="tab" data-ekran="obavijesti" aria-selected="false">Obavijesti</button>
+<div class="okvir" id="okvir">
+<aside class="bocni" id="bocni" aria-label="Izbornik">
+  <div class="bi-glava"><div class="mono">dp</div><div class="bi-ime"><div class="word"><b>digitalni</b>partner</div><div class="bi-pod">nadzor poslovanja</div></div></div>
+  <nav aria-label="Ekrani" id="ekrani">
+    <button type="button" data-ekran="pregled" data-ime="Pregled" title="Pregled"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="bi-t">Pregled</span><span class="bi-z" data-znacka="pregled"></span></button>
+    <p class="bi-grupa">Prodaja</p>
+    <button type="button" data-ekran="usluge" data-ime="Usluge" title="Usluge"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span class="bi-t">Usluge</span><span class="bi-z" data-znacka="usluge"></span></button>
+    <button type="button" data-ekran="aplikacije" data-ime="Aplikacije" title="Aplikacije"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="bi-t">Aplikacije</span><span class="bi-z" data-znacka="aplikacije"></span></button>
+    <button type="button" data-ekran="vjencanja" data-ime="Kuverta" title="Kuverta"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span class="bi-t">Kuverta</span><span class="bi-z" data-znacka="vjencanja"></span></button>
+    <button type="button" data-ekran="cestitka" data-ime="Čestitka" title="Čestitka"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span class="bi-t">Čestitka</span><span class="bi-z" data-znacka="cestitka"></span></button>
+    <p class="bi-grupa">Marketing</p>
+    <button type="button" data-ekran="oglasi" data-ime="Oglasi" title="Oglasi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h3l7 4V6l-7 4z"/><path d="M17.5 9a4 4 0 0 1 0 6"/></svg><span class="bi-t">Oglasi</span><span class="bi-z" data-znacka="oglasi"></span></button>
+    <button type="button" data-ekran="mailovi" data-ime="Mailovi" title="Mailovi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/><path d="M17 3v4M15 5h4"/></svg><span class="bi-t">Mailovi</span><span class="bi-z" data-znacka="mailovi"></span></button>
+    <p class="bi-grupa">Financije</p>
+    <button type="button" data-ekran="racuni" data-ime="Računi" title="Računi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg><span class="bi-t">Računi</span><span class="bi-z" data-znacka="racuni"></span></button>
+    <button type="button" data-ekran="banka" data-ime="Banka" title="Banka"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M10 10v8M14 10v8M19 10v8M3 20h18"/></svg><span class="bi-t">Banka</span><span class="bi-z" data-znacka="banka"></span></button>
+    <button type="button" data-ekran="knjige" data-ime="Knjige" title="Knjige"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg><span class="bi-t">Knjige</span><span class="bi-z" data-znacka="knjige"></span></button>
+    <p class="bi-grupa">Sustav</p>
+    <button type="button" data-ekran="obavijesti" data-ime="Obavijesti" title="Obavijesti"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><span class="bi-t">Obavijesti</span><span class="bi-z" data-znacka="obavijesti"></span></button>
   </nav>
-</div></header>
-<main><div class="wrap" id="sadrzaj"><p class="prazno">Učitavam podatke…</p></div></main>
-<footer><div class="wrap"><span class="src" id="osvjezeno"></span><span class="src" id="korisnik"></span></div></footer>
+  <button type="button" class="bi-sklopi" id="bi-sklopi" aria-pressed="false" title="Sklopi izbornik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="bi-t">Sklopi izbornik</span></button>
+</aside>
+<div class="bi-zastor" id="bi-zastor"></div>
+<div class="glavno">
+  <div class="traka"><button class="izb" type="button" aria-label="Izbornik" aria-expanded="false" aria-controls="bocni"><span></span><span></span><span></span></button><div class="mono">dp</div><div class="ekran-m" id="ekran-m"></div></div>
+  <main><div class="wrap" id="sadrzaj"><p class="prazno">Učitavam podatke…</p></div></main>
+  <footer><div class="wrap"><span class="src" id="osvjezeno"></span><span class="src" id="korisnik"></span></div></footer>
+</div>
+</div>
 
 <script>
 (function(){
 "use strict";
 var uredjivanje = false, D = null, ekran = (location.hash || "#pregled").slice(1);
-if (!document.querySelector('nav button[data-ekran="' + ekran + '"]')) ekran = "pregled";
+if (!document.querySelector('#ekrani button[data-ekran="' + ekran + '"]')) ekran = "pregled";
 var MJ = ["siječanj","veljača","ožujak","travanj","svibanj","lipanj","srpanj","kolovoz","rujan","listopad","studeni","prosinac"];
 var MJK = ["Sij","Velj","Ožu","Tra","Svi","Lip","Srp","Kol","Ruj","Lis","Stu","Pro"];
 var PRAG = 60000;
@@ -200,14 +263,15 @@ function ucitaj(){
 
 // Označi odabrani ekran u izborniku i upiši njegov naziv uz logo (vidi se samo na mobitelu)
 function oznaci(){
-  document.querySelectorAll("nav button").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.ekran === ekran ? "true" : "false"); if (b.dataset.ekran === ekran) document.getElementById("ekran-m").textContent = b.firstChild.textContent; });
+  document.querySelectorAll("#ekrani button").forEach(function(b){ if (b.dataset.ekran === ekran) { b.setAttribute("aria-current", "page"); document.getElementById("ekran-m").textContent = b.dataset.ime; } else b.removeAttribute("aria-current"); });
 }
 
 function crtaj(){
-  oznaci();
+  oznaci(); znacke();
   var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, cestitka: cestitkaEkran, oglasi: oglasiEkran, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti, mailovi: mailoviEkran}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
+  document.querySelectorAll("#sadrzaj [data-idi]").forEach(function(a){ a.addEventListener("click", function(ev){ ev.preventDefault(); idi(a.dataset.idi); }); });
   if (ekran === "usluge") veziUpite();
   if (ekran === "racuni") veziRacune();
   if (ekran === "vjencanja") { veziKorisnike(); var izd = document.getElementById("izvori-dana"); if (izd) izd.addEventListener("change", function(){ izDana = Number(izd.value); izDan = ""; izGreska = ""; crtaj(); });
@@ -234,57 +298,228 @@ function crtaj(){
 function mjeseci(){ return D.prihodi_po_mjesecima; }
 function ovaj(){ var m = mjeseci(); return m[m.length - 1]; }
 function prosli(){ var m = mjeseci(); return m[m.length - 2]; }
-function ukupno(m){ return Number(m.usluge) + Number(m.aplikacije) + Number(m.vjencanja); }
+function ukupno(m){ return Number(m.usluge || 0) + Number(m.aplikacije || 0) + Number(m.vjencanja || 0) + Number(m.cestitka || 0); }
 function mrr(){ return zbroj(D.klijenti, function(k){ return k.mjesecno; }); }
 function met(k){ return D.metrike[k] || null; }
 
-// ---------- Pregled ----------
+// ---------- Pregled: naslovna od kartica ----------
+// Svaki ekran ima karticu sa sažetkom. Kartice se dodaju, miču, povećavaju (1 do 4 stupca) i preslaguju povlačenjem za ručku.
+// Raspored se sprema u bazu (/api/raspored, sql/25-raspored-naslovne.sql) i u preglednik, da ostane i kad baza ne odgovori.
+// Kartice čiji se podaci učitavaju zasebno (Računi, Banka, ...) se pokažu odmah, a brojke dođu kad stignu (kartice()).
+var KARTICE = {
+  brojevi:    {ime: "Glavni brojevi", opis: "Prihod ovog mjeseca, MRR i prag od 60.000 €", vel: 4, goli: true, crtaj: kBrojevi},
+  prihod:     {ime: "Prihod po mjesecima", opis: "Graf zadnjih 6 mjeseci po linijama, s Čestitkom", vel: 3, crtaj: kPrihod},
+  zadanas:    {ime: "Za danas", opis: "Neuspjele naplate, upiti bez odgovora, vjenčanja", vel: 1, crtaj: zaDanas},
+  kuverta:    {ime: "Kuverta", opis: "Prihod, registracije, platili, iduća vjenčanja", vel: 1, ekran: "vjencanja", lijena: true, crtaj: kKuverta},
+  cestitka:   {ime: "Čestitka", opis: "Prihod, posjete i kupnje čestitke", vel: 1, ekran: "cestitka", lijena: true, crtaj: kCestitka},
+  racuni:     {ime: "Računi", opis: "Izdani računi, čekaju JIR, odbijeni", vel: 1, ekran: "racuni", lijena: true, crtaj: kRacuni},
+  banka:      {ime: "Banka", opis: "Stanje računa i promet ovog mjeseca", vel: 1, ekran: "banka", lijena: true, crtaj: kBanka},
+  oglasi:     {ime: "Oglasi", opis: "Potrošnja, klikovi, registracije i oglasi za pauzu", vel: 2, ekran: "oglasi", lijena: true, crtaj: kOglasi},
+  knjige:     {ime: "Knjige", opis: "Primici ove godine, razred paušala i limit", vel: 2, ekran: "knjige", lijena: true, crtaj: kKnjige},
+  usluge:     {ime: "Usluge", opis: "MRR, klijenti i upiti", vel: 1, ekran: "usluge", crtaj: kUsluge},
+  mailovi:    {ime: "Mailovi", opis: "Automatski mailovi Kuverte", vel: 1, ekran: "mailovi", lijena: true, crtaj: kMailovi},
+  obavijesti: {ime: "Obavijesti", opis: "Što je uključeno i što je zadnje poslano", vel: 2, ekran: "obavijesti", lijena: true, crtaj: kObavijesti},
+  linije:     {ime: "Poslovne linije", opis: "Usluge, aplikacije, Kuverta i Čestitka usporedo", vel: 4, lijena: true, crtaj: kLinije},
+  troskovi:   {ime: "Troškovi ovog mjeseca", opis: "Upis i brisanje troškova, dobit", vel: 4, crtaj: kTroskovi},
+  aplikacije: {ime: "Aplikacije", opis: "App Store: preuzimanja, prihod, pretplatnici", vel: 1, ekran: "aplikacije", crtaj: kAplikacije}
+};
+var ZADANO = [["brojevi",4],["prihod",3],["zadanas",1],["kuverta",1],["cestitka",1],["racuni",1],["banka",1],["oglasi",2],["knjige",2],["usluge",1],["mailovi",1],["obavijesti",2],["linije",4],["troskovi",4]];
+var VELICINA = {1: "Mala", 2: "Srednja", 3: "Velika", 4: "Cijela širina"};
+var naslovnaUredi = false, rasporedPoruka = "", ktUcitava = {};
+function cistiRaspored(x){
+  if (!Array.isArray(x)) return null;
+  var bilo = {};
+  return x.filter(function(k){ if (!Array.isArray(k) || !KARTICE[k[0]] || bilo[k[0]] || [1,2,3,4].indexOf(Number(k[1])) < 0) return false; bilo[k[0]] = 1; return true; })
+    .map(function(k){ return [k[0], Number(k[1])]; });
+}
+function zadano(){ return ZADANO.map(function(k){ return k.slice(); }); }
+var raspored = (function(){ try { return cistiRaspored(JSON.parse(localStorage.getItem("naslovna-raspored"))) || zadano(); } catch (x) { return zadano(); } })();
+function spremiRaspored(){
+  try { localStorage.setItem("naslovna-raspored", JSON.stringify(raspored)); } catch (x) {}
+  fetch("/api/raspored", {method: "POST", credentials: "same-origin", headers: {"content-type": "application/json"}, body: JSON.stringify({raspored: raspored})})
+    .then(function(r){ return r.json().then(function(j){ if (!r.ok) throw new Error(j.greska || r.status); }); })
+    .then(function(){ rasporedPoruka = ""; }).catch(function(err){ rasporedPoruka = "Raspored je spremljen samo u ovom pregledniku (" + err.message + ")."; })
+    .then(function(){ var p = document.getElementById("kt-poruka"); if (p) p.textContent = rasporedPoruka; });
+}
+// Raspored iz baze vrijedi za sve uređaje; kad stigne, zamijeni onaj iz preglednika.
+function ucitajRaspored(){
+  fetch("/api/raspored", {credentials: "same-origin"}).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+    var r = j && cistiRaspored(j.raspored);
+    if (!r || JSON.stringify(r) === JSON.stringify(raspored)) return;
+    raspored = r; try { localStorage.setItem("naslovna-raspored", JSON.stringify(raspored)); } catch (x) {}
+    if (D && ekran === "pregled" && !naslovnaUredi) crtaj();
+  }).catch(function(){});
+}
+// Učitaj podatke za karticu samo jednom (ekrani Banka, Knjige, Obavijesti i Mailovi nemaju svoju zaštitu od dvostrukog poziva).
+function treba(kljuc, fn){ if (!ktUcitava[kljuc]) { ktUcitava[kljuc] = true; fn(); } }
+function ktCeka(t){ return '<p class="prazno">' + (t || "Učitavam…") + '</p>'; }
+function ktGreska(t){ return '<p class="prazno">Nije se učitalo (' + e(t) + '). Pogledaj ekran.</p>'; }
+function kpiMali(polja){ return '<div class="iz-kpi kt-kpi">' + polja.map(function(p){ return '<div><span class="src">' + p[0] + '</span><b class="num' + (p[2] ? ' hitno' : '') + '">' + p[1] + '</b>' + (p[3] ? '<span class="src">' + p[3] + '</span>' : '') + '</div>'; }).join("") + '</div>'; }
+
 function pregled(){
+  var mj = MJ[Number(D.danas.slice(5,7)) - 1];
+  var h = '<div class="ek-glava"><div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Cijeli obrt · stanje ' + datum(D.danas) + '</p><h1>' + e(mj.charAt(0).toUpperCase() + mj.slice(1)) + ' ' + D.danas.slice(0,4) + '.</h1></div>'
+    + '<div class="gumbi-n">' + (naslovnaUredi ? '<button type="button" class="tiho" id="kt-zadano">Vrati zadano</button><button type="button" class="gumb" id="kt-gotovo">Gotovo</button>' : '<button type="button" class="tiho" id="kt-uredi">Uredi naslovnu</button>') + '</div></div>';
+  if (naslovnaUredi) {
+    var skrivene = Object.keys(KARTICE).filter(function(id){ return !raspored.some(function(k){ return k[0] === id; }); });
+    h += '<section class="kt-uredi"><p style="margin:0"><b>Uređivanje naslovne.</b> Karticu premjesti povlačenjem za ručku ⠿ (ili strelicama dok je ručka odabrana), veličinu mijenjaš gumbom uz naslov, a × je makne. Promjene se spremaju odmah.</p>'
+      + '<div class="kt-dodaj"><span class="src">Dodaj karticu:</span>' + (skrivene.length ? skrivene.map(function(id){ return '<button type="button" class="tiho" data-kt-dodaj="' + id + '" title="' + e(KARTICE[id].opis) + '">+ ' + e(KARTICE[id].ime) + '</button>'; }).join("") : '<span class="src">sve kartice su već na naslovnoj.</span>') + '</div>'
+      + '<p class="src" id="kt-poruka" role="status">' + e(rasporedPoruka) + '</p></section>';
+  }
+  if (!raspored.length) return h + '<section class="panel"><p class="prazno">Na naslovnoj nema kartica. Klikni Uredi naslovnu i dodaj one koje želiš vidjeti.</p></section>';
+  h += '<div class="kt-mreza' + (naslovnaUredi ? ' ured' : '') + '" id="kt-mreza">' + raspored.map(kartica).join("") + '</div>';
+  return h;
+}
+function kartica(k){
+  var id = k[0], x = KARTICE[id], tijelo;
+  try { tijelo = x.crtaj(); } catch (err) { tijelo = ktGreska(err.message); }
+  return '<section class="panel kt kt-v' + k[1] + (x.goli ? ' goli' : '') + '" data-kt="' + id + '" aria-label="' + e(x.ime) + '">'
+    + '<div class="kt-glava"><button type="button" class="kt-hvat" aria-label="Premjesti karticu ' + e(x.ime) + '" title="Povuci za premještanje">⠿</button><h2>' + e(x.ime) + '</h2>'
+    + (x.ekran ? '<a class="kt-otvori" href="#' + x.ekran + '" data-idi="' + x.ekran + '">Otvori</a>' : '')
+    + '<span class="kt-alati"><button type="button" class="tiho" data-kt-vel="' + id + '" title="Promijeni veličinu">' + VELICINA[k[1]] + '</button><button type="button" class="tiho kt-makni" data-kt-makni="' + id + '" aria-label="Makni karticu ' + e(x.ime) + '">×</button></span></div>'
+    + '<div class="kt-tijelo" id="kt-' + id + '">' + tijelo + '</div></section>';
+}
+// Kad stignu podaci jednog ekrana, prepiše se samo tijelo kartica koje ih čekaju (obrazac za troškove ostaje kakav jest).
+function kartice(){
+  znacke();
+  if (!D || ekran !== "pregled") return;
+  raspored.forEach(function(k){ var x = KARTICE[k[0]], el = document.getElementById("kt-" + k[0]); if (x.lijena && el) { try { el.innerHTML = x.crtaj(); } catch (err) { el.innerHTML = ktGreska(err.message); } } });
+}
+
+function kBrojevi(){
   var t = ovaj(), p = prosli(), u = ukupno(t), up = ukupno(p);
   var promjena = up ? (u - up) / up * 100 : 0;
   var god = Number(D.prihod_godina), udio = Math.min(100, god / PRAG * 100);
   var danUGod = (new Date(D.danas) - new Date(D.danas.slice(0,4) + "-01-01")) / 864e5 + 1;
   var tempo = god / danUGod, ostaje = tempo > 0 ? (PRAG - god) / tempo : Infinity;
   var kad = god >= PRAG ? "Prag je dosegnut." : (isFinite(ostaje) ? "Uz ovaj tempo prag se dostiže oko " + new Date(Date.now() + ostaje * 864e5).toLocaleDateString("hr-HR", {month:"long", year:"numeric"}).replace(/\.$/, "") + "." : "Još nema prihoda.");
-  var mj = MJ[Number(D.danas.slice(5,7)) - 1];
-
-  var h = '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 32px"><div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Cijeli obrt</p><h1>' + e(mj.charAt(0).toUpperCase() + mj.slice(1)) + ' ' + D.danas.slice(0,4) + '.</h1></div><p class="src">Stanje ' + datum(D.danas) + '</p></div>';
-  h += '<section class="zeleno" aria-label="Glavni brojevi">'
+  return '<div class="zeleno">'
     + '<div><span class="k">Prihod ovog mjeseca</span><span class="v num">' + eur(u) + '</span><span class="o">' + (up ? pct(promjena) + " u odnosu na prošli mjesec (" + eur(up) + ")" : "Prošli mjesec bez prihoda.") + '</span></div>'
     + '<div><span class="k">Mjesečni ponavljajući prihod</span><span class="v num">' + eur(mrr()) + '</span><span class="o">' + D.klijenti.length + ' aktivnih klijenata</span></div>'
-    + '<div style="border-right:0"><span class="k">Prag od 60.000 € ove godine</span><span class="v num">' + Math.round(udio) + ' %</span><div class="bar" role="img" aria-label="Naplaćeno ' + eur(god) + ' od 60.000 €"><i style="width:' + udio.toFixed(1) + '%"></i></div><span class="o">' + eur(god) + ' naplaćeno. ' + kad + '</span></div>'
-    + '</section>';
-
-  h += '<div class="red"><section class="panel sir"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px"><h2>Prihod po mjesecima</h2><div class="legenda"><span><i style="background:#0F3B33"></i>Usluge</span><span><i style="background:#6E8F86"></i>Aplikacije</span><span><i style="background:#C6A15B"></i>Kuverta</span></div></div><p class="num" id="tip" style="min-height:22px;font-size:14px"></p>' + grafPrihoda() + '<p class="src">Iznosi su nakon provizije Applea i naknada Stripea.</p></section>';
-  h += '<section class="panel uz"><h2>Za danas</h2>' + zaDanas() + '</section></div>';
-
-  var kv = D.kuverta || {};
-  h += '<section class="panel"><h2>Poslovne linije</h2><div class="skrol"><table class="num"><thead><tr><th>Linija</th><th class="r">Ovaj mjesec</th><th class="r">Prošli</th><th>Korisnici</th><th>Ključni broj</th></tr></thead><tbody>'
-    + linija("#0F3B33", "Usluge za klijente", t.usluge, p.usluge, D.klijenti.length + " klijenata", "MRR " + eur(mrr()))
-    + linija("#6E8F86", "Aplikacije", t.aplikacije, p.aplikacije, met("aplikacije.aktivni_mjesecno") ? br(met("aplikacije.aktivni_mjesecno").vrijednost) + " aktivnih mjesečno" : "nije spojeno", met("aplikacije.pretplatnici") ? br(met("aplikacije.pretplatnici").vrijednost) + " pretplatnika" : "")
-    + linija("#C6A15B", "Kuverta", t.vjencanja, p.vjencanja, kv.greska ? "baza nedostupna" : br(kv.pozivnice) + " pozivnica u bazi", kv.greska ? "" : br(zbroj(kv.po_mjesecima || [], function(x){ return x.broj; })) + " vjenčanja u 12 mjeseci")
-    + '</tbody></table></div></section>';
-
-  var tr = D.troskovi_ovaj_mjesec, tu = zbroj(tr, function(x){ return x.iznos; });
-  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px"><h2>Troškovi ovog mjeseca</h2><span class="num" style="font-weight:600">' + eur(tu, true) + ' · dobit ' + eur(u - tu, true) + '</span></div>'
+    + '<div><span class="k">Prag od 60.000 € ove godine</span><span class="v num">' + Math.round(udio) + ' %</span><div class="bar" role="img" aria-label="Naplaćeno ' + eur(god) + ' od 60.000 €"><i style="width:' + udio.toFixed(1) + '%"></i></div><span class="o">' + eur(god) + ' naplaćeno. ' + kad + '</span></div>'
+    + '</div>';
+}
+function kPrihod(){
+  return '<div class="legenda">' + LINIJE.map(function(l){ return '<span><i style="background:' + l[1] + '"></i>' + l[2] + '</span>'; }).join("") + '</div><p class="num" id="tip" style="min-height:22px;font-size:14px"></p>' + grafPrihoda() + '<p class="src">Iznosi su nakon provizije Applea i naknada Stripea. Kuverta i Čestitka su pravi fiskalizirani računi, sa stornima.</p>';
+}
+function kLinije(){
+  var t = ovaj(), p = prosli(), kv = D.kuverta || {}, cu = C && C.ukupno;
+  return '<div class="skrol"><table class="num"><thead><tr><th>Linija</th><th class="r">Ovaj mjesec</th><th class="r">Prošli</th><th>Korisnici</th><th>Ključni broj</th></tr></thead><tbody>'
+    + linija(LINIJE[0][1], "Usluge za klijente", t.usluge, p.usluge, D.klijenti.length + " klijenata", "MRR " + eur(mrr()))
+    + linija(LINIJE[1][1], "Aplikacije", t.aplikacije, p.aplikacije, met("aplikacije.aktivni_mjesecno") ? br(met("aplikacije.aktivni_mjesecno").vrijednost) + " aktivnih mjesečno" : "nije spojeno", met("aplikacije.pretplatnici") ? br(met("aplikacije.pretplatnici").vrijednost) + " pretplatnika" : "")
+    + linija(LINIJE[2][1], "Kuverta", t.vjencanja, p.vjencanja, kv.greska ? "baza nedostupna" : br(kv.pozivnice) + " pozivnica u bazi", kv.greska ? "" : br(zbroj(kv.po_mjesecima || [], function(x){ return x.broj; })) + " vjenčanja u 12 mjeseci")
+    + linija(LINIJE[3][1], "Čestitka", t.cestitka, p.cestitka, cu ? br(cu.kupnje) + " kupnji od početka" : (cGreska ? "baza nedostupna" : "…"), cu ? br(cu.komada) + " čestitki" : "")
+    + '</tbody></table></div>';
+}
+function kTroskovi(){
+  var u = ukupno(ovaj()), tr = D.troskovi_ovaj_mjesec, tu = zbroj(tr, function(x){ return x.iznos; });
+  return '<p class="num" style="font-weight:600">' + eur(tu, true) + ' · dobit ' + eur(u - tu, true) + '</p>'
     + (tr.length ? '<div class="skrol"><table class="num"><tbody>' + tr.map(function(x){ return '<tr data-trosak="' + x.id + '"><td>' + e(x.opis) + '</td><td class="src">' + e(x.linija) + '</td><td class="nw">' + datum(x.datum) + '</td><td class="r nw">' + eur(x.iznos, true) + '</td>' + (uredjivanje ? '<td class="r" style="padding-right:0;width:1%"><button type="button" class="minus" data-makni="' + x.id + '" aria-label="Obriši trošak ' + e(x.opis) + '"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="5" width="10" height="2" rx="1" fill="currentColor"/></svg></button></td>' : '') + '</tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Ovaj mjesec još nema upisanih troškova.</p>')
-    + '<form class="unos" id="trosak"><label>Datum<input name="datum" type="date" required value="' + D.danas + '"></label><label>Opis<input name="opis" required maxlength="200" placeholder="npr. domena"></label><label>Iznos (€)<input name="iznos" type="number" step="0.01" min="0" required></label><label>Linija<select name="linija"><option value="obrt">Obrt</option><option value="usluge">Usluge</option><option value="aplikacije">Aplikacije</option><option value="vjencanja">Kuverta</option></select></label><div class="gumbi"><button class="gumb" type="submit">Dodaj trošak</button><button class="uredi" type="button" id="uredi-troskove" aria-pressed="' + (uredjivanje ? "true" : "false") + '" aria-label="Uredi troškove" title="Uredi troškove"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button></div></form><p class="src" id="trosak-poruka" role="status"></p></section>';
-  return h;
+    + '<form class="unos" id="trosak"><label>Datum<input name="datum" type="date" required value="' + D.danas + '"></label><label>Opis<input name="opis" required maxlength="200" placeholder="npr. domena"></label><label>Iznos (€)<input name="iznos" type="number" step="0.01" min="0" required></label><label>Linija<select name="linija"><option value="obrt">Obrt</option><option value="usluge">Usluge</option><option value="aplikacije">Aplikacije</option><option value="vjencanja">Kuverta</option></select></label><div class="gumbi"><button class="gumb" type="submit">Dodaj trošak</button><button class="uredi" type="button" id="uredi-troskove" aria-pressed="' + (uredjivanje ? "true" : "false") + '" aria-label="Uredi troškove" title="Uredi troškove"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button></div></form><p class="src" id="trosak-poruka" role="status"></p>';
+}
+function kUsluge(){
+  var novi = D.upiti.filter(function(u){ return u.status === "novi"; }).length;
+  return kpiMali([["MRR", eur(mrr())], ["Aktivni klijenti", br(D.klijenti.length)], ["Upiti ovaj mjesec", br(upitiMj().length)], ["Novi upiti", br(novi), novi > 0, "čekaju odgovor"]]);
+}
+function kAplikacije(){
+  var imena = ["app1","app2","app3"], v = function(p){ return zbroj(imena, function(a){ var m = met("aplikacije." + a + "." + p); return m ? m.vrijednost : 0; }); };
+  if (!imena.some(function(a){ return met("aplikacije." + a + ".preuzimanja_30d"); })) return '<p class="prazno">App Store Connect još nije spojen. Spaja se u fazi 2, kad aplikacije budu u trgovini.</p>';
+  return kpiMali([["Preuzimanja, 30 dana", br(v("preuzimanja_30d"))], ["Prihod ovaj mjesec", eur(v("prihod_mjesec"))], ["Pretplatnici", br(v("pretplatnici"))], ["Rušenja, 7 dana", br(v("rusenja_7d"))]]);
+}
+function kKuverta(){
+  var kv = D.kuverta || {}, t = ovaj(), p = prosli();
+  if (kv.greska) return '<p class="prazno">Baza Kuverte trenutno ne odgovara.</p>';
+  if (!K && !kGreska) ucitajKorisnike();
+  var od30 = Date.now() - 30 * 864e5, reg30 = K ? K.filter(function(u){ return new Date(u.registriran).getTime() >= od30; }).length : null;
+  var platili = K ? K.filter(function(u){ return Number(u.placeno) > 0; }).length : null;
+  var iduca = (kv.iduca || []).filter(function(v){ var d = dana(v.datum); return d >= 0 && d <= 30; }).length;
+  return '<div><span class="src">Prihod ovaj mjesec</span><div class="kt-broj num">' + eur(t.vjencanja) + '</div><span class="src">prošli ' + eur(p ? p.vjencanja : 0) + '</span></div>'
+    + kpiMali([["Registracije, 30 dana", reg30 == null ? "…" : br(reg30)], ["Platili", platili == null ? "…" : br(platili)], ["Vjenčanja za 30 dana", br(iduca)], ["Pozivnica u bazi", br(kv.pozivnice)]]);
+}
+function kCestitka(){
+  var t = ovaj(), p = prosli(), mjes = t.cestitka == null ? null : t.cestitka;
+  var h = '<div><span class="src">Prihod ovaj mjesec</span><div class="kt-broj num">' + (mjes == null ? "–" : eur(mjes)) + '</div><span class="src">' + (mjes == null ? "treba pokrenuti sql/24-prihod-cestitke.sql" : "prošli " + eur(p ? p.cestitka : 0)) + '</span></div>';
+  if (cGreska) return h + '<p class="prazno">Brojke čestitke se nisu učitale (' + e(cGreska) + ').</p>';
+  if (!C) { ucitajCestitku(); return h + ktCeka(); }
+  var r = C.razdoblje || {}, rz = C.dan ? "na dan " + datum(C.dan) : (C.dana ? C.dana + " dana" : "od početka");
+  return h + kpiMali([["Posjete, " + rz, br(r.posjete)], ["Kupnje, " + rz, br(r.kupnje), false, br(r.komada) + " čestitki"], ["Kupnje / posjete", postotak(Number(r.kupnje), Number(r.posjete))], ["Primatelji otvorili", br(r.otvorene)]]);
+}
+function kRacuni(){
+  if (rGreska) return ktGreska(rGreska);
+  if (!R) { ucitajRacune(); return ktCeka(); }
+  var ok = R.some(function(x){ return x.okolina === "produkcija"; }), lista = R.filter(function(x){ return !ok || x.okolina === "produkcija"; });
+  var mj = D.danas.slice(0,7), ovajMj = lista.filter(function(x){ return x.stanje !== "odbijen" && String(x.izdan).slice(0,7) === mj; });
+  var cekaju = lista.filter(function(x){ return x.stanje === "izdan"; }).length, odbijeni = lista.filter(function(x){ return x.stanje === "odbijen"; }).length;
+  var zadnji = lista[0];
+  return kpiMali([["Ovaj mjesec", br(ovajMj.length), false, eur(zbroj(ovajMj, function(x){ return x.iznos; }), true)], ["Čekaju JIR", br(cekaju), cekaju > 0], ["Odbijeni", br(odbijeni), odbijeni > 0]])
+    + (zadnji ? '<p class="src">Zadnji: <b style="color:var(--oniks)">' + e(zadnji.oznaka) + '</b> · ' + e(zadnji.izvor) + ' · ' + eur(zadnji.iznos, true) + ' · ' + stanjeRacuna(zadnji) + '</p>' : '<p class="prazno">Još nema izdanih računa.</p>')
+    + (ok ? '' : '<p class="src">Prikazani su testni računi, pravih još nema.</p>');
+}
+function kBanka(){
+  if (bGreska) return ktGreska(bGreska);
+  if (!B) { treba("banka", ucitajBanku); return ktCeka(); }
+  if (!B.racuni.length) return '<p class="prazno">Još nema uvezenih izvoda.</p>';
+  var r = B.racuni.filter(function(x){ return x.iban === bFiltar.iban; })[0] || B.racuni[0], val = r.valuta, mj = D.danas.slice(0,7);
+  var knj = B.stavke.filter(function(x){ return x.iban === r.iban && x.status === "BOOK" && String(x.knjizeno).slice(0,7) === mj; });
+  var pr = knj.filter(function(x){ return x.iznos_centi > 0; }), od = knj.filter(function(x){ return x.iznos_centi < 0; }), star = -dana(r.stanje_datum);
+  return '<div><span class="src">Stanje na računu</span><div class="kt-broj num">' + iznosC(r.stanje_centi, val) + '</div><span class="src' + (star > 7 ? ' hitno' : '') + '">izvod ' + (r.redni_broj ? "br. " + e(r.redni_broj) + " " : "") + 'na dan ' + datumG(r.stanje_datum) + '</span></div>'
+    + kpiMali([["Priljevi ovaj mjesec", promjenaC(zbroj(pr, function(x){ return x.iznos_centi; }), val), false, pr.length + " uplata"], ["Odljevi ovaj mjesec", promjenaC(zbroj(od, function(x){ return x.iznos_centi; }), val), false, od.length + " isplata"]]);
+}
+function kOglasi(){
+  if (ogGreska) return ktGreska(ogGreska);
+  if (!OG || OG.dana !== ogDana) { ucitajOglase(); return ktCeka("Učitavam oglase iz Mete…"); }
+  if (!OG.postavljeno) return '<p class="prazno">Na Workeru nije postavljen META_ADS_TOKEN ili META_OGLASNI_RACUN.</p>';
+  var kamp = OG.kampanje || [], z = ogZbroj(kamp), zaPauzu = 0;
+  kamp.forEach(function(k){ k.skupovi.forEach(function(s){ s.oglasi.forEach(function(o){ if (o.ocjena && o.ocjena.id) zaPauzu++; }); }); });
+  var budzet = Number(OG.budzet.kuverta || 0) + Number(OG.budzet.cestitka || 0), granica = Number(OG.granice.kuverta || 0) + Number(OG.granice.cestitka || 0);
+  return kpiMali([["Potrošeno, " + ogDana + " dana", eur(z.potrosnja, true)], ["Klikovi", br(z.klikovi)], ["Registracije", br(z.registracije), false, z.registracije ? eur(z.potrosnja / z.registracije, true) + " po registraciji" : ""], ["Kupnje", br(z.kupnje), false, z.prihod ? eur(z.prihod, true) + " prihoda" : ""]])
+    + '<p class="src">Dnevni budžet aktivnih ' + eur(budzet) + ' od granice ' + eur(granica) + '.' + (zaPauzu ? ' <span class="hitno">' + zaPauzu + (zaPauzu === 1 ? ' oglas je predložen' : ' oglasa je predloženo') + ' za pauzu.</span>' : '') + '</p>';
+}
+function kKnjige(){
+  if (knGreska) return ktGreska(knGreska);
+  if (!KN) { treba("knjige", ucitajKnjige); return ktCeka(); }
+  var red = redoviKpr(), zU = zbroj(red, function(x){ return x.u; }), eura = zU / 100, rz = razred(eura), udio = Math.min(100, eura / 60000 * 100);
+  return kpiMali([["Primici " + KN.godina + ".", iznosC(zU), false, red.length + " stavki u KPR-u"], ["Razred paušala", rz ? rz.n + "." : "iznad limita", !rz, rz ? "primici do " + eur(rz.do) : ""]])
+    + '<div class="bar" role="img" aria-label="' + Math.round(udio) + ' % limita od 60.000 €"><i style="width:' + udio.toFixed(1) + '%;' + (udio > 85 ? "background:var(--crvena)" : "") + '"></i></div><span class="src">' + Math.round(udio) + ' % limita od 60.000 €' + (knFiltar.okolina !== "produkcija" ? ", s testnim računima" : "") + '.</span>';
+}
+function kMailovi(){
+  if (moGreska) return ktGreska(moGreska);
+  if (!MO) { treba("mailovi", ucitajMailove); return ktCeka(); }
+  var P = MO.pravila || [], R7 = (MO.na_redu || []).filter(function(x){ return dana(x.dan) < 7; });
+  return kpiMali([["Uključena pravila", br(P.filter(function(p){ return p.aktivno && !zavrseno(p); }).length), false, "od " + br(P.length)], ["Na redu, 7 dana", br(R7.length)], ["Poslano, 7 dana", br(zbroj(P, function(p){ return p.poslano_7; }))]]);
+}
+function kObavijesti(){
+  if (obGreska) return ktGreska(obGreska);
+  if (!OB) { treba("obavijesti", ucitajObavijesti); return ktCeka(); }
+  var p = OB.popis || [], iskljucene = p.filter(function(o){ return !o.ukljuceno; }).length, poslane = (OB.poslane || []).slice(0, 3);
+  return '<p class="src">' + (p.length - iskljucene) + ' od ' + p.length + ' obavijesti je uključeno' + (iskljucene ? ', <span class="hitno">' + iskljucene + ' isključeno</span>' : '') + '. Stižu na ' + e(OB.adresa || "(adresa nije postavljena)") + '.</p>'
+    + (poslane.length ? poslane.map(function(x){ return '<div class="stavka"><b>' + e(vrijeme(x.poslano)) + '</b><span style="font-size:14px">' + e(obavijestZaKljuc(x.kljuc)) + '</span></div>'; }).join("") : '<p class="prazno">Satna upozorenja još nisu ništa poslala.</p>');
+}
+
+// Brojke uz stavke lijevog izbornika: računi koji čekaju JIR, novi upiti, oglasi predloženi za pauzu.
+function znacke(){
+  var z = {};
+  if (D) { var n = D.upiti.filter(function(u){ return u.status === "novi"; }).length; if (n) z.usluge = [n, false]; }
+  if (R) { var c = R.filter(function(x){ return x.stanje === "izdan" || x.stanje === "odbijen"; }).length; if (c) z.racuni = [c, true]; }
+  if (OG && OG.kampanje) { var p = 0; OG.kampanje.forEach(function(k){ k.skupovi.forEach(function(s){ s.oglasi.forEach(function(o){ if (o.ocjena && o.ocjena.id) p++; }); }); }); if (p) z.oglasi = [p, true]; }
+  document.querySelectorAll("[data-znacka]").forEach(function(s){ var v = z[s.dataset.znacka]; s.textContent = v ? v[0] : ""; s.classList.toggle("hitno", !!(v && v[1])); });
 }
 
 function linija(boja, ime, a, b, korisnici, kljucni){
   var ch = Number(b) ? pct((a - b) / b * 100) : "–";
-  return '<tr><td class="nw" style="font-weight:600"><i style="display:inline-block;width:10px;height:10px;background:' + boja + ';margin-right:10px"></i>' + e(ime) + '</td><td class="r nw">' + eur(a) + '</td><td class="r nw">' + eur(b) + ' <span class="src">' + ch + '</span></td><td>' + korisnici + '</td><td>' + e(kljucni) + '</td></tr>';
+  return '<tr><td class="nw" style="font-weight:600"><i style="display:inline-block;width:10px;height:10px;background:' + boja + ';margin-right:10px"></i>' + e(ime) + '</td><td class="r nw">' + (a == null ? "–" : eur(a)) + '</td><td class="r nw">' + (b == null ? "–" : eur(b)) + ' <span class="src">' + ch + '</span></td><td>' + korisnici + '</td><td>' + e(kljucni) + '</td></tr>';
 }
 
+// Linije prihoda: ključ u prihodi_po_mjesecima, boja, naziv. Čestitka dolazi iz sql/24 (dok se ne pokrene, ima 0).
+var LINIJE = [["usluge","#0F3B33","Usluge"],["aplikacije","#6E8F86","Aplikacije"],["vjencanja","#C6A15B","Kuverta"],["cestitka","#B5654A","Čestitka"]];
 function grafPrihoda(){
   var m = mjeseci(), max = Math.max(1000, Math.max.apply(null, m.map(ukupno)));
   var korak = max > 6000 ? 2000 : (max > 3000 ? 1000 : 500); max = Math.ceil(max / korak) * korak;
   var base = 240, ph = 205, slot = (712 - 56) / m.length, w = Math.min(56, slot * .6), s = "";
   for (var g = 0; g <= max; g += korak){ var y = base - g / max * ph; s += '<line x1="56" x2="712" y1="' + y + '" y2="' + y + '" stroke="rgba(11,11,12,.08)"/><text x="48" y="' + (y + 4) + '" text-anchor="end" font-size="11.5" fill="#5E6266">' + (g ? (g >= 1000 ? (g / 1000) + "k" : g) : 0) + '</text>'; }
   m.forEach(function(x, i){
-    var X = 56 + i * slot + (slot - w) / 2, y = base, seg = [["usluge","#0F3B33"],["aplikacije","#6E8F86"],["vjencanja","#C6A15B"]];
-    seg.forEach(function(sg){ var hh = Number(x[sg[0]]) / max * ph; if (hh > 0){ y -= hh; s += '<rect x="' + X + '" y="' + y + '" width="' + w + '" height="' + Math.max(0, hh - 2) + '" fill="' + sg[1] + '"/>'; } });
+    var X = 56 + i * slot + (slot - w) / 2, y = base;
+    LINIJE.forEach(function(sg){ var hh = Number(x[sg[0]] || 0) / max * ph; if (hh > 0){ y -= hh; s += '<rect x="' + X + '" y="' + y + '" width="' + w + '" height="' + Math.max(0, hh - 2) + '" fill="' + sg[1] + '"/>'; } });
     var mi = Number(x.mjesec.slice(5,7)) - 1;
     s += '<text x="' + (X + w / 2) + '" y="' + (y - 8) + '" text-anchor="middle" font-size="12" font-weight="600" fill="#0B0B0C">' + (ukupno(x) ? eur(ukupno(x)) : "") + '</text><text x="' + (X + w / 2) + '" y="262" text-anchor="middle" font-size="12" fill="#5E6266">' + MJK[mi] + '</text>';
     s += '<rect class="hit" data-i="' + i + '" x="' + (56 + i * slot) + '" y="0" width="' + slot + '" height="270" fill="transparent" tabindex="0" aria-label="' + MJ[mi] + ' ' + eur(ukupno(x)) + '"/>';
@@ -305,13 +540,17 @@ function zaDanas(){
 }
 
 function vezi(){
+  veziNaslovnu();
   var m = mjeseci(), tip = document.getElementById("tip");
-  function pokazi(i){ var x = m[i], mi = Number(x.mjesec.slice(5,7)) - 1; tip.innerHTML = '<b>' + MJ[mi].charAt(0).toUpperCase() + MJ[mi].slice(1) + ': ' + eur(ukupno(x)) + '.</b> Usluge ' + eur(x.usluge) + ', aplikacije ' + eur(x.aplikacije) + ', Kuverta ' + eur(x.vjencanja) + '.'; }
-  pokazi(m.length - 1);
-  document.querySelectorAll(".hit").forEach(function(r){ r.addEventListener("mouseenter", function(){ pokazi(+r.dataset.i); }); r.addEventListener("focus", function(){ pokazi(+r.dataset.i); }); });
+  if (tip) {
+    var pokazi = function(i){ var x = m[i], mi = Number(x.mjesec.slice(5,7)) - 1; tip.innerHTML = '<b>' + MJ[mi].charAt(0).toUpperCase() + MJ[mi].slice(1) + ': ' + eur(ukupno(x)) + '.</b> ' + LINIJE.map(function(l){ return l[2] + ' ' + eur(x[l[0]] || 0); }).join(", ") + '.'; };
+    pokazi(m.length - 1);
+    document.querySelectorAll(".hit").forEach(function(r){ r.addEventListener("mouseenter", function(){ pokazi(+r.dataset.i); }); r.addEventListener("focus", function(){ pokazi(+r.dataset.i); }); });
+  }
   var f = document.getElementById("trosak"), por = document.getElementById("trosak-poruka");
+  if (!f) return;
   // Brisanje troška: olovka uključi uređivanje (minus uz svaki trošak), minus otvara potvrdu u retku, briše se tek na Obriši
-  document.getElementById("uredi-troskove").addEventListener("click", function(){ uredjivanje = !uredjivanje; crtaj(); document.getElementById("uredi-troskove").focus(); });
+  document.getElementById("uredi-troskove").addEventListener("click", function(){ uredjivanje = !uredjivanje; var y = window.scrollY; crtaj(); window.scrollTo(0, y); document.getElementById("uredi-troskove").focus(); });
   var tablica = f.parentNode.querySelector("table");
   if (tablica) tablica.addEventListener("click", function(ev){
     var b = ev.target.closest("button"); if (!b) return;
@@ -337,6 +576,46 @@ function vezi(){
     fetch("/api/trosak", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(b)})
       .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); }); })
       .then(function(){ ucitaj(); }).catch(function(err){ por.textContent = "Nije spremljeno: " + err.message; });
+  });
+}
+
+// Uređivanje naslovne: gumbi, veličina, micanje i povlačenje (mišem, prstom ili strelicama na ručki).
+function veziNaslovnu(){
+  var ponovo = function(){ var y = window.scrollY; crtaj(); window.scrollTo(0, y); };
+  var ur = document.getElementById("kt-uredi"); if (ur) ur.addEventListener("click", function(){ naslovnaUredi = true; ponovo(); });
+  var go = document.getElementById("kt-gotovo"); if (go) go.addEventListener("click", function(){ naslovnaUredi = false; ponovo(); });
+  var za = document.getElementById("kt-zadano"); if (za) za.addEventListener("click", function(){ raspored = zadano(); spremiRaspored(); ponovo(); });
+  document.querySelectorAll("[data-kt-dodaj]").forEach(function(b){ b.addEventListener("click", function(){ var id = b.dataset.ktDodaj; raspored.push([id, KARTICE[id].vel]); spremiRaspored(); ponovo(); }); });
+  document.querySelectorAll("[data-kt-makni]").forEach(function(b){ b.addEventListener("click", function(){ raspored = raspored.filter(function(k){ return k[0] !== b.dataset.ktMakni; }); spremiRaspored(); ponovo(); }); });
+  document.querySelectorAll("[data-kt-vel]").forEach(function(b){ b.addEventListener("click", function(){ raspored.forEach(function(k){ if (k[0] === b.dataset.ktVel) k[1] = k[1] % 4 + 1; }); spremiRaspored(); ponovo(); var n = document.querySelector('[data-kt-vel="' + b.dataset.ktVel + '"]'); if (n) n.focus(); }); });
+  var mreza = document.getElementById("kt-mreza");
+  if (!mreza || !naslovnaUredi) return;
+  var poredak = function(){ var red = [].map.call(mreza.children, function(c){ return c.dataset.kt; }); raspored = red.map(function(id){ return raspored.filter(function(k){ return k[0] === id; })[0]; }); spremiRaspored(); };
+  mreza.querySelectorAll(".kt-hvat").forEach(function(h){
+    var k = h.closest(".kt");
+    h.addEventListener("keydown", function(ev){
+      var i = {ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1}[ev.key]; if (!i) return;
+      ev.preventDefault();
+      if (i < 0 && k.previousElementSibling) mreza.insertBefore(k, k.previousElementSibling);
+      else if (i > 0 && k.nextElementSibling) mreza.insertBefore(k, k.nextElementSibling.nextElementSibling);
+      else return;
+      h.focus(); poredak();
+    });
+    h.addEventListener("pointerdown", function(ev){
+      if (ev.button > 0) return;
+      ev.preventDefault();
+      // Slušamo cijeli dokument: premještanje kartice u DOM-u prekida hvatanje pokazivača na ručki.
+      k.classList.add("vuce");
+      var pomak = function(p){
+        if (p.clientY < 70) window.scrollBy(0, -16); else if (p.clientY > innerHeight - 70) window.scrollBy(0, 16);
+        var cilj = document.elementFromPoint(p.clientX, p.clientY); cilj = cilj && cilj.closest(".kt");
+        if (!cilj || cilj === k || cilj.parentNode !== mreza) return;
+        var poslije = [].indexOf.call(mreza.children, cilj) > [].indexOf.call(mreza.children, k);
+        mreza.insertBefore(k, poslije ? cilj.nextElementSibling : cilj);
+      };
+      var kraj = function(){ k.classList.remove("vuce"); document.removeEventListener("pointermove", pomak); document.removeEventListener("pointerup", kraj); document.removeEventListener("pointercancel", kraj); poredak(); };
+      document.addEventListener("pointermove", pomak); document.addEventListener("pointerup", kraj); document.addEventListener("pointercancel", kraj);
+    });
   });
 }
 
@@ -557,8 +836,8 @@ function ucitajCestitku(){
   if (cUcitavam === cKljuc()) return;
   cUcitavam = cKljuc();
   fetch("/api/cestitka?dana=" + cDana + (cDan ? "&dan=" + cDan : ""), {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ cUcitavam = ""; if (j.dana + "|" + (j.dan || "") !== cKljuc()) return; C = j; cGreska = ""; if (ekran === "cestitka") crtaj(); })
-    .catch(function(err){ cUcitavam = ""; cGreska = err.message; if (ekran === "cestitka") crtaj(); });
+    .then(function(j){ cUcitavam = ""; if (j.dana + "|" + (j.dan || "") !== cKljuc()) return; C = j; cGreska = ""; if (ekran === "cestitka") crtaj(); kartice(); })
+    .catch(function(err){ cUcitavam = ""; cGreska = err.message; if (ekran === "cestitka") crtaj(); kartice(); });
 }
 var C_IZVOR = {izravno: "Izravno", cestitka: "Link na dnu poslane čestitke", "kuverta.hr": "Kuverta (kuverta.hr)"};
 function imeIzvoraC(x){ return C_IZVOR[x] || imeIzvora(x); }
@@ -725,7 +1004,7 @@ function ucitajOglase(){
   if (ogUcitavam) return; ogUcitavam = true;
   fetch("/api/oglasi?dana=" + ogDana, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if (!r.ok) throw new Error(j.greska || r.status); return j; }); })
     .then(function(j){ OG = j; ogGreska = ""; }).catch(function(err){ ogGreska = err.message; })
-    .then(function(){ ogUcitavam = false; if (ekran === "oglasi") { var y = window.scrollY; crtaj(); window.scrollTo(0, y); } });
+    .then(function(){ ogUcitavam = false; if (ekran === "oglasi") { var y = window.scrollY; crtaj(); window.scrollTo(0, y); } kartice(); });
 }
 function ogKampanje(){ return ((OG && OG.kampanje) || []).filter(function(k){ return ogProizvod === "sve" || k.proizvod === ogProizvod; }); }
 function ogZbroj(lista){
@@ -905,8 +1184,8 @@ var kUcitavam = false;
 function ucitajKorisnike(){
   if (kUcitavam) return; kUcitavam = true;
   fetch("/api/korisnici", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ kUcitavam = false; K = j.korisnici || []; kGreska = ""; if (ekran === "vjencanja") crtaj(); })
-    .catch(function(err){ kUcitavam = false; kGreska = err.message; if (ekran === "vjencanja") crtaj(); });
+    .then(function(j){ kUcitavam = false; K = j.korisnici || []; kGreska = ""; if (ekran === "vjencanja") crtaj(); kartice(); })
+    .catch(function(err){ kUcitavam = false; kGreska = err.message; if (ekran === "vjencanja") crtaj(); kartice(); });
 }
 function korisniciKuverte(){
   var h = '<section class="panel"><h2>Registrirani korisnici</h2>';
@@ -964,8 +1243,8 @@ var rUcitavam = false;
 function ucitajRacune(){
   if (rUcitavam) return; rUcitavam = true;
   fetch("/api/racuni", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ rUcitavam = false; R = j.racuni || []; rGreska = ""; if (rFiltar.okolina === "") rFiltar.okolina = R.some(function(x){ return x.okolina === "produkcija"; }) ? "produkcija" : "sve"; if (ekran === "racuni" || ekran === "vjencanja") crtaj(); })
-    .catch(function(err){ rUcitavam = false; rGreska = err.message; if (ekran === "racuni" || ekran === "vjencanja") crtaj(); });
+    .then(function(j){ rUcitavam = false; R = j.racuni || []; rGreska = ""; if (rFiltar.okolina === "") rFiltar.okolina = R.some(function(x){ return x.okolina === "produkcija"; }) ? "produkcija" : "sve"; if (ekran === "racuni" || ekran === "vjencanja") crtaj(); kartice(); })
+    .catch(function(err){ rUcitavam = false; rGreska = err.message; if (ekran === "racuni" || ekran === "vjencanja") crtaj(); kartice(); });
 }
 function stanjeRacuna(x){
   if (x.stanje === "fiskaliziran") return '<span class="oznaka ok">fiskaliziran</span>';
@@ -1017,8 +1296,8 @@ function veziRacune(){
 var B = null, bGreska = "", bFiltar = {iban: "", smjer: "", mjesec: null}, bPoruka = "", bSviIzvodi = false;
 function ucitajBanku(){
   fetch("/api/banka", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ B = j; bGreska = ""; if (!B.racuni.some(function(x){ return x.iban === bFiltar.iban; })) bFiltar.iban = B.racuni.length ? B.racuni[0].iban : ""; if (ekran === "banka") crtaj(); })
-    .catch(function(err){ bGreska = err.message; if (ekran === "banka") crtaj(); });
+    .then(function(j){ B = j; bGreska = ""; if (!B.racuni.some(function(x){ return x.iban === bFiltar.iban; })) bFiltar.iban = B.racuni.length ? B.racuni[0].iban : ""; if (ekran === "banka") crtaj(); kartice(); })
+    .catch(function(err){ bGreska = err.message; if (ekran === "banka") crtaj(); kartice(); });
 }
 function iznosC(c, valuta){ var s = (Number(c || 0) / 100).toLocaleString("hr-HR", {minimumFractionDigits: 2, maximumFractionDigits: 2}); return s + (valuta && valuta !== "EUR" ? " " + valuta : " €"); }
 function promjenaC(c, valuta){ return (c > 0 ? "+" : (c < 0 ? "−" : "")) + iznosC(Math.abs(c), valuta); }
@@ -1138,8 +1417,8 @@ var RAZREDI = [[11300, 1695], [15300, 2295], [19900, 2985], [30600, 4590], [4000
 var KN = null, knGreska = "", knFiltar = {godina: Number(new Date().getFullYear()), okolina: "produkcija"}, knPoruka = "";
 function ucitajKnjige(){
   fetch("/api/knjige?godina=" + knFiltar.godina + "&okolina=" + knFiltar.okolina, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ KN = j; knGreska = ""; if (ekran === "knjige") crtaj(); })
-    .catch(function(err){ knGreska = err.message; if (ekran === "knjige") crtaj(); });
+    .then(function(j){ KN = j; knGreska = ""; if (ekran === "knjige") crtaj(); kartice(); })
+    .catch(function(err){ knGreska = err.message; if (ekran === "knjige") crtaj(); kartice(); });
 }
 function uKpr(b){ return b.kpr === null || b.kpr === undefined ? !b.stripe : b.kpr; }
 // Redovi knjige prometa: računi po načinu plaćanja i priljevi na račun koji ulaze u KPR, po datumu.
@@ -1226,23 +1505,30 @@ function veziKnjige(){
   }); });
 }
 
-document.querySelectorAll("nav button").forEach(function(b){ b.addEventListener("click", function(){ ekran = b.dataset.ekran; history.replaceState(null, "", "#" + ekran); izbornik(false); oznaci(); if (D) crtaj(); window.scrollTo(0, 0); }); });
-// Izbornik na mobitelu: tipka s tri crte otvara i zatvara popis ekrana; zatvara ga i odabir ekrana, Esc ili klik izvan zaglavlja
-var zaglavlje = document.querySelector("header"), izb = zaglavlje.querySelector(".izb");
-function izbornik(otvori){ zaglavlje.classList.toggle("otvoren", otvori); izb.setAttribute("aria-expanded", otvori ? "true" : "false"); }
-izb.addEventListener("click", function(){ izbornik(!zaglavlje.classList.contains("otvoren")); });
-document.addEventListener("keydown", function(ev){ if (ev.key === "Escape" && zaglavlje.classList.contains("otvoren")) { izbornik(false); izb.focus(); } });
-document.addEventListener("click", function(ev){ if (!zaglavlje.contains(ev.target)) izbornik(false); });
-addEventListener("resize", function(){ if (innerWidth > 640) izbornik(false); });
+function idi(novi){ ekran = novi; naslovnaUredi = false; history.replaceState(null, "", "#" + ekran); izbornik(false); oznaci(); if (D) crtaj(); window.scrollTo(0, 0); }
+document.querySelectorAll("#ekrani button").forEach(function(b){ b.addEventListener("click", function(){ idi(b.dataset.ekran); }); });
+// Izbornik na mobitelu je ladica: tipka s tri crte je otvara, a zatvara je odabir ekrana, Esc ili klik izvan nje.
+// Iznad 1100 px izbornik se može sklopiti na ikone (pamti se u pregledniku); od 641 do 1100 px uvijek je samo ikone.
+var okvir = document.getElementById("okvir"), izb = okvir.querySelector(".izb"), sklopi = document.getElementById("bi-sklopi"), sklopljen = false;
+try { sklopljen = localStorage.getItem("izbornik-sklopljen") === "1"; } catch (x) {}
+function izbornik(otvori){ okvir.classList.toggle("otvoren", otvori); izb.setAttribute("aria-expanded", otvori ? "true" : "false"); }
+function sirina(){ var w = innerWidth; okvir.classList.toggle("mali", w > 640 && (w <= 1100 || sklopljen)); sklopi.setAttribute("aria-pressed", sklopljen ? "true" : "false"); sklopi.title = sklopljen ? "Raširi izbornik" : "Sklopi izbornik"; sklopi.querySelector(".bi-t").textContent = sklopi.title; if (w > 640) izbornik(false); }
+izb.addEventListener("click", function(){ izbornik(!okvir.classList.contains("otvoren")); });
+document.getElementById("bi-zastor").addEventListener("click", function(){ izbornik(false); });
+sklopi.addEventListener("click", function(){ sklopljen = !sklopljen; try { localStorage.setItem("izbornik-sklopljen", sklopljen ? "1" : "0"); } catch (x) {} sirina(); });
+document.addEventListener("keydown", function(ev){ if (ev.key === "Escape" && okvir.classList.contains("otvoren")) { izbornik(false); izb.focus(); } });
+addEventListener("resize", sirina);
+sirina();
 oznaci();
 ucitaj();
+ucitajRaspored();
 // ---------- Obavijesti (popis svih obavijesti mailom) ----------
 var OB = null, obGreska = "";
 var OB_UVJET = {mail: "treba RESEND_KEY i OBAVIJEST_NA", iban: "treba IZVODI_IBAN", fisk: "treba ključ za fisk-racun"};
 function ucitajObavijesti(){
   fetch("/api/obavijesti", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ OB = j; obGreska = ""; if (ekran === "obavijesti") crtaj(); })
-    .catch(function(err){ obGreska = err.message; if (ekran === "obavijesti") crtaj(); });
+    .then(function(j){ OB = j; obGreska = ""; if (ekran === "obavijesti") crtaj(); kartice(); })
+    .catch(function(err){ obGreska = err.message; if (ekran === "obavijesti") crtaj(); kartice(); });
 }
 function obavijestZaKljuc(k){
   var x = (OB.popis || []).filter(function(o){ return o.kljuc && (k === o.kljuc || k.indexOf(o.kljuc + ":") === 0); });
@@ -1285,8 +1571,8 @@ var POLJA_MAILA = [["naslov", "Naslov maila (predmet)"], ["preheader", "Kratki t
 
 function ucitajMailove(){
   fetch("/api/mailovi", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ MO = j; moGreska = ""; if (ekran === "mailovi") crtajMailove(); })
-    .catch(function(err){ moGreska = err.message; if (ekran === "mailovi") crtajMailove(); });
+    .then(function(j){ MO = j; moGreska = ""; if (ekran === "mailovi") crtajMailove(); kartice(); })
+    .catch(function(err){ moGreska = err.message; if (ekran === "mailovi") crtajMailove(); kartice(); });
 }
 // Crtanje ekrana s istim položajem na stranici (uređivanje je usred stranice).
 function crtajMailove(){ var y = window.scrollY; crtaj(); window.scrollTo(0, y); }
