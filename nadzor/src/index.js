@@ -31,6 +31,7 @@ import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i poč
 import { citajCamt053 } from "./camt.js";
 import { izOmotnice, jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
 import { DOMENA_NADZORA, POPIS_OBAVIJESTI, sastaviUpozorenja } from "./upozorenja.js";
+import { dozvole, metaJutro, pauziraj } from "./oglasi.js";
 
 export default {
   async fetch(req, env, ctx) {
@@ -46,6 +47,17 @@ export default {
       }
       if (req.method === "GET" && url.pathname === "/") {
         return new Response(STRANICA, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", ...SIGURNOSNA_ZAGLAVLJA } });
+      }
+      // Vođenje oglasa (src/oglasi.js): odobravanje pauze iz jutarnjeg maila, provjera tokena i ručno pokretanje.
+      if (url.pathname === "/meta/odobri") return await metaOdobri(req, url, env);
+      if (req.method === "GET" && url.pathname === "/meta/provjera") {
+        if (!env.META_ADS_TOKEN) return json({ greska: "Nije postavljen META_ADS_TOKEN." }, 500);
+        const d = await dozvole(env).catch((e) => ({ greska: String(e.message || e) }));
+        return json(Array.isArray(d) ? { dozvole: d, moze_pauzirati: d.includes("ads_management") } : d, Array.isArray(d) ? 200 : 500);
+      }
+      if (req.method === "GET" && url.pathname === "/meta/osvjezi") {
+        const r = await metaPosao(env).catch((e) => "greška: " + (e.message || e));
+        return new Response("Oglasi: " + r + "\nMail je poslan ako ima aktivnih oglasa ili potrošnje.", { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } });
       }
       if (req.method === "GET" && url.pathname === "/api/podaci") {
         const [podaci, kuverta] = await Promise.all([
@@ -605,6 +617,81 @@ async function prikupi(env) {
       await zapis("cloudflare", false, String(e.message || e));
     }
   }
+
+  // 3. Meta oglasi: dnevni brojevi, ocjena oglasa i jutarnji mail (src/oglasi.js)
+  if (env.META_ADS_TOKEN && env.META_OGLASNI_RACUN) {
+    try {
+      await zapis("meta", true, await metaPosao(env));
+    } catch (e) {
+      await zapis("meta", false, String(e.message || e));
+    }
+  }
+}
+
+// ---------- Vođenje Meta oglasa (src/oglasi.js) ----------
+
+function metaPosao(env) {
+  return metaJutro(env, {
+    rpcNadzor: (fn, args) => rpc(env.SUPABASE_URL, env.SUPABASE_KEY, fn, { p_kljuc: env.NADZOR_KLJUC, ...args }),
+    // Naše registracije i kupnje po oglasu (utm_content = ad.id) u zadnjih 7 dana, iz baze Kuverte (sql/20).
+    nasePoOglasu: async () => {
+      const oznake = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", { p_kljuc: env.NADZOR_KLJUC, p_dana: 7 });
+      const po = {};
+      for (const x of oznake || []) {
+        if (!["paid", "paid_social", "cpc"].includes(x.medij) || !x.oglas) continue;
+        const p = po[x.oglas] || (po[x.oglas] = { registracije: 0, kupnje: 0 });
+        p.registracije += Number(x.registracije || 0);
+        p.kupnje += Number(x.kupnje || 0);
+      }
+      return po;
+    },
+    posaljiMail: (naslov, tekst) => (env.RESEND_KEY && env.OBAVIJEST_NA ? posaljiMail(env, naslov, tekst) : false),
+    domena: DOMENA_NADZORA,
+  });
+}
+
+function stranicaOdobri(naslov, tijelo) {
+  const h = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  return new Response('<!doctype html><html lang="hr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + h(naslov)
+    + '</title><style>body{font-family:system-ui,sans-serif;max-width:520px;margin:48px auto;padding:0 20px;color:#222;line-height:1.5}button{font:inherit;padding:10px 18px;border-radius:8px;border:1px solid #888;background:#fff;cursor:pointer;margin-right:8px}button.da{background:#7a1f2b;color:#fff;border-color:#7a1f2b}.src{color:#666;font-size:14px}</style></head><body>'
+    + tijelo(h) + '</body></html>', { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", ...SIGURNOSNA_ZAGLAVLJA } });
+}
+
+// GET pokaže prijedlog i dva gumba, POST (obrazac s iste domene) pauzira oglas ili zabilježi "ostavi".
+async function metaOdobri(req, url, env) {
+  const rpcN = (fn, args) => rpc(env.SUPABASE_URL, env.SUPABASE_KEY, fn, { p_kljuc: env.NADZOR_KLJUC, ...args });
+  let id = url.searchParams.get("id") || "", odluka = "";
+  if (req.method === "POST") {
+    const izvor = req.headers.get("origin");
+    if (!izvor || new URL(izvor).host !== url.host) return new Response("Zahtjev nije s nadzora.", { status: 403 });
+    const f = await req.formData();
+    id = String(f.get("id") || "");
+    odluka = String(f.get("odluka") || "");
+  } else if (req.method !== "GET") return new Response("Nema te stranice.", { status: 404 });
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return stranicaOdobri("Oglasi", () => "<p>Neispravna poveznica.</p>");
+  const p = await rpcN("nadzor_meta_prijedlog", { p_id: id });
+  if (!p) return stranicaOdobri("Oglasi", () => "<p>Prijedlog ne postoji.</p>");
+  const glava = (h) => "<h1>" + h(p.ad_name) + '</h1><p class="src">' + h(p.campaign_name) + " · ocjena od " + h(p.datum) + "</p><p>" + h(p.razlog) + "</p>";
+  if (p.odobreno !== null) {
+    return stranicaOdobri("Oglasi", (h) => glava(h) + "<p><b>Već je odlučeno:</b> " + (p.odobreno ? "oglas je pauziran." : "oglas je ostavljen.") + "</p>");
+  }
+  if (p.stanje !== "prijedlog_pauza") return stranicaOdobri("Oglasi", (h) => glava(h) + "<p>Za ovaj oglas više nema prijedloga za pauzu.</p>");
+  if (req.method === "GET") {
+    return stranicaOdobri("Pauzirati oglas?", (h) => glava(h)
+      + '<form method="post" action="/meta/odobri"><input type="hidden" name="id" value="' + h(id) + '">'
+      + '<button class="da" name="odluka" value="pauziraj">Pauziraj oglas</button><button name="odluka" value="ostavi">Ostavi ga</button></form>'
+      + '<p class="src">Pauza se može poništiti u Ads Manageru (uključi oglas).</p>');
+  }
+  if (odluka === "pauziraj") {
+    const status = await pauziraj(env, p.ad_id);
+    await rpcN("nadzor_meta_odluka", { p_id: id, p_odobreno: true });
+    return stranicaOdobri("Pauzirano", (h) => glava(h) + "<p><b>Oglas je pauziran.</b> Meta javlja status: " + h(status) + ".</p>");
+  }
+  if (odluka === "ostavi") {
+    await rpcN("nadzor_meta_odluka", { p_id: id, p_odobreno: false });
+    return stranicaOdobri("Ostavljeno", (h) => glava(h) + "<p>U redu, oglas radi dalje. Ako ostane slab, sutra stiže novi prijedlog.</p>");
+  }
+  return stranicaOdobri("Oglasi", () => "<p>Nepoznata odluka.</p>");
 }
 
 // ---------- Upozorenja mailom ----------

@@ -29,6 +29,14 @@
     "CESTITKA_URL": "https://ofnvwzpvyjztbllhuewy.supabase.co",
     // Meta oglasi za ekran Čestitka: broj oglasnog računa (bez act_). Token je tajna META_ADS_TOKEN.
     "META_OGLASNI_RACUN": "1457833179822992",
+    // Vođenje oglasa (src/oglasi.js): € po registraciji za "dobar" i za prijedlog pauze, € bez registracije, frekvencija,
+    // i dnevne granice potrošnje (alat ih ne mijenja, samo upozori u jutarnjem mailu).
+    "META_PRAG_DOBAR": "3",
+    "META_PRAG_SLAB": "5",
+    "META_BEZ_REG": "6",
+    "META_FREKV": "3",
+    "META_BUDZET_KUVERTA": "30",
+    "META_BUDZET_CESTITKA": "20",
     "DOZVOLJENI_IZVORI": "https://digitalnipartner.hr,https://www.digitalnipartner.hr,https://digitalni-partner-web.bruno-dobric32.workers.dev",
     "ACCESS_TIM": "soft-cloud-4728.cloudflareaccess.com",
     "ACCESS_AUD": "0144174a889f88854a0ca3a3fc3c2b7371be7369991dc0bb6566e324a3d45b77",
