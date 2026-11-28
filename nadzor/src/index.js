@@ -523,7 +523,7 @@ function b64uTekst(s) {
   return new TextDecoder().decode(b64uBajtovi(s));
 }
 
-// ---------- Meta oglasi (ekran Čestitka) ----------
+// ---------- Meta oglasi (ekrani Kuverta i Čestitka, tab Oglasi i izvori) ----------
 // Prikazi, doseg, klikovi i potrošnja po oglasu iz Metinog API-ja za oglase (Insights, razina oglasa).
 // Treba tajnu META_ADS_TOKEN (token sistemskog korisnika s dozvolom ads_read) i META_OGLASNI_RACUN (broj računa).
 // META_KAMPANJE: regularni izraz za imena kampanja čestitke (zadano čestitka ili Božić). Račun dijeli i Kuverta:
@@ -536,7 +536,7 @@ async function metaOglasi(env, { dana, dan = null, cestitka }) {
   const danas = zg(Date.now());
   const parametri = new URLSearchParams({
     level: "ad",
-    fields: "ad_id,ad_name,campaign_name,impressions,reach,clicks,spend",
+    fields: "ad_id,ad_name,campaign_name,impressions,reach,clicks,spend,frequency,actions",
     limit: "500",
   });
   if (dan) parametri.set("time_range", JSON.stringify({ since: dan, until: dan }));
@@ -551,8 +551,14 @@ async function metaOglasi(env, { dana, dan = null, cestitka }) {
   try { filtar = new RegExp(env.META_KAMPANJE || "čestit|cestit|božić|bozic", "i"); } catch { filtar = /čestit|cestit|božić|bozic/i; }
   const broj = (v) => Number(v || 0);
   const jeCestitka = (x) => filtar.test(x.campaign_name || "") || filtar.test(x.ad_name || "");
+  // Metin vlastiti broj registracija i kupnji (Pixel + Conversions API), samo za usporedbu s našim brojem iz baze.
+  // Meta isti događaj vraća pod više naziva, pa se uzima prvi koji postoji, ne zbroj.
+  const akcija = (x, vrste) => { const a = x.actions || []; for (const v of vrste) { const n = a.find((y) => y.action_type === v); if (n) return broj(n.value); } return 0; };
   const redovi = (j.data || []).filter((x) => jeCestitka(x) === cestitka).map((x) => ({
     id: x.ad_id, ime: x.ad_name, kampanja: x.campaign_name, prikazi: broj(x.impressions), doseg: broj(x.reach), klikovi: broj(x.clicks), potrosnja: broj(x.spend),
+    frekvencija: broj(x.frequency),
+    meta_registracije: akcija(x, ["complete_registration", "offsite_conversion.fb_pixel_complete_registration"]),
+    meta_kupnje: akcija(x, ["purchase", "omni_purchase", "offsite_conversion.fb_pixel_purchase"]),
   }));
   redovi.sort((a, b) => b.potrosnja - a.potrosnja || b.prikazi - a.prikazi);
   return { postavljeno: true, redovi };
