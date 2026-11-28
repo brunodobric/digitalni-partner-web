@@ -50,3 +50,25 @@ test("mail s poveznicom i upozorenjem o budžetu", () => {
   assert.match(m.tekst, /UPOZORENJE: Kuverta je potrošila 35,00 €/);
   assert.doesNotMatch(m.tekst, /Čestitka je potrošila/);
 });
+
+import { dnevniBudzet, spojiNase } from "../src/oglasi.js";
+
+test("dnevni budžet: CBO kampanja ili zbroj aktivnih skupova", () => {
+  const k = [{ id: "1", proizvod: "kuverta", status: "ACTIVE", daily_budget: "2000" }, { id: "2", proizvod: "kuverta", status: "PAUSED" }, { id: "3", proizvod: "cestitka", status: "ACTIVE" }];
+  const s = [{ id: "21", campaign_id: "2", status: "ACTIVE", daily_budget: "1000" }, { id: "31", campaign_id: "3", status: "ACTIVE", daily_budget: "2000" }];
+  assert.equal(dnevniBudzet(k, s, "kuverta"), 20);
+  assert.equal(dnevniBudzet(k, s, "kuverta", { 2: "ACTIVE" }), 30);
+  assert.equal(dnevniBudzet(k, s, "cestitka"), 20);
+});
+
+test("naše oznake po ID-u oglasa i po imenu (oglas1 = Oglas 1 - Paket)", () => {
+  const oglasi = [{ id: "100", ime: "Oglas 1" }, { id: "120", ime: "Oglas 1 - Paket" }, { id: "130", ime: "Reel" }];
+  const po = spojiNase(oglasi, [
+    { medij: "paid", oglas: "130", posjete: 5, registracije: 1 },
+    { medij: "paid_social", oglas: "oglas1", posjete: 3, registracije: 2 },
+    { medij: "grupa", oglas: "130", posjete: 9 },
+  ]);
+  assert.equal(po["130"].posjete, 5);
+  assert.equal(po["120"].registracije, 2);
+  assert.equal(po["100"], undefined);
+});

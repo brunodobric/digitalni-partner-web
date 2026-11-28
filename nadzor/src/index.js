@@ -31,7 +31,7 @@ import IKONA from "./apple-touch-icon.png"; // ikona za oznaku (bookmark) i poč
 import { citajCamt053 } from "./camt.js";
 import { izOmotnice, jeZip, posiljateljDopusten, privitci, xmlIzZipa } from "./mail.js";
 import { DOMENA_NADZORA, POPIS_OBAVIJESTI, sastaviUpozorenja } from "./upozorenja.js";
-import { dozvole, metaJutro, pauziraj } from "./oglasi.js";
+import { dozvole, metaJutro, oglasiPregled, pauziraj, promijeniStatus } from "./oglasi.js";
 
 export default {
   async fetch(req, env, ctx) {
@@ -50,6 +50,27 @@ export default {
       }
       // Vođenje oglasa (src/oglasi.js): odobravanje pauze iz jutarnjeg maila, provjera tokena i ručno pokretanje.
       if (url.pathname === "/meta/odobri") return await metaOdobri(req, url, env);
+      // Ekran Oglasi: kampanje, skupovi i oglasi s Metinim i našim brojkama, ocjenom i lijevkom.
+      if (req.method === "GET" && url.pathname === "/api/oglasi") {
+        const dana = [7, 14, 30, 90].includes(Number(url.searchParams.get("dana"))) ? Number(url.searchParams.get("dana")) : 7;
+        const r = await oglasiPregled(env, {
+          dana,
+          oznakeKuverta: () => rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana }),
+          oznakeCestitka: async () => (env.CESTITKA_KEY ? ((await rpc(env.CESTITKA_URL, env.CESTITKA_KEY, "nadzor_cestitka", { p_kljuc: env.NADZOR_KLJUC, p_dana: dana })) || {}).po_oznaci || [] : []),
+          stanjaOglasa: async () => ((await rpc(env.SUPABASE_URL, env.SUPABASE_KEY, "nadzor_meta_oglasi", { p_kljuc: env.NADZOR_KLJUC, p_dana: 1 })) || {}).stanje || [],
+        }).catch((e) => ({ greska: String(e.message || e) }));
+        return json(r, r.greska ? 500 : 200);
+      }
+      if (req.method === "POST" && url.pathname === "/api/oglasi/status") {
+        const izvor = req.headers.get("origin");
+        if (izvor && new URL(izvor).host !== url.host) return json({ greska: "Zahtjev nije s nadzora." }, 403);
+        const t = await req.json().catch(() => ({}));
+        try {
+          return json(await promijeniStatus(env, { id: t.id, razina: t.razina, ukljuci: t.ukljuci === true }));
+        } catch (e) {
+          return json({ greska: String(e.message || e) }, e.status || 500);
+        }
+      }
       if (req.method === "GET" && url.pathname === "/meta/provjera") {
         if (!env.META_ADS_TOKEN) return json({ greska: "Nije postavljen META_ADS_TOKEN." }, 500);
         const d = await dozvole(env).catch((e) => ({ greska: String(e.message || e) }));
@@ -216,7 +237,7 @@ const SIGURNOSNA_ZAGLAVLJA = {
   "x-frame-options": "DENY",
   "referrer-policy": "no-referrer",
   "x-content-type-options": "nosniff",
-  "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data: https://kuverta.hr; frame-ancestors 'none'",
+  "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data: https://kuverta.hr https://*.fbcdn.net; frame-ancestors 'none'",
 };
 
 function json(obj, status = 200, extra = {}) {
@@ -633,18 +654,7 @@ async function prikupi(env) {
 function metaPosao(env) {
   return metaJutro(env, {
     rpcNadzor: (fn, args) => rpc(env.SUPABASE_URL, env.SUPABASE_KEY, fn, { p_kljuc: env.NADZOR_KLJUC, ...args }),
-    // Naše registracije i kupnje po oglasu (utm_content = ad.id) u zadnjih 7 dana, iz baze Kuverte (sql/20).
-    nasePoOglasu: async () => {
-      const oznake = await rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", { p_kljuc: env.NADZOR_KLJUC, p_dana: 7 });
-      const po = {};
-      for (const x of oznake || []) {
-        if (!["paid", "paid_social", "cpc"].includes(x.medij) || !x.oglas) continue;
-        const p = po[x.oglas] || (po[x.oglas] = { registracije: 0, kupnje: 0 });
-        p.registracije += Number(x.registracije || 0);
-        p.kupnje += Number(x.kupnje || 0);
-      }
-      return po;
-    },
+    oznakeKuverta: () => rpc(env.KUVERTA_URL, env.KUVERTA_KEY, "nadzor_oznake", { p_kljuc: env.NADZOR_KLJUC, p_dana: 7 }),
     posaljiMail: (naslov, tekst) => (env.RESEND_KEY && env.OBAVIJEST_NA ? posaljiMail(env, naslov, tekst) : false),
     domena: DOMENA_NADZORA,
   });
