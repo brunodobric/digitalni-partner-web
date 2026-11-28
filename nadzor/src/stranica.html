@@ -91,6 +91,19 @@ footer .wrap{padding-top:4px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap
 .iz-kpi>div{background:var(--pozadina);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
 .iz-kpi b{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
 .iz-tablica td{vertical-align:middle}
+.ek-glava{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:14px}
+.pod{display:inline-flex;flex-wrap:wrap;background:var(--kamen);border-radius:10px;padding:4px;gap:4px}
+.pod button{border:0;background:none;font:600 14px Manrope,sans-serif;color:var(--grafit);padding:0 16px;min-height:40px;border-radius:7px;cursor:pointer}
+.pod button[aria-selected=true]{background:var(--kartica);color:var(--oniks);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.pod button:focus-visible{outline:2px solid var(--zlato);outline-offset:2px}
+.lij{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));border:1px solid var(--linija);border-radius:12px;overflow:hidden}
+.lij>div{padding:14px 16px;display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--linija-svj);border-bottom:1px solid var(--linija-svj)}
+.lij>div.trosak{background:var(--zlato-svj)}
+.lij b{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
+.lij .izv{font-size:11px;font-weight:700;border-radius:999px;padding:0 8px;align-self:start;line-height:1.7}
+.izv.m{background:#EAF0FB;color:#2A4A8A}.izv.n{background:var(--smaragd-svj);color:var(--smaragd)}
+th.m{color:#2A4A8A}th.n{color:var(--smaragd)}
+.iz-meta td{background:var(--pozadina)}
 .iz-otvori{background:none;border:0;padding:0;font:700 14px Manrope,sans-serif;color:var(--oniks);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
 .iz-otvori span{color:var(--grafit);width:10px}
 .iz-ime{font-weight:700;padding-left:16px}
@@ -187,6 +200,7 @@ function crtaj(){
     var cdan = document.getElementById("cestitka-dan"); if (cdan) cdan.addEventListener("change", function(){ cPostavi(/^\d{4}-\d{2}-\d{2}$/.test(cdan.value) ? cdan.value : ""); });
     var csvi = document.getElementById("cestitka-svi-dani"); if (csvi) csvi.addEventListener("click", function(){ cPostavi(""); });
     var gc = document.getElementById("graf-cestitke"); if (gc) gc.addEventListener("click", function(ev){ var g = ev.target.closest("[data-dan]"); if (g) cPostavi(g.dataset.dan === cDan ? "" : g.dataset.dan); }); }
+  document.querySelectorAll(".pod [data-tab]").forEach(function(b){ b.addEventListener("click", function(){ if (ekran === "vjencanja") kTab = b.dataset.tab; else cTab = b.dataset.tab; try { localStorage.setItem("tab-" + ekran, b.dataset.tab); } catch (x) {} crtaj(); }); });
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
   if (ekran === "mailovi") veziMailove();
@@ -345,18 +359,59 @@ function aplikacije(){
 }
 
 // ---------- Kuverta ----------
+// Dva taba: "Pozivnice i korisnici" (proizvod, uplate, korisnici) i "Oglasi i izvori" (Meta oglasi spojeni s našim brojkama, svi izvori).
+var kTab = "poslovanje", cTab = "prodaja";
+try { kTab = localStorage.getItem("tab-vjencanja") || kTab; cTab = localStorage.getItem("tab-cestitka") || cTab; } catch (x) {}
+function podtabovi(t, popis){ return '<div class="pod" role="tablist" aria-label="Dio ekrana">' + popis.map(function(x){ return '<button type="button" role="tab" data-tab="' + x[0] + '" aria-selected="' + (x[0] === t) + '">' + x[1] + '</button>'; }).join("") + '</div>'; }
+function izFiltri(){
+  return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="izvori-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === izDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label>'
+    + '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Dan<input type="date" id="izvori-dan" value="' + izDan + '" max="' + D.danas + '"></label>'
+    + (izDan ? '<button type="button" class="tiho" id="izvori-svi-dani">Svi dani</button>' : '') + '</div>';
+}
 function vjencanja(){
   var k = D.kuverta || {};
-  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Linija 3 · Kuverta</p><h1>Pozivnica, album i raspored sjedenja</h1></div>';
+  var h = '<div class="ek-glava"><div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Linija 3 · Kuverta</p><h1>Pozivnica, album i raspored sjedenja</h1></div>'
+    + podtabovi(kTab, [["poslovanje", "Pozivnice i korisnici"], ["oglasi", "Oglasi i izvori"]]) + '</div>';
+  if (kTab === "oglasi") return h + izvoriKuverte();
   if (k.greska) return h + '<section class="panel"><p class="prazno">Baza Kuverte trenutno ne odgovara: ' + e(k.greska) + '</p></section>';
-  var t = ovaj();
-  var reg30 = K ? K.filter(function(u){ return new Date(u.registriran).getTime() >= Date.now() - 30 * 864e5; }).length : 0;
-  h += '<section class="kpi"><div><span class="src">Registracije ukupno</span><span class="v num">' + (K ? br(K.length) : "…") + '</span><span class="src">' + (K ? br(reg30) + ' u zadnjih 30 dana' : '&nbsp;') + '</span></div><div><span class="src">Prihod ovaj mjesec</span><span class="v num">' + eur(t.vjencanja) + '</span></div><div><span class="src">Pozivnice u bazi</span><span class="v num">' + br(k.pozivnice) + '</span><span class="src">' + br(k.pozivnice_objavljene) + ' objavljenih</span></div><div><span class="src">Albumi</span><span class="v num">' + br(k.albumi) + '</span><span class="src">' + br(k.fotografije) + ' datoteka, ' + (Number(k.album_bajtovi) / 1073741824).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + ' GB</span></div><div><span class="src">Rasporedi sjedenja</span><span class="v num">' + br(k.rasporedi) + '</span><span class="src">' + br(k.stolovi) + ' stolova, ' + br(k.gosti_u_rasporedu) + ' gostiju</span></div></section>';
+  var t = ovaj(), p = prosli();
+  var od30 = Date.now() - 30 * 864e5, od7 = Date.now() - 7 * 864e5;
+  function akt(u){ return u.zadnja_aktivnost || u.zadnja_prijava; }
+  var reg30 = K ? K.filter(function(u){ return new Date(u.registriran).getTime() >= od30; }).length : 0;
+  var platili = K ? K.filter(function(u){ return Number(u.placeno) > 0; }).length : 0;
+  var akt7 = K ? K.filter(function(u){ return akt(u) && new Date(akt(u)).getTime() >= od7; }).length : 0;
+  var akt30 = K ? K.filter(function(u){ return akt(u) && new Date(akt(u)).getTime() >= od30; }).length : 0;
+  h += '<section class="kpi">'
+    + '<div><span class="src">Registracije ukupno</span><span class="v num">' + (K ? br(K.length) : "…") + '</span><span class="src">' + (K ? br(reg30) + ' u zadnjih 30 dana' : '&nbsp;') + '</span></div>'
+    + '<div><span class="src">Platili</span><span class="v num">' + (K ? br(platili) : "…") + '</span><span class="src">' + (K && K.length ? postotak(platili, K.length) + ' registriranih' : '&nbsp;') + '</span></div>'
+    + '<div><span class="src">Prihod ovaj mjesec</span><span class="v num">' + eur(t.vjencanja) + '</span><span class="src">prošli ' + eur(p ? p.vjencanja : 0) + '</span></div>'
+    + '<div><span class="src">Aktivni u 7 dana</span><span class="v num">' + (K ? br(akt7) : "…") + '</span><span class="src">' + (K ? br(akt30) + ' u 30 dana' : '&nbsp;') + '</span></div></section>';
+  h += '<div class="red"><section class="panel uz" style="flex:1 1 440px"><h2>Što korisnici rade</h2>' + stoRade(k) + '</section>'
+    + '<section class="panel uz" style="flex:1 1 440px"><h2>Uplate i računi</h2>' + uplateKuverte() + '</section></div>';
   var id = k.iduca || [];
   h += '<section class="panel"><h2>Iduća vjenčanja</h2>' + (id.length ? '<div class="skrol"><table class="num"><thead><tr><th>Datum</th><th>Objavljena</th><th class="r">Potvrde</th><th class="r">Gostiju dolazi</th><th>Album</th><th class="r">Stolova</th></tr></thead><tbody>' + id.map(function(v){ return '<tr><td class="nw" style="font-weight:600">' + datumG(v.datum) + '</td><td>' + (v.objavljena == null ? "samo raspored" : (v.objavljena ? "da" : "ne")) + '</td><td class="r">' + v.potvrde + '</td><td class="r">' + v.dolazi + '</td><td>' + (v.ima_album ? "da" : "ne") + '</td><td class="r">' + v.stolovi + '</td></tr>'; }).join("") + '</tbody></table></div>' : '<p class="prazno">Nema pozivnica s datumom u budućnosti.</p>') + '<p class="src">Imena parova i gostiju se ne prenose u dashboard, samo brojevi.</p></section>';
-  h += izvoriKuverte();
   h += korisniciKuverte();
   return h;
+}
+// Niz od registracije do plaćanja (po korisniku), a ispod zbroj iz baze: pozivnice, albumi, rasporedi.
+function stoRade(k){
+  if (kGreska) return '<p class="prazno">Korisnici se nisu učitali (' + e(kGreska) + ').</p>';
+  if (!K) { ucitajKorisnike(); return '<p class="prazno">Učitavam korisnike…</p>'; }
+  var n = function(f){ return K.filter(f).length; };
+  var k2 = [["Registrirali se", K.length], ["Napravili pozivnicu", n(function(u){ return u.pozivnica; })], ["Napravili album ili raspored", n(function(u){ return u.album || u.raspored; })], ["Platili", n(function(u){ return Number(u.placeno) > 0; })]];
+  var mx = Math.max(1, K.length);
+  return k2.map(function(x, i){ return '<div class="num" style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;gap:12px;font-size:14px"><span>' + x[0] + '</span><span><b>' + br(x[1]) + '</b> <span class="src">' + (i ? postotak(x[1], K.length) : '') + '</span></span></div><div class="trak"><i style="width:' + (x[1] / mx * 100).toFixed(1) + '%"></i></div></div>'; }).join("")
+    + '<p class="src num">U bazi: ' + br(k.pozivnice) + ' pozivnica (' + br(k.pozivnice_objavljene) + ' objavljenih), ' + br(k.albumi) + ' albuma (' + br(k.fotografije) + ' datoteka, ' + (Number(k.album_bajtovi) / 1073741824).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + ' GB), ' + br(k.rasporedi) + ' rasporeda (' + br(k.stolovi) + ' stolova, ' + br(k.gosti_u_rasporedu) + ' gostiju).</p>';
+}
+// Zadnji računi Kuverte iz fiskalizacije (isti podaci kao ekran Računi).
+function uplateKuverte(){
+  if (rGreska) return '<p class="prazno">Računi se nisu učitali (' + e(rGreska) + ').</p>';
+  if (!R) { ucitajRacune(); return '<p class="prazno">Učitavam račune…</p>'; }
+  var l = R.filter(function(x){ return x.izvor === "kuverta" && x.okolina === "produkcija"; }).sort(function(a, b){ return String(b.izdan).localeCompare(String(a.izdan)); }).slice(0, 6);
+  if (!l.length) return '<p class="prazno">Kuverta još nema pravih računa.</p>';
+  return '<div class="skrol"><table class="num"><thead><tr><th>Izdan</th><th>Opis</th><th class="r">Iznos</th><th>Stanje</th></tr></thead><tbody>'
+    + l.map(function(x){ return '<tr><td class="nw">' + vrijeme(x.izdan) + '</td><td>' + e(x.opis) + '<div class="src">' + e(x.broj) + '</div></td><td class="r nw">' + eur(x.iznos, true) + '</td><td>' + stanjeRacuna(x) + '</td></tr>'; }).join("")
+    + '</tbody></table></div><p class="src">Zadnji računi Kuverte. Svi su na ekranu Računi.</p>';
 }
 
 // ---------- Otkud dolaze kupci (na ekranu Kuverta) ----------
@@ -378,14 +433,15 @@ function postotak(a, b){ return b > 0 ? (a / b * 100).toLocaleString("hr-HR", {m
 // Retci ispod izvora: sve oznake poveznica (po_oznaci, sql/20) sa svim brojkama; kampanje koje u po_oznaci
 // nedostaju (dok sql/20 nije pokrenut) samo s posjetama; ostatak registracija i kupnji izvora (odgovor na
 // pitanje „Kako ste čuli za Kuvertu?”, bez oznake) u zasebnom retku, da se retci zbroje u izvor.
+function jeOglas(o){ return IZ_VRSTA[o.medij] === "oglas"; }
 function djecaIzvora(x){
   var izvor = x.izvor;
-  var d = (IZ.po_oznaci || []).filter(function(o){ return o.izvor === izvor; }).map(function(o){
+  var d = (IZ.po_oznaci || []).filter(function(o){ return o.izvor === izvor && !jeOglas(o); }).map(function(o){
     return {ime: o.oglas || o.kampanja || (o.medij === "profil" ? "Profil" : "bez kampanje"), vrsta: IZ_VRSTA[o.medij] || o.medij || "bez oznake", kampanja: o.oglas ? o.kampanja : "", posjete: o.posjete, registracije: o.registracije, kupnje: o.kupnje, prihod: o.prihod, sve: true};
   });
   var ima = {}; (IZ.po_oznaci || []).forEach(function(o){ ima[o.izvor + "|" + o.medij + "|" + o.kampanja] = 1; });
   (IZ.po_kampanji || []).forEach(function(o){
-    if (o.izvor !== izvor || ima[o.izvor + "|" + o.medij + "|" + o.kampanja]) return;
+    if (o.izvor !== izvor || jeOglas(o) || ima[o.izvor + "|" + o.medij + "|" + o.kampanja]) return;
     d.push({ime: o.kampanja || "bez kampanje", vrsta: IZ_VRSTA[o.medij] || o.medij || "bez oznake", kampanja: "", posjete: o.posjete, sve: false});
   });
   var r = x.registracije, k = x.kupnje, e2 = Number(x.prihod);
@@ -419,26 +475,38 @@ function grafPoDanu(){
 }
 // Danas (Worker: nadzor_izvori za današnji dan), ispod zbroja posjeta, registracija i kupnji.
 function danasK(k){ var d = IZ && IZ.danas; return d && d[k] != null ? '<span class="src">danas ' + br(d[k]) + '</span>' : ''; }
+// Plaćeni oglasi (oznake s utm_medium paid, paid_social ili cpc) izdvojeni iz izvora u jedan redak "Meta oglasi",
+// da se posjete, registracije i kupnje s oglasa ne pokazuju dvaput. Detalji po oglasu su u tablici Po oglasu.
+function placeno(po){ return (po || []).filter(jeOglas).reduce(function(a, o){ a.posjete += Number(o.posjete || 0); a.registracije += Number(o.registracije || 0); a.kupnje += Number(o.kupnje || 0); a.prihod += Number(o.prihod || 0); (a.po[o.izvor] || (a.po[o.izvor] = {posjete: 0, registracije: 0, kupnje: 0, prihod: 0})); ["posjete","registracije","kupnje","prihod"].forEach(function(k){ a.po[o.izvor][k] += Number(o[k] || 0); }); a.n++; return a; }, {posjete: 0, registracije: 0, kupnje: 0, prihod: 0, n: 0, po: {}}); }
+function bezOglasa(pi, pl){
+  var r = pi.map(function(x){ var o = pl.po[x.izvor]; if (!o) return x; var y = {}; for (var k in x) y[k] = x[k]; ["posjete","registracije","kupnje"].forEach(function(k){ if (y[k] != null) y[k] = Math.max(0, Number(y[k]) - o[k]); }); y.prihod = Math.max(0, Number(y.prihod || 0) - o.prihod); y.dijeljen = true; return y; })
+    .filter(function(x){ return x.posjete || x.registracije || x.kupnje || Number(x.prihod); });
+  if (pl.n) r.unshift({izvor: "__oglasi", posjete: pl.posjete, registracije: pl.registracije, kupnje: pl.kupnje, prihod: pl.prihod, oglasi: true});
+  return r;
+}
 function izvoriKuverte(){
-  var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">'
-    + '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="izvori-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === izDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label>'
-    + '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Dan<input type="date" id="izvori-dan" value="' + izDan + '" max="' + D.danas + '"></label>'
-    + (izDan ? '<button type="button" class="tiho" id="izvori-svi-dani">Svi dani</button>' : '') + '</div></div>';
+  var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><div><h2>Oglasi u brojkama</h2><p class="src">Jedan niz od prikaza do kupnje. Plavo stiže iz Mete, zeleno iz naše baze.</p></div>' + izFiltri() + '</div>';
   if (izGreska) return h + '<p class="prazno">Izvori se nisu učitali (' + e(izGreska) + '). Ako piše da funkcija ne postoji, u projektu MyWeddingInvite treba pokrenuti sql/12-kuverta-izvori.sql.</p></section>';
   if (!IZ || IZ.dana + "|" + (IZ.dan || "") !== izKljuc()) { ucitajIzvore(); return h + '<p class="prazno">Učitavam izvore…</p></section>'; }
-  var pi = IZ.po_izvoru || [];
-  var uk = pi.reduce(function(a, x){ a.p += x.posjete; a.r += x.registracije; a.k += x.kupnje; a.e += Number(x.prihod); return a; }, {p:0, r:0, k:0, e:0});
+  var pl = placeno(IZ.po_oznaci);
+  h += nizOglasa(IZ.oglasi, pl, true) + '</section>';
+  h += poOglasu(IZ.oglasi, IZ.po_oznaci, true);
+  var pi = bezOglasa(IZ.po_izvoru || [], pl);
+  var uk = (IZ.po_izvoru || []).reduce(function(a, x){ a.p += x.posjete; a.r += x.registracije; a.k += x.kupnje; a.e += Number(x.prihod); return a; }, {p:0, r:0, k:0, e:0});
+  h += '<section class="panel"><div><h2>Svi izvori</h2><p class="src">Oglasi su ovdje jedan zbirni redak, da se izvori zbroje u ukupno. Grupe, pinovi i profil otvaraju se klikom na izvor.</p></div>';
   h += '<div class="iz-kpi">'
     + '<div><span class="src">Posjete s poznatim izvorom</span><b class="num">' + br(uk.p) + '</b>' + danasK("posjete") + '</div>'
     + '<div><span class="src">Registracije</span><b class="num">' + br(uk.r) + '</b><span class="src">' + (uk.p ? postotak(uk.r, uk.p) + ' posjeta' : '&nbsp;') + '</span>' + danasK("registracije") + '</div>'
     + '<div><span class="src">Kupnje</span><b class="num">' + br(uk.k) + '</b><span class="src">' + (uk.r ? postotak(uk.k, uk.r) + ' registracija' : '&nbsp;') + '</span>' + danasK("kupnje") + '</div>'
     + '<div><span class="src">Prihod</span><b class="num">' + eur(uk.e) + '</b></div></div>';
   h += grafPoDanu();
-  if (izDan) h += '<p class="num" style="font-size:14px">Prikazan je samo dan <b>' + datumG(izDan) + '</b> · <b>' + br(uk.p) + '</b> posjeta s poznatim izvorom, <b>' + br(uk.r) + '</b> registracija, <b>' + br(uk.k) + '</b> kupnji. Tablica ispod je za taj dan.</p>';
-  if (!pi.length) return h + '<p class="prazno">U ovom razdoblju još nema posjeta s oznakom ni registracija.</p></section>' + oglasiKuverte();
+  if (izDan) h += '<p class="num" style="font-size:14px">Prikazan je samo dan <b>' + datumG(izDan) + '</b> · <b>' + br(uk.p) + '</b> posjeta s poznatim izvorom, <b>' + br(uk.r) + '</b> registracija, <b>' + br(uk.k) + '</b> kupnji. Sve na ovom tabu je za taj dan.</p>';
+  if (!pi.length) return h + '<p class="prazno">U ovom razdoblju još nema posjeta s oznakom ni registracija.</p></section>';
   var maxP = Math.max(1, Math.max.apply(null, pi.map(function(x){ return x.posjete; })));
   var redak = '';
   pi.forEach(function(x){
+    if (x.oglasi) { redak += '<tr class="iz-red iz-meta"><td><span class="iz-ime">Meta oglasi</span><span class="src iz-opis">' + br(pl.n) + ' ' + (pl.n === 1 ? 'oznaka' : pl.n < 5 ? 'oznake' : 'oznaka') + ' oglasa, detalji u tablici Po oglasu</span></td>'
+      + '<td class="r"><div class="iz-posj"><span class="trak"><i style="width:' + (x.posjete / maxP * 100) + '%"></i></span>' + br(x.posjete) + '</div></td><td class="r">' + br(x.registracije) + '</td><td class="r src">' + postotak(x.registracije, x.posjete) + '</td><td class="r">' + br(x.kupnje) + '</td><td class="r nw">' + (x.prihod > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; return; }
     var dj = djecaIzvora(x), otv = !!izOtvoreni[x.izvor];
     var vrste = {}; dj.forEach(function(d){ if (!d.ostatak) vrste[d.vrsta] = (vrste[d.vrsta] || 0) + 1; });
     var opis = Object.keys(vrste).map(function(v){ var n = vrste[v]; return n + " " + ({grupa: n === 1 ? "grupa" : n < 5 ? "grupe" : "grupa", pin: n === 1 ? "pin" : n < 5 ? "pina" : "pinova", oglas: n === 1 ? "oglas" : "oglasa", poveznica: n === 1 ? "poveznica" : n < 5 ? "poveznice" : "poveznica"}[v] || v); }).join(", ");
@@ -456,8 +524,7 @@ function izvoriKuverte(){
   });
   h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th><th class="r">Registracije</th><th class="r">Reg. / posjete</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>' + redak + '</tbody></table></div>';
   if (IZ.pinterest_greska || IZ.grupe_greska) h += '<p class="src">Grupe i pinovi se nisu učitali (' + e(IZ.pinterest_greska || IZ.grupe_greska) + '). U projektu MyWeddingInvite treba pokrenuti sql/20-kuverta-oznake-sve.sql.</p>';
-  h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjete se broje bez kolačića: oznake utm u poveznici ili stranica s koje je posjetitelj došao. Grupa je poveznica s utm_medium=grupa, a pin poveznica s utm_medium=pin; ime je utm_content. Izvor registracije je oznaka s kojom je korisnik došao, a ako je nema, odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih. Ispod izvora su sve oznake poveznica (grupe, pinovi, oglasi, kampanje). Registracije bez oznake, za koje znamo samo odgovor na pitanje „Kako ste čuli za Kuvertu?”, su u retku „Odgovor „Kako ste čuli””.</p></details></section>';
-  h += oglasiKuverte();
+  h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjete se broje bez kolačića: oznake utm u poveznici ili stranica s koje je posjetitelj došao. Grupa je poveznica s utm_medium=grupa, a pin poveznica s utm_medium=pin; ime je utm_content. Izvor registracije je oznaka s kojom je korisnik došao, a ako je nema, odgovor na pitanje „Kako ste čuli za Kuvertu?”. Kupnje su po izvoru računa koji je platio, bez testnih. Ispod izvora su sve oznake poveznica (grupe, pinovi, oglasi, kampanje). Registracije bez oznake, za koje znamo samo odgovor na pitanje „Kako ste čuli za Kuvertu?”, su u retku „Odgovor „Kako ste čuli””. Posjete s oglasa (utm_medium paid, paid_social ili cpc) nisu ispod svog izvora, nego u retku Meta oglasi i u tablici Po oglasu.</p></details></section>';
   return h;
 }
 
@@ -503,35 +570,63 @@ function lijevakCestitke(r, rz){
     + k.map(function(x, i){ var n = Number(x[1]) || 0; return '<tr><td><span style="font-weight:600">' + x[0] + '</span><br><span class="src">' + x[2] + '</span></td>'
       + '<td class="r"><div class="iz-posj"><span class="trak"><i style="width:' + Math.min(100, n / mx * 100) + '%"></i></span>' + br(n) + '</div></td>'
       + '<td class="r src">' + (i ? postotak(n, Number(k[i - 1][1]) || 0) : "–") + '</td><td class="r src">' + (i ? postotak(n, Number(k[0][1]) || 0) : "–") + '</td></tr>'; }).join("")
-    + '</tbody></table></div><p class="src">Uređivač se broji pri svakom otvaranju, i kad ga ista osoba ponovno učita. Plaćanje se broji jednom po čestitci, kad ga kupac prvi put otvori. Po izvoru je u tablici ispod.</p></section>';
+    + '</tbody></table></div><p class="src">Uređivač se broji pri svakom otvaranju, i kad ga ista osoba ponovno učita. Plaćanje se broji jednom po čestitci, kad ga kupac prvi put otvori. Po izvoru je u tabu Oglasi i izvori.</p></section>';
   return h;
 }
-// Meta oglasi: prikazi, doseg, klikovi i potrošnja (Worker metaOglasi), uz posjete i kupnje istog oglasa (utm_content = ID oglasa).
-function oglasiCestitke(){ return metaOglasi(C.oglasi, C.po_oznaci, false, "za čestitku"); }
-function oglasiKuverte(){ return metaOglasi(IZ.oglasi, IZ.po_oznaci, true, "za Kuvertu"); }
-function metaOglasi(o, poOznaci, imaReg, zaSto){
+// Meta oglasi: prikazi, klikovi, potrošnja i frekvencija (Worker metaOglasi) spojeni s našim posjetama, registracijama i kupnjama
+// s oglasa (oznake s utm_medium paid/paid_social/cpc; uz pojedini oglas preko utm_content={{ad.id}}). Za registracije i kupnje
+// vrijedi naš broj iz baze, Metin broj (Pixel + Conversions API) piše samo kao usporedba.
+function metaZbroj(o){ return ((o && o.redovi) || []).reduce(function(a, x){ a.prikazi += x.prikazi; a.klikovi += x.klikovi; a.potrosnja += x.potrosnja; a.doseg += x.doseg; a.mreg += x.meta_registracije || 0; a.mkup += x.meta_kupnje || 0; return a; }, {prikazi: 0, klikovi: 0, potrosnja: 0, doseg: 0, mreg: 0, mkup: 0}); }
+function metaNapomena(o, zaSto){
   o = o || {};
-  var h = '<section class="panel"><h2>Meta oglasi</h2>';
-  if (o.greska) return h + '<p class="prazno">Oglasi se nisu učitali (' + e(o.greska) + '). Provjeri token META_ADS_TOKEN i broj računa META_OGLASNI_RACUN na Workeru dp-nadzor.</p></section>';
-  if (!o.postavljeno) return h + '<p class="prazno">Meta oglasi još nisu spojeni. Na Workeru dp-nadzor trebaju tajna META_ADS_TOKEN (dozvola ads_read) i varijabla META_OGLASNI_RACUN.</p></section>';
-  var r = o.redovi || [];
-  if (!r.length) return h + '<p class="prazno">U ovom razdoblju nema prikaza oglasa ' + zaSto + '.</p></section>';
-  var po = {}; (poOznaci || []).forEach(function(x){ if (!x.oglas) return; var p = po[x.oglas] || (po[x.oglas] = {posjete: 0, registracije: 0, kupnje: 0, prihod: 0}); p.posjete += x.posjete || 0; p.registracije += x.registracije || 0; p.kupnje += x.kupnje || 0; p.prihod += Number(x.prihod || 0); });
-  var uk = r.reduce(function(a, x){ var p = po[x.id] || {}; a.prikazi += x.prikazi; a.klikovi += x.klikovi; a.potrosnja += x.potrosnja; a.kupnje += p.kupnje || 0; a.prihod += p.prihod || 0; return a; }, {prikazi: 0, klikovi: 0, potrosnja: 0, kupnje: 0, prihod: 0});
-  h += '<div class="iz-kpi">'
-    + '<div><span class="src">Prikazi</span><b class="num">' + br(uk.prikazi) + '</b></div>'
-    + '<div><span class="src">Klikovi</span><b class="num">' + br(uk.klikovi) + '</b><span class="src">' + postotak(uk.klikovi, uk.prikazi) + ' prikaza</span></div>'
-    + '<div><span class="src">Potrošnja</span><b class="num">' + eur(uk.potrosnja, true) + '</b></div>'
-    + '<div><span class="src">Kupnje s oglasa</span><b class="num">' + br(uk.kupnje) + '</b><span class="src">' + (uk.kupnje ? eur(uk.potrosnja / uk.kupnje, true) + ' po kupnji' : '&nbsp;') + '</span></div>'
-    + '<div><span class="src">Prihod s oglasa</span><b class="num">' + eur(uk.prihod, true) + '</b></div></div>';
-  h += '<div class="skrol"><table class="num"><thead><tr><th>Oglas</th><th>Kampanja</th><th class="r">Prikazi</th><th class="r">Doseg</th><th class="r">Klikovi</th><th class="r">Potrošnja</th><th class="r">Posjete</th>' + (imaReg ? '<th class="r">Registracije</th>' : '') + '<th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
-    + r.map(function(x){ var p = po[x.id]; return '<tr><td style="font-weight:600;min-width:160px">' + e(x.ime) + '</td><td class="src">' + e(x.kampanja) + '</td><td class="r">' + br(x.prikazi) + '</td><td class="r">' + br(x.doseg) + '</td><td class="r">' + br(x.klikovi) + '</td><td class="r nw">' + eur(x.potrosnja, true) + '</td><td class="r">' + (p ? br(p.posjete) : '–') + '</td>' + (imaReg ? '<td class="r">' + (p ? br(p.registracije) : '–') + '</td>' : '') + '<td class="r">' + (p ? br(p.kupnje) : '–') + '</td><td class="r nw">' + (p && p.prihod > 0 ? eur(p.prihod, true) : '–') + '</td></tr>'; }).join("")
-    + '</tbody></table></div>';
-  h += '<p class="src">Doseg je broj različitih ljudi koji su vidjeli oglas. Posjete i kupnje stoje uz oglas kad link oglasa ima utm_content={{ad.id}}; inače je crtica. Iznosi su u valuti oglasnog računa.</p></section>';
+  if (o.greska) return '<p class="src">Brojke iz Mete se nisu učitale (' + e(o.greska) + '). Provjeri tajnu META_ADS_TOKEN i varijablu META_OGLASNI_RACUN na Workeru dp-nadzor.</p>';
+  if (!o.postavljeno) return '<p class="src">Prikazi, klikovi i potrošnja pojavit će se kad se na Workeru dp-nadzor postave tajna META_ADS_TOKEN i varijabla META_OGLASNI_RACUN. Do tada su ovdje samo naše brojke s oglasa.</p>';
+  if (!(o.redovi || []).length) return '<p class="src">U ovom razdoblju Meta nema prikaza oglasa ' + zaSto + '.</p>';
+  return '';
+}
+function nizOglasa(o, pl, imaReg){
+  var m = metaZbroj(o), ima = o && o.postavljeno && !o.greska, c = function(v){ return ima ? v : '–'; };
+  var frekv = m.doseg ? (m.prikazi / m.doseg).toLocaleString("hr-HR", {maximumFractionDigits: 1}) : '–';
+  var h = '<div class="lij num">'
+    + '<div class="trosak"><span class="izv m">Meta</span><span class="src">Potrošnja</span><b>' + c(eur(m.potrosnja, true)) + '</b><span class="src">CPM ' + c(m.prikazi ? eur(m.potrosnja / m.prikazi * 1000, true) : '–') + '</span></div>'
+    + '<div><span class="izv m">Meta</span><span class="src">Prikazi</span><b>' + c(br(m.prikazi)) + '</b><span class="src">frekvencija ' + c(frekv) + '</span></div>'
+    + '<div><span class="izv m">Meta</span><span class="src">Klikovi</span><b>' + c(br(m.klikovi)) + '</b><span class="src">CTR ' + c(postotak(m.klikovi, m.prikazi)) + '</span></div>'
+    + '<div><span class="izv n">Naše</span><span class="src">Posjete</span><b>' + br(pl.posjete) + '</b><span class="src">' + (ima && m.klikovi ? postotak(pl.posjete, m.klikovi) + ' klikova stiglo' : '&nbsp;') + '</span></div>'
+    + (imaReg ? '<div><span class="izv n">Naše</span><span class="src">Registracije</span><b>' + br(pl.registracije) + '</b><span class="src">' + postotak(pl.registracije, pl.posjete) + ' posjeta</span></div>' : '')
+    + '<div><span class="izv n">Naše</span><span class="src">Kupnje</span><b>' + br(pl.kupnje) + '</b><span class="src">' + (imaReg ? postotak(pl.kupnje, pl.registracije) + ' registracija' : postotak(pl.kupnje, pl.posjete) + ' posjeta') + '</span></div>'
+    + '<div><span class="izv n">Naše</span><span class="src">Prihod</span><b>' + eur(pl.prihod) + '</b><span class="src">' + (ima && m.potrosnja ? 'povrat ' + (pl.prihod / m.potrosnja).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + '×' : '&nbsp;') + '</span></div></div>';
+  if (ima && m.potrosnja) h += '<div class="iz-kpi num">'
+    + (imaReg ? '<div><span class="src">Cijena po registraciji</span><b>' + (pl.registracije ? eur(m.potrosnja / pl.registracije, true) : '–') + '</b><span class="src">' + br(pl.registracije) + ' za ' + eur(m.potrosnja, true) + '</span></div>' : '')
+    + '<div><span class="src">Cijena po kupnji</span><b>' + (pl.kupnje ? eur(m.potrosnja / pl.kupnje, true) : '–') + '</b><span class="src">' + br(pl.kupnje) + ' za ' + eur(m.potrosnja, true) + '</span></div>'
+    + '<div><span class="src">Meta broji</span><b>' + (imaReg ? br(m.mreg) + ' ' + (m.mreg === 1 ? 'registraciju' : m.mreg % 10 >= 2 && m.mreg % 10 <= 4 && (m.mreg % 100 < 12 || m.mreg % 100 > 14) ? 'registracije' : 'registracija') : br(m.mkup) + ' kupnji') + '</b><span class="src">mi brojimo ' + br(imaReg ? pl.registracije : pl.kupnje) + '. U niz ide naš broj.</span></div></div>';
+  return h + metaNapomena(o, imaReg ? "za Kuvertu" : "za čestitku");
+}
+// Tablica po oglasu: Metini i naši brojevi u istom retku. Oznake oglasa kojima utm_content nije ID Metinog oglasa
+// (npr. ručno imenovane) dodaju se kao zasebni retci bez Metinih brojki, da se tablica zbroji u niz iznad.
+function poOglasu(o, poOznaci, imaReg){
+  o = o || {};
+  var po = {}, plac = (poOznaci || []).filter(jeOglas);
+  plac.forEach(function(x){ var kl = x.oglas || ("kampanja:" + (x.kampanja || "")); var p = po[kl] || (po[kl] = {posjete: 0, registracije: 0, kupnje: 0, prihod: 0, kampanja: x.kampanja}); p.posjete += Number(x.posjete || 0); p.registracije += Number(x.registracije || 0); p.kupnje += Number(x.kupnje || 0); p.prihod += Number(x.prihod || 0); });
+  var red = ((o.postavljeno && o.redovi) || []).map(function(x){ var p = po[x.id] || {}; delete po[x.id]; return {ime: x.ime, kampanja: x.kampanja, meta: x, posjete: p.posjete || 0, registracije: p.registracije || 0, kupnje: p.kupnje || 0, prihod: p.prihod || 0}; });
+  Object.keys(po).forEach(function(kl){ var p = po[kl]; red.push({ime: kl.indexOf("kampanja:") === 0 ? (p.kampanja || "bez oznake oglasa") : kl, kampanja: kl.indexOf("kampanja:") === 0 ? "" : p.kampanja, meta: null, posjete: p.posjete, registracije: p.registracije, kupnje: p.kupnje, prihod: p.prihod}); });
+  if (!red.length) return '';
+  var h = '<section class="panel"><div><h2>Po oglasu</h2><p class="src">Svaki oglas jednom, s Metinim i našim brojkama u istom retku.</p></div>';
+  var cpm = function(m){ return m && m.prikazi ? eur(m.potrosnja / m.prikazi * 1000, true) : '–'; };
+  var celije = function(x){ var m = x.meta;
+    return '<td class="r nw">' + (m ? eur(m.potrosnja, true) : '–') + '</td><td class="r">' + (m ? br(m.prikazi) : '–') + '</td><td class="r nw">' + cpm(m) + '</td><td class="r">' + (m ? postotak(m.klikovi, m.prikazi) : '–') + '</td><td class="r">' + (m && m.frekvencija ? m.frekvencija.toLocaleString("hr-HR", {maximumFractionDigits: 1}) : '–') + '</td>'
+      + '<td class="r">' + br(x.posjete) + '</td>' + (imaReg ? '<td class="r"' + (m ? ' title="Meta broji ' + br(m.meta_registracije) + '"' : '') + '>' + br(x.registracije) + '</td><td class="r nw">' + (m && x.registracije ? eur(m.potrosnja / x.registracije, true) : '–') + '</td>' : '')
+      + '<td class="r"' + (m ? ' title="Meta broji ' + br(m.meta_kupnje) + '"' : '') + '>' + br(x.kupnje) + '</td><td class="r nw">' + (x.prihod > 0 ? eur(x.prihod, true) : '–') + '</td>'; };
+  var uk = red.reduce(function(a, x){ a.posjete += x.posjete; a.registracije += x.registracije; a.kupnje += x.kupnje; a.prihod += x.prihod; return a; }, {posjete: 0, registracije: 0, kupnje: 0, prihod: 0});
+  var m = metaZbroj(o.postavljeno ? o : null); uk.meta = m.prikazi ? {potrosnja: m.potrosnja, prikazi: m.prikazi, klikovi: m.klikovi, frekvencija: m.doseg ? m.prikazi / m.doseg : 0, meta_registracije: m.mreg, meta_kupnje: m.mkup} : null;
+  h += '<div class="skrol"><table class="num"><thead><tr><th>Oglas</th><th class="r m">Potrošnja</th><th class="r m">Prikazi</th><th class="r m">CPM</th><th class="r m">CTR</th><th class="r m">Frekv.</th><th class="r n">Posjete</th>' + (imaReg ? '<th class="r n">Registracije</th><th class="r n">€ / reg.</th>' : '') + '<th class="r n">Kupnje</th><th class="r n">Prihod</th></tr></thead><tbody>'
+    + red.map(function(x){ return '<tr><td style="font-weight:600;min-width:170px">' + e(x.ime) + (x.kampanja ? '<div class="src" style="font-weight:400">' + e(x.kampanja) + '</div>' : '') + (x.meta ? '' : '<div class="src" style="font-weight:400">bez Metinih brojki: u linku nema utm_content={{ad.id}}</div>') + '</td>' + celije(x) + '</tr>'; }).join("")
+    + (red.length > 1 ? '<tr class="kpr-zbroj"><td>Ukupno</td>' + celije(uk) + '</tr>' : '')
+    + '</tbody></table></div><p class="src">Plavi stupci stižu iz Mete, zeleni iz naše baze. Prijeđi mišem preko ' + (imaReg ? 'registracija ili kupnji' : 'kupnji') + ' i vidiš koliko ih broji Meta. Iznosi su u valuti oglasnog računa.</p></section>';
   return h;
 }
 function cestitkaEkran(){
-  var h = '<div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Kuverta · Božićna čestitka</p><h1>bozicna.kuverta.hr</h1></div>';
+  var h = '<div class="ek-glava"><div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Kuverta · Božićna čestitka</p><h1>bozicna.kuverta.hr</h1></div>'
+    + podtabovi(cTab, [["prodaja", "Prodaja"], ["oglasi", "Oglasi i izvori"]]) + '</div>';
   var izbor = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="cestitka-dana">' + [[7,"7 dana"],[30,"30 dana"],[90,"90 dana"],[0,"sve"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === cDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label>'
     + '<label class="src" style="display:flex;flex-direction:row;align-items:center;gap:8px">Dan<input type="date" id="cestitka-dan" value="' + cDan + '" max="' + D.danas + '"></label>'
     + (cDan ? '<button type="button" class="tiho" id="cestitka-svi-dani">Svi dani</button>' : '') + '</div>';
@@ -539,6 +634,8 @@ function cestitkaEkran(){
   if (!C || C.dana + "|" + (C.dan || "") !== cKljuc()) { ucitajCestitku(); return h + '<section class="panel"><p class="prazno">Učitavam čestitku…</p></section>'; }
   var r = C.razdoblje || {}, u = C.ukupno || {};
   var rz = cDan ? "na dan " + datumG(cDan) : (cDana ? "u zadnjih " + cDana + " dana" : "od početka");
+  if (cTab === "oglasi") return h + oglasiCestitke(izbor, r, u, rz);
+  h += '<div style="display:flex;justify-content:flex-end">' + izbor + '</div>';
   h += '<section class="kpi">'
     + '<div><span class="src">Posjete ' + rz + '</span><span class="v num">' + br(r.posjete) + '</span><span class="src">danas ' + br(u.danas_posjete) + '</span></div>'
     + '<div><span class="src">Kupnje ' + rz + '</span><span class="v num">' + br(r.kupnje) + '</span><span class="src">' + br(r.komada) + ' čestitki' + (Number(r.iz_paketa) ? ', ' + br(r.iz_paketa) + ' iskorišteno iz paketa' : '') + ' · danas ' + br(u.danas_kupnje) + '</span></div>'
@@ -547,37 +644,48 @@ function cestitkaEkran(){
     + '<div><span class="src">Primatelji otvorili</span><span class="v num">' + br(r.otvorene) + '</span><span class="src">' + rz + '</span></div>'
     + '</section>';
   h += lijevakCestitke(r, rz);
-  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2>Otkud dolaze kupci</h2>' + izbor + '</div>';
+  return h;
+}
+// Tab Oglasi i izvori na ekranu Čestitka: niz oglasa (Meta + naše), po oglasu, svi izvori s oglasima u jednom retku.
+function oglasiCestitke(izbor, r, u, rz){
+  var pl = placenoC(C.po_oznaci);
+  var h = '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><div><h2>Oglasi u brojkama</h2><p class="src">Jedan niz od prikaza do kupnje. Plavo stiže iz Mete, zeleno iz naše baze.</p></div>' + izbor + '</div>' + nizOglasa(C.oglasi, pl, false) + '</section>';
+  h += poOglasu(C.oglasi, C.po_oznaci, false);
+  h += '<section class="panel"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><div><h2>Svi izvori</h2><p class="src">Oglasi su ovdje jedan zbirni redak, da se izvori zbroje u ukupno.</p></div></div>';
   h += '<p class="src">Od početka: ' + br(u.posjete) + ' posjeta, ' + br(u.kupnje) + ' kupnji (' + br(u.komada) + ' čestitki), ' + eur(u.prihod, true) + '.</p>';
   h += grafCestitke();
-  if (cDan) h += '<p class="num" style="font-size:14px">Prikazan je samo dan <b>' + datumG(cDan) + '</b> · <b>' + br(r.posjete) + '</b> posjeta, <b>' + br(r.kupnje) + '</b> kupnji. Brojevi gore, tablice i oglasi su za taj dan.</p>';
-  var pi = C.po_izvoru || [];
+  if (cDan) h += '<p class="num" style="font-size:14px">Prikazan je samo dan <b>' + datumG(cDan) + '</b> · <b>' + br(r.posjete) + '</b> posjeta, <b>' + br(r.kupnje) + '</b> kupnji. Sve na ovom tabu je za taj dan.</p>';
+  var pi = bezOglasa(C.po_izvoru || [], pl);
   if (!pi.length) h += '<p class="prazno">U ovom razdoblju još nema posjeta ni kupnji.</p>';
   else {
     var maxP = Math.max(1, Math.max.apply(null, pi.map(function(x){ return x.posjete; })));
-    var lj = pi[0].uredivac !== undefined;
+    var lj = ((C.po_izvoru || [])[0] || {}).uredivac !== undefined;
     h += '<div class="skrol"><table class="num iz-tablica"><thead><tr><th>Izvor</th><th class="r">Posjete</th>' + (lj ? '<th class="r">Uređivač</th><th class="r">Spremili</th><th class="r">Plaćanje</th>' : '') + '<th class="r">Kupnje</th><th class="r">Kupnje / posjete</th><th class="r">Prihod</th></tr></thead><tbody>'
-      + pi.map(function(x){ return '<tr class="iz-red"><td><span class="iz-ime">' + e(imeIzvoraC(x.izvor)) + '</span></td>'
+      + pi.map(function(x){ return '<tr class="iz-red' + (x.oglasi ? ' iz-meta' : '') + '"><td><span class="iz-ime">' + (x.oglasi ? 'Meta oglasi' : e(imeIzvoraC(x.izvor))) + '</span>' + (x.oglasi ? '<span class="src iz-opis">detalji u tablici Po oglasu</span>' : '') + '</td>'
         + '<td class="r"><div class="iz-posj"><span class="trak"><i style="width:' + (x.posjete / maxP * 100) + '%"></i></span>' + br(x.posjete) + '</div></td>'
-        + (lj ? '<td class="r">' + br(x.uredivac) + '</td><td class="r">' + br(x.spremljene) + '</td><td class="r">' + br(x.placanje) + '</td>' : '')
+        + (lj ? (x.oglasi || x.dijeljen ? '<td class="r src">–</td><td class="r src">–</td><td class="r src">–</td>' : '<td class="r">' + br(x.uredivac) + '</td><td class="r">' + br(x.spremljene) + '</td><td class="r">' + br(x.placanje) + '</td>') : '')
         + '<td class="r">' + br(x.kupnje) + '</td><td class="r src">' + postotak(x.kupnje, x.posjete) + '</td><td class="r nw">' + (Number(x.prihod) > 0 ? eur(x.prihod, true) : "–") + '</td></tr>'; }).join("")
       + '</tbody></table></div>';
   }
-  var po = C.po_oznaci || [];
+  var po = (C.po_oznaci || []).filter(function(o){ return !jeOglas(o); });
   if (po.length) h += '<h2 style="margin-top:8px">Po oznaci poveznice</h2><div class="skrol"><table class="num"><thead><tr><th>Izvor</th><th>Medij</th><th>Kampanja</th><th>Oglas</th><th class="r">Posjete</th><th class="r">Kupnje</th><th class="r">Prihod</th></tr></thead><tbody>'
     + po.map(function(o){ return '<tr><td class="nw" style="font-weight:600">' + e(imeIzvoraC(o.izvor)) + '</td><td>' + e(IZ_VRSTA[o.medij] || o.medij || "–") + '</td><td>' + e(o.kampanja || "–") + '</td><td>' + e(o.oglas || "–") + '</td><td class="r">' + br(o.posjete) + '</td><td class="r">' + br(o.kupnje) + '</td><td class="r nw">' + (Number(o.prihod) > 0 ? eur(o.prihod, true) : "–") + '</td></tr>'; }).join("")
     + '</tbody></table></div>';
-  h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjeta je ulazak na stranicu: s oznakom utm u poveznici, s vanjske stranice (Instagram, Facebook, Google) ili izravno (upisana adresa, poveznica iz WhatsAppa ili Vibera). Klik unutar stranice, roboti i otvaranje poslane čestitke se ne broje, a ponovno učitavanje stranice broji se kao nova posjeta. Sve se broji bez kolačića. Oznake poveznice: utm_source je izvor, utm_medium medij, utm_campaign kampanja i utm_content oglas, npr. bozicna.kuverta.hr/?utm_source=instagram&amp;utm_medium=paid&amp;utm_campaign=bozic&amp;utm_content=reel-sob. Kupnja je plaćena uplata bez testnih (paket od 5 ili 10 je jedna kupnja), a izvor kupnje je izvor s kojim je kupac došao do uređivača. „Nepoznato” su kupci koji su kod kolačića odabrali „Samo nužni” i kupnje prije uvođenja brojanja.</p></details></section>';
-  h += oglasiCestitke();
+  h += '<details class="src"><summary style="cursor:pointer">Kako se broji</summary><p style="margin-top:6px">Posjeta je ulazak na stranicu: s oznakom utm u poveznici, s vanjske stranice (Instagram, Facebook, Google) ili izravno (upisana adresa, poveznica iz WhatsAppa ili Vibera). Klik unutar stranice, roboti i otvaranje poslane čestitke se ne broje, a ponovno učitavanje stranice broji se kao nova posjeta. Sve se broji bez kolačića. Oznake poveznice: utm_source je izvor, utm_medium medij, utm_campaign kampanja i utm_content oglas, npr. bozicna.kuverta.hr/?utm_source=instagram&amp;utm_medium=paid&amp;utm_campaign=bozic&amp;utm_content=reel-sob. Kupnja je plaćena uplata bez testnih (paket od 5 ili 10 je jedna kupnja), a izvor kupnje je izvor s kojim je kupac došao do uređivača. Posjete i kupnje s oglasa (utm_medium paid, paid_social ili cpc) su u retku Meta oglasi i u tablici Po oglasu; uređivač i plaćanje po izvoru ne dijele se na oglase, pa je kod njih crtica. „Nepoznato” su kupci koji su kod kolačića odabrali „Samo nužni” i kupnje prije uvođenja brojanja.</p></details></section>';
   return h;
 }
 
+// Čestitka nema registracija: placeno() radi i ovdje, registracije su 0.
+function placenoC(po){ return placeno(po); }
+
 // ---------- Korisnici Kuverte (na ekranu Kuverta) ----------
 var K = null, kGreska = "", kPoruka = "";
+var kUcitavam = false;
 function ucitajKorisnike(){
+  if (kUcitavam) return; kUcitavam = true;
   fetch("/api/korisnici", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ K = j.korisnici || []; kGreska = ""; if (ekran === "vjencanja") crtaj(); })
-    .catch(function(err){ kGreska = err.message; if (ekran === "vjencanja") crtaj(); });
+    .then(function(j){ kUcitavam = false; K = j.korisnici || []; kGreska = ""; if (ekran === "vjencanja") crtaj(); })
+    .catch(function(err){ kUcitavam = false; kGreska = err.message; if (ekran === "vjencanja") crtaj(); });
 }
 function korisniciKuverte(){
   var h = '<section class="panel"><h2>Registrirani korisnici</h2>';
@@ -631,10 +739,12 @@ function veziKorisnike(){
 // ---------- Računi ----------
 var R = null, rGreska = "", rFiltar = {godina: "", izvor: "", okolina: ""};
 var NACIN = {G: "gotovina", K: "kartica", T: "transakcijski račun", O: "ostalo"};
+var rUcitavam = false;
 function ucitajRacune(){
+  if (rUcitavam) return; rUcitavam = true;
   fetch("/api/racuni", {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.greska || r.status); return j; }); })
-    .then(function(j){ R = j.racuni || []; rGreska = ""; if (rFiltar.okolina === "") rFiltar.okolina = R.some(function(x){ return x.okolina === "produkcija"; }) ? "produkcija" : "sve"; if (ekran === "racuni") crtaj(); })
-    .catch(function(err){ rGreska = err.message; if (ekran === "racuni") crtaj(); });
+    .then(function(j){ rUcitavam = false; R = j.racuni || []; rGreska = ""; if (rFiltar.okolina === "") rFiltar.okolina = R.some(function(x){ return x.okolina === "produkcija"; }) ? "produkcija" : "sve"; if (ekran === "racuni" || ekran === "vjencanja") crtaj(); })
+    .catch(function(err){ rUcitavam = false; rGreska = err.message; if (ekran === "racuni" || ekran === "vjencanja") crtaj(); });
 }
 function stanjeRacuna(x){
   if (x.stanje === "fiskaliziran") return '<span class="oznaka ok">fiskaliziran</span>';
