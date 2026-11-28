@@ -591,7 +591,7 @@ function nizOglasa(o, pl, imaReg){
     + '<div class="trosak"><span class="izv m">Meta</span><span class="src">Potrošnja</span><b>' + c(eur(m.potrosnja, true)) + '</b><span class="src">CPM ' + c(m.prikazi ? eur(m.potrosnja / m.prikazi * 1000, true) : '–') + '</span></div>'
     + '<div><span class="izv m">Meta</span><span class="src">Prikazi</span><b>' + c(br(m.prikazi)) + '</b><span class="src">frekvencija ' + c(frekv) + '</span></div>'
     + '<div><span class="izv m">Meta</span><span class="src">Klikovi</span><b>' + c(br(m.klikovi)) + '</b><span class="src">CTR ' + c(postotak(m.klikovi, m.prikazi)) + '</span></div>'
-    + '<div><span class="izv n">Naše</span><span class="src">Posjete</span><b>' + br(pl.posjete) + '</b><span class="src">' + (ima && m.klikovi ? postotak(pl.posjete, m.klikovi) + ' klikova stiglo' : '&nbsp;') + '</span></div>'
+    + '<div><span class="izv n">Naše</span><span class="src">Posjete</span><b>' + br(pl.posjete) + '</b><span class="src">' + (ima && m.klikovi && pl.posjete <= m.klikovi ? postotak(pl.posjete, m.klikovi) + ' klikova stiglo' : '&nbsp;') + '</span></div>'
     + (imaReg ? '<div><span class="izv n">Naše</span><span class="src">Registracije</span><b>' + br(pl.registracije) + '</b><span class="src">' + postotak(pl.registracije, pl.posjete) + ' posjeta</span></div>' : '')
     + '<div><span class="izv n">Naše</span><span class="src">Kupnje</span><b>' + br(pl.kupnje) + '</b><span class="src">' + (imaReg ? postotak(pl.kupnje, pl.registracije) + ' registracija' : postotak(pl.kupnje, pl.posjete) + ' posjeta') + '</span></div>'
     + '<div><span class="izv n">Naše</span><span class="src">Prihod</span><b>' + eur(pl.prihod) + '</b><span class="src">' + (ima && m.potrosnja ? 'povrat ' + (pl.prihod / m.potrosnja).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + '×' : '&nbsp;') + '</span></div></div>';
@@ -607,8 +607,23 @@ function poOglasu(o, poOznaci, imaReg){
   o = o || {};
   var po = {}, plac = (poOznaci || []).filter(jeOglas);
   plac.forEach(function(x){ var kl = x.oglas || ("kampanja:" + (x.kampanja || "")); var p = po[kl] || (po[kl] = {posjete: 0, registracije: 0, kupnje: 0, prihod: 0, kampanja: x.kampanja}); p.posjete += Number(x.posjete || 0); p.registracije += Number(x.registracije || 0); p.kupnje += Number(x.kupnje || 0); p.prihod += Number(x.prihod || 0); });
-  var red = ((o.postavljeno && o.redovi) || []).map(function(x){ var p = po[x.id] || {}; delete po[x.id]; return {ime: x.ime, kampanja: x.kampanja, meta: x, posjete: p.posjete || 0, registracije: p.registracije || 0, kupnje: p.kupnje || 0, prihod: p.prihod || 0}; });
-  Object.keys(po).forEach(function(kl){ var p = po[kl]; red.push({ime: kl.indexOf("kampanja:") === 0 ? (p.kampanja || "bez oznake oglasa") : kl, kampanja: kl.indexOf("kampanja:") === 0 ? "" : p.kampanja, meta: null, posjete: p.posjete, registracije: p.registracije, kupnje: p.kupnje, prihod: p.prihod}); });
+  // Isti oglas može u Meti imati više ID-ova (nova verzija, npr. "Oglas 1" i "Oglas 1 - Paket"), a link starijeg oglasa ručnu
+  // oznaku (utm_content=oglas1) umjesto {{ad.id}}. Zato se retci spajaju: Metini po imenu prije " - " unutar kampanje,
+  // a naše oznake po ID-u oglasa ili, ako ID ne odgovara, po tom imenu bez razmaka i znakova (oglas1 = Oglas 1).
+  var norm = function(t){ return String(t || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, ""); };
+  var baza = function(t){ return String(t || "").split(/\s+[-–—|]\s+/)[0].trim(); };
+  var grupe = [], poId = {}, poImenu = {};
+  ((o.postavljeno && o.redovi) || []).forEach(function(x){
+    var kl = norm(baza(x.ime)) + "|" + (x.kampanja || ""), g = grupe.filter(function(y){ return y.kl === kl; })[0];
+    if (!g) { g = {kl: kl, ime: baza(x.ime), kampanja: x.kampanja, verzije: [], meta: {potrosnja: 0, prikazi: 0, klikovi: 0, doseg: 0, meta_registracije: 0, meta_kupnje: 0}, posjete: 0, registracije: 0, kupnje: 0, prihod: 0}; grupe.push(g); }
+    g.verzije.push(x.ime); poId[x.id] = g; if (!poImenu[norm(baza(x.ime))]) poImenu[norm(baza(x.ime))] = g;
+    ["potrosnja","prikazi","klikovi","doseg","meta_registracije","meta_kupnje"].forEach(function(k){ g.meta[k] += Number(x[k] || 0); });
+  });
+  grupe.forEach(function(g){ g.meta.frekvencija = g.meta.doseg ? g.meta.prikazi / g.meta.doseg : 0; });
+  var red = grupe.slice();
+  Object.keys(po).forEach(function(kl){ var p = po[kl], g = poId[kl] || (kl.indexOf("kampanja:") === 0 ? null : poImenu[norm(baza(kl))]);
+    if (g) { g.posjete += p.posjete; g.registracije += p.registracije; g.kupnje += p.kupnje; g.prihod += p.prihod; return; }
+    red.push({ime: kl.indexOf("kampanja:") === 0 ? (p.kampanja || "bez oznake oglasa") : kl, kampanja: kl.indexOf("kampanja:") === 0 ? "" : p.kampanja, meta: null, posjete: p.posjete, registracije: p.registracije, kupnje: p.kupnje, prihod: p.prihod}); });
   if (!red.length) return '';
   var h = '<section class="panel"><div><h2>Po oglasu</h2><p class="src">Svaki oglas jednom, s Metinim i našim brojkama u istom retku.</p></div>';
   var cpm = function(m){ return m && m.prikazi ? eur(m.potrosnja / m.prikazi * 1000, true) : '–'; };
@@ -619,7 +634,7 @@ function poOglasu(o, poOznaci, imaReg){
   var uk = red.reduce(function(a, x){ a.posjete += x.posjete; a.registracije += x.registracije; a.kupnje += x.kupnje; a.prihod += x.prihod; return a; }, {posjete: 0, registracije: 0, kupnje: 0, prihod: 0});
   var m = metaZbroj(o.postavljeno ? o : null); uk.meta = m.prikazi ? {potrosnja: m.potrosnja, prikazi: m.prikazi, klikovi: m.klikovi, frekvencija: m.doseg ? m.prikazi / m.doseg : 0, meta_registracije: m.mreg, meta_kupnje: m.mkup} : null;
   h += '<div class="skrol"><table class="num"><thead><tr><th>Oglas</th><th class="r m">Potrošnja</th><th class="r m">Prikazi</th><th class="r m">CPM</th><th class="r m">CTR</th><th class="r m">Frekv.</th><th class="r n">Posjete</th>' + (imaReg ? '<th class="r n">Registracije</th><th class="r n">€ / reg.</th>' : '') + '<th class="r n">Kupnje</th><th class="r n">Prihod</th></tr></thead><tbody>'
-    + red.map(function(x){ return '<tr><td style="font-weight:600;min-width:170px">' + e(x.ime) + (x.kampanja ? '<div class="src" style="font-weight:400">' + e(x.kampanja) + '</div>' : '') + (x.meta ? '' : '<div class="src" style="font-weight:400">bez Metinih brojki: u linku nema utm_content={{ad.id}}</div>') + '</td>' + celije(x) + '</tr>'; }).join("")
+    + red.map(function(x){ return '<tr><td style="font-weight:600;min-width:170px">' + e(x.ime) + (x.kampanja ? '<div class="src" style="font-weight:400">' + e(x.kampanja) + '</div>' : '') + (x.verzije && x.verzije.length > 1 ? '<div class="src" style="font-weight:400">u Meti ' + x.verzije.length + ' verzije: ' + e(x.verzije.join(", ")) + '</div>' : '') + (x.meta ? '' : '<div class="src" style="font-weight:400">bez Metinih brojki: u linku nema utm_content={{ad.id}}</div>') + '</td>' + celije(x) + '</tr>'; }).join("")
     + (red.length > 1 ? '<tr class="kpr-zbroj"><td>Ukupno</td>' + celije(uk) + '</tr>' : '')
     + '</tbody></table></div><p class="src">Plavi stupci stižu iz Mete, zeleni iz naše baze. Prijeđi mišem preko ' + (imaReg ? 'registracija ili kupnji' : 'kupnji') + ' i vidiš koliko ih broji Meta. Iznosi su u valuti oglasnog računa.</p></section>';
   return h;
