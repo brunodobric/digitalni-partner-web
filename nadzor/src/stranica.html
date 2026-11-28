@@ -114,6 +114,25 @@ th.m{color:#2A4A8A}th.n{color:var(--smaragd)}
 .iz-posj{display:flex;align-items:center;justify-content:flex-end;gap:10px}
 .iz-posj .trak{width:90px;flex:none}
 @media (max-width:640px){.iz-posj .trak{display:none}}
+.og-prek{width:38px;height:22px;border-radius:999px;border:0;padding:0;background:#CFCBC4;position:relative;cursor:pointer;flex:none}
+.og-prek i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
+.og-prek[aria-checked=true]{background:var(--smaragd)}.og-prek[aria-checked=true] i{left:19px}
+.og-prek:disabled{opacity:.5;cursor:wait}
+.og-ime{display:flex;align-items:center;gap:6px}
+.og-otvori{width:22px;height:22px;flex:none;border:0;background:none;padding:0;color:var(--grafit);cursor:pointer;font-size:13px}
+.og-odaberi{border:0;background:none;padding:0;font:inherit;color:var(--oniks);cursor:pointer;text-align:left}
+.og-odaberi:hover{text-decoration:underline}
+.og-kampanja .og-odaberi{font-weight:700}.og-skup .og-odaberi{font-weight:600}
+.og-skup td,.og-oglas td{background:var(--pozadina);font-size:13.5px}.og-oglas td{padding-top:7px;padding-bottom:7px}
+.og-odabran td{background:var(--zlato-svj)!important}
+.og-tablica td{vertical-align:middle}
+.og-lij{display:flex;flex-direction:column;gap:14px}
+.og-korak{display:flex;flex-direction:column;gap:5px}
+.og-korak-v{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13.5px;font-weight:600}
+.og-korak-v b{font-size:20px;letter-spacing:-.02em}
+.og-korak .izv{font-size:11px;font-weight:700;border-radius:999px;padding:0 7px;margin-left:4px}
+.og-hit:hover{fill:rgba(198,161,91,.12)}
+@media (prefers-reduced-motion:reduce){.og-prek i{transition:none}}
 .jir{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--grafit);word-break:break-all}
 svg text{font-family:Manrope,sans-serif}
 .izb,.ekran-m{display:none}
@@ -145,6 +164,7 @@ svg text{font-family:Manrope,sans-serif}
     <button role="tab" data-ekran="aplikacije" aria-selected="false">Aplikacije</button>
     <button role="tab" data-ekran="vjencanja" aria-selected="false">Kuverta</button>
     <button role="tab" data-ekran="cestitka" aria-selected="false">Čestitka</button>
+    <button role="tab" data-ekran="oglasi" aria-selected="false">Oglasi</button>
     <button role="tab" data-ekran="mailovi" aria-selected="false">Mailovi</button>
     <button role="tab" data-ekran="racuni" aria-selected="false">Računi</button>
     <button role="tab" data-ekran="banka" aria-selected="false">Banka</button>
@@ -185,7 +205,7 @@ function oznaci(){
 
 function crtaj(){
   oznaci();
-  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, cestitka: cestitkaEkran, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti, mailovi: mailoviEkran}[ekran] || pregled;
+  var f = {pregled: pregled, usluge: usluge, aplikacije: aplikacije, vjencanja: vjencanja, cestitka: cestitkaEkran, oglasi: oglasiEkran, racuni: racuni, banka: banka, knjige: knjige, obavijesti: obavijesti, mailovi: mailoviEkran}[ekran] || pregled;
   document.getElementById("sadrzaj").innerHTML = f();
   if (ekran === "pregled") vezi();
   if (ekran === "usluge") veziUpite();
@@ -200,7 +220,8 @@ function crtaj(){
     var cdan = document.getElementById("cestitka-dan"); if (cdan) cdan.addEventListener("change", function(){ cPostavi(/^\d{4}-\d{2}-\d{2}$/.test(cdan.value) ? cdan.value : ""); });
     var csvi = document.getElementById("cestitka-svi-dani"); if (csvi) csvi.addEventListener("click", function(){ cPostavi(""); });
     var gc = document.getElementById("graf-cestitke"); if (gc) gc.addEventListener("click", function(ev){ var g = ev.target.closest("[data-dan]"); if (g) cPostavi(g.dataset.dan === cDan ? "" : g.dataset.dan); }); }
-  document.querySelectorAll(".pod [data-tab]").forEach(function(b){ b.addEventListener("click", function(){ if (ekran === "vjencanja") kTab = b.dataset.tab; else cTab = b.dataset.tab; try { localStorage.setItem("tab-" + ekran, b.dataset.tab); } catch (x) {} crtaj(); }); });
+  document.querySelectorAll(".pod [data-tab]").forEach(function(b){ b.addEventListener("click", function(){ if (ekran === "vjencanja") kTab = b.dataset.tab; else if (ekran === "oglasi") { ogProizvod = b.dataset.tab; ogOdabran = null; ogPotvrda = null; } else cTab = b.dataset.tab; try { localStorage.setItem("tab-" + ekran, b.dataset.tab); } catch (x) {} crtaj(); }); });
+  if (ekran === "oglasi") veziOglase();
   if (ekran === "banka") veziBanku();
   if (ekran === "knjige") veziKnjige();
   if (ekran === "mailovi") veziMailove();
@@ -692,6 +713,191 @@ function oglasiCestitke(izbor, r, u, rz){
 
 // Čestitka nema registracija: placeno() radi i ovdje, registracije su 0.
 function placenoC(po){ return placeno(po); }
+
+// ---------- Oglasi (Meta): kampanje → oglasni skupovi → oglasi, graf, lijevak, paljenje i gašenje ----------
+// Podaci: /api/oglasi (src/oglasi.js, oglasiPregled). Paljenje i gašenje: /api/oglasi/status; paljenje kampanje ili skupa
+// Worker odbije ako bi dnevni budžet prešao granicu (META_BUDZET_*). Ocjene su iz jutarnjeg posla (meta_oglasi_stanje).
+var OG = null, ogGreska = "", ogUcitavam = false, ogDana = 7, ogProizvod = "sve", ogOtvoreni = {}, ogOdabran = null, ogPotvrda = null, ogPoruka = "", ogRadim = "";
+try { ogProizvod = localStorage.getItem("tab-oglasi") || ogProizvod; ogDana = Number(localStorage.getItem("oglasi-dana")) || ogDana; } catch (x) {}
+var OG_BOJE = {kuverta: "#0F3B33", cestitka: "#C6A15B"};
+var OG_OCJENA = {dobar: ["ok", "dobar"], slab: ["ceka", "pod nadzorom"], malo_podataka: ["ceka", "malo podataka"], prijedlog_pauza: ["lose", "za pauzu"], pauziran: ["lose", "pauziran"], samo_izvjestaj: ["ceka", "samo izvještaj"]};
+function ucitajOglase(){
+  if (ogUcitavam) return; ogUcitavam = true;
+  fetch("/api/oglasi?dana=" + ogDana, {credentials: "same-origin"}).then(function(r){ return r.json().then(function(j){ if (!r.ok) throw new Error(j.greska || r.status); return j; }); })
+    .then(function(j){ OG = j; ogGreska = ""; }).catch(function(err){ ogGreska = err.message; })
+    .then(function(){ ogUcitavam = false; if (ekran === "oglasi") { var y = window.scrollY; crtaj(); window.scrollTo(0, y); } });
+}
+function ogKampanje(){ return ((OG && OG.kampanje) || []).filter(function(k){ return ogProizvod === "sve" || k.proizvod === ogProizvod; }); }
+function ogZbroj(lista){
+  return lista.reduce(function(a, x){ var m = x.m || {}, n = x.n || {}; a.potrosnja += m.potrosnja || 0; a.prikazi += m.prikazi || 0; a.klikovi += m.klikovi || 0; a.meta_registracije += m.meta_registracije || 0; a.meta_kupnje += m.meta_kupnje || 0;
+    a.posjete += n.posjete || 0; a.registracije += n.registracije || 0; a.kupnje += n.kupnje || 0; a.prihod += n.prihod || 0; return a; },
+    {potrosnja: 0, prikazi: 0, klikovi: 0, meta_registracije: 0, meta_kupnje: 0, posjete: 0, registracije: 0, kupnje: 0, prihod: 0});
+}
+// Odabrani redak (kampanja, skup ili oglas) ili cijeli odabir proizvoda.
+function ogNadji(){
+  if (!ogOdabran) return null;
+  var r = null;
+  ogKampanje().forEach(function(k){ if (k.id === ogOdabran) r = {razina: "kampanja", x: k, k: k};
+    k.skupovi.forEach(function(s){ if (s.id === ogOdabran) r = {razina: "skup", x: s, k: k};
+      s.oglasi.forEach(function(o){ if (o.id === ogOdabran) r = {razina: "oglas", x: o, k: k, s: s}; }); }); });
+  return r;
+}
+function ogStatus(x){
+  var ef = x.ef || x.status;
+  if (ef === "ACTIVE") return '<span class="oznaka ok">radi</span>';
+  if (ef === "PAUSED") return '<span class="oznaka ceka">pauzirano</span>';
+  if (ef === "CAMPAIGN_PAUSED") return '<span class="oznaka ceka" title="Ugašena je kampanja">kampanja ugašena</span>';
+  if (ef === "ADSET_PAUSED") return '<span class="oznaka ceka" title="Ugašen je oglasni skup">skup ugašen</span>';
+  if (ef === "DISAPPROVED" || ef === "WITH_ISSUES") return '<span class="oznaka lose">' + (ef === "DISAPPROVED" ? "odbijen" : "problem") + '</span>';
+  if (ef === "IN_PROCESS" || ef === "PENDING_REVIEW") return '<span class="oznaka ceka">u pregledu</span>';
+  return '<span class="oznaka ceka">' + e(String(ef || "").toLowerCase()) + '</span>';
+}
+function ogOcjena(o){ if (!o) return '<span class="src">–</span>'; var c = OG_OCJENA[o.stanje] || ["ceka", o.stanje]; return '<span class="oznaka ' + c[0] + '" title="' + e(o.razlog || "") + '">' + c[1] + '</span>'; }
+function ogPrekidac(x, razina){
+  var ukljuceno = x.status === "ACTIVE", radi = ogRadim === x.id;
+  return '<button type="button" class="og-prek" role="switch" aria-checked="' + ukljuceno + '" data-og-prek="' + x.id + '" data-razina="' + razina + '" aria-label="' + (ukljuceno ? "Ugasi " : "Upali ") + e(x.ime) + '"' + (radi ? ' disabled' : '') + '><i></i></button>';
+}
+function ogCelije(m, n, cestitka){
+  m = m || null;
+  var cpm = m && m.prikazi ? eur(m.potrosnja / m.prikazi * 1000, true) : '–';
+  return '<td class="r nw">' + (m ? eur(m.potrosnja, true) : '–') + '</td><td class="r">' + (m ? br(m.prikazi) : '–') + '</td><td class="r nw">' + cpm + '</td>'
+    + '<td class="r">' + (m ? br(m.klikovi) : '–') + '</td><td class="r">' + (m ? postotak(m.klikovi, m.prikazi) : '–') + '</td><td class="r">' + (m && m.frekvencija ? m.frekvencija.toLocaleString("hr-HR", {maximumFractionDigits: 1}) : '–') + '</td>'
+    + '<td class="r">' + br(n.posjete) + '</td><td class="r"' + (m ? ' title="Meta broji ' + br(m.meta_registracije) + '"' : '') + '>' + (cestitka ? '–' : br(n.registracije)) + '</td>'
+    + '<td class="r nw">' + (!cestitka && m && n.registracije ? eur(m.potrosnja / n.registracije, true) : '–') + '</td>'
+    + '<td class="r"' + (m ? ' title="Meta broji ' + br(m.meta_kupnje) + '"' : '') + '>' + br(n.kupnje) + '</td><td class="r nw">' + (n.prihod > 0 ? eur(n.prihod, true) : '–') + '</td>';
+}
+function ogGraf(){
+  var d = (OG && OG.dani) || [];
+  if (!d.length) return '<p class="prazno">U ovom razdoblju nema potrošnje.</p>';
+  var kljucevi = ogProizvod === "sve" ? ["kuverta", "cestitka"] : [ogProizvod];
+  var granica = kljucevi.reduce(function(a, k){ return a + Number(OG.granice[k] || 0); }, 0);
+  var mx = Math.max(granica * 1.15, Math.max.apply(null, d.map(function(x){ return kljucevi.reduce(function(a, k){ return a + x[k].potrosnja; }, 0); })) * 1.1, 1);
+  var V = 150, sl = 680 / d.length, w = Math.min(36, sl * .64), s = "";
+  [0, .5, 1].forEach(function(t){ var y = V - t * (V - 10); s += '<line x1="32" x2="712" y1="' + y + '" y2="' + y + '" stroke="rgba(11,11,12,' + (t ? .06 : .14) + ')"/><text x="26" y="' + (y + 4) + '" text-anchor="end" font-size="10" fill="#5E6266">' + Math.round(mx * t) + '</text>'; });
+  d.forEach(function(x, i){
+    var x0 = 32 + i * sl + (sl - w) / 2, y = V, tip = datum(x.datum) + ": ";
+    kljucevi.forEach(function(k, j){
+      var h = x[k].potrosnja / mx * (V - 10); if (h <= 0) return;
+      var gore = j === kljucevi.length - 1 || !kljucevi.slice(j + 1).some(function(q){ return x[q].potrosnja > 0; });
+      var hh = Math.max(0, h - (j ? 2 : 0));
+      s += gore && hh > 4 ? '<path d="M' + x0 + ',' + (y - (j ? 2 : 0)) + 'v-' + (hh - 4) + 'q0,-4 4,-4h' + (w - 8) + 'q4,0 4,4v' + (hh - 4) + 'z" fill="' + OG_BOJE[k] + '"/>' : '<rect x="' + x0 + '" y="' + (y - (j ? 2 : 0) - hh) + '" width="' + w + '" height="' + hh + '" fill="' + OG_BOJE[k] + '"/>';
+      y -= h;
+    });
+    tip += kljucevi.map(function(k){ return (k === "kuverta" ? "Kuverta " : "Čestitka ") + eur(x[k].potrosnja, true) + ", " + br(x[k].klikovi) + " klikova"; }).join(" · ");
+    s += '<rect x="' + (32 + i * sl) + '" y="0" width="' + sl + '" height="' + V + '" fill="transparent" class="og-hit"><title>' + e(tip) + '</title></rect>';
+  });
+  var yg = V - granica / mx * (V - 10);
+  s += '<line x1="32" x2="712" y1="' + yg + '" y2="' + yg + '" stroke="#A33A2A" stroke-width="1.5" stroke-dasharray="5 4"/><text x="710" y="' + (yg - 5) + '" text-anchor="end" font-size="11" fill="#A33A2A">granica ' + eur(granica) + ' dnevno</text>';
+  var uk = d.reduce(function(a, x){ return a + kljucevi.reduce(function(b, k){ return b + x[k].potrosnja; }, 0); }, 0);
+  return '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px"><p class="src">Potrošnja po danu (€), ukupno ' + eur(uk, true) + '. Prijeđi mišem preko stupca za detalje.</p>'
+    + (kljucevi.length > 1 ? '<div class="legenda"><span><i style="background:' + OG_BOJE.kuverta + '"></i>Kuverta</span><span><i style="background:' + OG_BOJE.cestitka + '"></i>Čestitka</span><span><i style="background:none;border-top:2px dashed #A33A2A;border-radius:0;height:0"></i>Granica</span></div>' : '') + '</div>'
+    + '<svg viewBox="0 0 720 158" role="img" aria-label="Potrošnja po danu" style="width:100%;height:auto;display:block">' + s + '</svg>'
+    + '<div class="src" style="display:flex;justify-content:space-between;padding:0 8px 0 32px"><span>' + datum(d[0].datum) + '</span><span>' + datum(d[d.length - 1].datum) + '</span></div>';
+}
+function ogLijevak(z, cestitka){
+  var koraci = [["Prikazi", z.prikazi, "m"], ["Klikovi na link", z.klikovi, "m"], ["Posjete na webu", z.posjete, "n"]];
+  if (!cestitka) koraci.push(["Registracije", z.registracije, "n"]);
+  koraci.push(["Kupnje", z.kupnje, "n"]);
+  var h = '<div class="og-lij">';
+  koraci.forEach(function(k, i){
+    var pr = i ? koraci[i - 1][1] : 0, udio = i && pr ? Math.min(100, k[1] / pr * 100) : 100;
+    h += '<div class="og-korak"><div class="og-korak-v"><span>' + k[0] + ' <span class="izv ' + k[2] + '">' + (k[2] === "m" ? "Meta" : "naše") + '</span></span><b class="num">' + br(k[1]) + '</b></div>'
+      + '<div class="trak" role="img" aria-label="' + (i ? postotak(k[1], pr) + ' od prethodnog koraka' : 'početak') + '"><i style="width:' + Math.max(i && k[1] ? 1.5 : 0, udio).toFixed(1) + '%;background:' + (k[2] === "m" ? "#2A4A8A" : "var(--smaragd)") + '"></i></div>'
+      + '<span class="src">' + (i ? postotak(k[1], pr) + ' od prethodnog koraka' + (k[0] === "Registracije" && k[1] ? ' · ' + eur(z.potrosnja / k[1], true) + ' po registraciji' : '') + (k[0] === "Kupnje" && k[1] ? ' · ' + eur(z.potrosnja / k[1], true) + ' po kupnji' : '') : 'potrošeno ' + eur(z.potrosnja, true) + (z.prikazi ? ' · CPM ' + eur(z.potrosnja / z.prikazi * 1000, true) : '')) + '</span></div>';
+  });
+  return h + '</div>';
+}
+function ogDetalji(){
+  var o = ogNadji(), kamp = ogKampanje();
+  var z, naslov, podnaslov = "", cestitka = ogProizvod === "cestitka", dod = "";
+  if (o) {
+    var m = o.x.m || {}; z = {potrosnja: m.potrosnja || 0, prikazi: m.prikazi || 0, klikovi: m.klikovi || 0, posjete: o.x.n.posjete, registracije: o.x.n.registracije, kupnje: o.x.n.kupnje, prihod: o.x.n.prihod};
+    cestitka = o.k.proizvod === "cestitka";
+    naslov = o.x.ime; podnaslov = {kampanja: "Kampanja", skup: "Oglasni skup", oglas: "Oglas"}[o.razina] + (o.razina !== "kampanja" ? " · " + o.k.ime : "") + (o.s ? " › " + o.s.ime : "");
+    if (o.x.dnevni_budzet) dod += '<span class="src">Dnevni budžet ' + eur(o.x.dnevni_budzet, true) + '</span>';
+    if (o.razina === "oglas") {
+      if (o.x.slika) dod += '<img src="' + e(o.x.slika) + '" alt="" width="96" height="96" style="border-radius:8px;object-fit:cover;background:var(--kamen-svj)">';
+      if (o.x.ocjena) dod += '<div class="stavka"><b>OCJENA ' + e(datum(o.x.ocjena.datum)) + '</b><span>' + ogOcjena(o.x.ocjena) + ' ' + e(o.x.ocjena.razlog) + '</span>' + (o.x.ocjena.id ? '<a href="/meta/odobri?id=' + e(o.x.ocjena.id) + '">Pogledaj prijedlog za pauzu</a>' : '') + '</div>';
+      if (o.x.m && o.x.m.frekvencija) dod += '<span class="src">Frekvencija ' + o.x.m.frekvencija.toLocaleString("hr-HR", {maximumFractionDigits: 1}) + ' · Meta broji ' + br(o.x.m.meta_registracije) + ' registracija i ' + br(o.x.m.meta_kupnje) + ' kupnji</span>';
+    }
+  } else {
+    z = ogZbroj(kamp); naslov = ogProizvod === "sve" ? "Sve kampanje" : (ogProizvod === "kuverta" ? "Sve kampanje Kuverte" : "Sve kampanje Čestitke");
+    podnaslov = "Klikni ime kampanje, skupa ili oglasa u tablici i vidiš njegov lijevak.";
+  }
+  return '<section class="panel uz" id="og-detalji"><div style="display:flex;justify-content:space-between;gap:12px;align-items:start"><div><h2>' + e(naslov) + '</h2><p class="src">' + e(podnaslov) + '</p></div>'
+    + (o ? '<button type="button" class="tiho" id="og-sve">Sve</button>' : '') + '</div>' + (dod ? '<div style="display:flex;flex-direction:column;gap:8px">' + dod + '</div>' : '') + ogLijevak(z, cestitka) + '</section>';
+}
+function ogRedak(x, razina, k, dubina){
+  var cest = k.proizvod === "cestitka", djeca = razina === "kampanja" ? x.skupovi.length : razina === "skup" ? x.oglasi.length : 0;
+  var otv = !!ogOtvoreni[x.id], odab = ogOdabran === x.id;
+  var ime = '<div class="og-ime" style="padding-left:' + (dubina * 22) + 'px">'
+    + (djeca ? '<button type="button" class="og-otvori" data-og-otvori="' + x.id + '" aria-expanded="' + otv + '" aria-label="' + (otv ? "Zatvori" : "Otvori") + ' ' + e(x.ime) + '">' + (otv ? "▾" : "▸") + '</button>' : '<span class="og-otvori"></span>')
+    + (razina === "oglas" && x.slika ? '<img src="' + e(x.slika) + '" alt="" width="28" height="28" style="border-radius:5px;object-fit:cover;flex:none;background:var(--kamen-svj)">' : '')
+    + '<button type="button" class="og-odaberi" data-og-odaberi="' + x.id + '">' + e(x.ime) + '</button></div>'
+    + (razina === "kampanja" ? '<div class="src" style="padding-left:28px">' + (cest ? "Čestitka" : "Kuverta") + (x.dnevni_budzet ? " · " + eur(x.dnevni_budzet) + " dnevno" : "") + '</div>' : (razina === "skup" && x.dnevni_budzet ? '<div class="src" style="padding-left:' + (dubina * 22 + 28) + 'px">' + eur(x.dnevni_budzet) + ' dnevno</div>' : ''));
+  var h = '<tr class="og-' + razina + (odab ? ' og-odabran' : '') + '"><td style="width:1%">' + ogPrekidac(x, razina) + '</td><td style="min-width:230px">' + ime + '</td><td>' + ogStatus(x) + '</td><td>' + (razina === "oglas" ? ogOcjena(x.ocjena) : '') + '</td>' + ogCelije(x.m, x.n, cest) + '</tr>';
+  if (ogPotvrda && ogPotvrda.id === x.id) {
+    var pali = x.status !== "ACTIVE", naziv = {kampanja: "kampanju", skup: "oglasni skup", oglas: "oglas"}[razina];
+    h += '<tr class="potvrda"><td colspan="15"><div class="potvrda-tekst"><span>' + (pali ? "Upaliti " : "Ugasiti ") + naziv + ' <b>' + e(x.ime) + '</b>?' + (pali && razina !== "oglas" ? ' Provjerit ću da dnevni budžet ne prijeđe granicu.' : '') + (pali && razina === "oglas" && x.ef !== "PAUSED" && x.ef !== "ACTIVE" ? ' Oglas će raditi tek kad radi i njegov skup i kampanja.' : '') + '</span><div><button type="button" class="gumb' + (pali ? '' : ' opasno') + '" data-og-da="' + x.id + '" style="min-height:36px">' + (pali ? "Upali" : "Ugasi") + '</button><button type="button" class="tiho" data-og-ne="1" style="min-height:36px">Odustani</button></div></div></td></tr>';
+  }
+  if (otv && razina === "kampanja") x.skupovi.forEach(function(s){ h += ogRedak(s, "skup", k, 1); });
+  if (otv && razina === "skup") x.oglasi.forEach(function(o){ h += ogRedak(o, "oglas", k, 2); });
+  return h;
+}
+function oglasiEkran(){
+  var h = '<div class="ek-glava"><div style="display:flex;flex-direction:column;gap:10px"><p class="lbl">Meta · Facebook i Instagram</p><h1>Oglasi</h1></div>'
+    + podtabovi(ogProizvod, [["sve", "Sve"], ["kuverta", "Kuverta"], ["cestitka", "Čestitka"]]) + '</div>';
+  var izbor = '<div class="filtri"><label class="src" style="flex-direction:row;align-items:center;gap:8px">Razdoblje<select id="og-dana">' + [[7, "7 dana"], [14, "14 dana"], [30, "30 dana"], [90, "90 dana"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === ogDana ? " selected" : "") + '>' + o[1] + '</option>'; }).join("") + '</select></label><button type="button" class="tiho" id="og-osvjezi">Osvježi</button></div>';
+  if (ogGreska) return h + '<section class="panel"><p class="prazno">Oglasi se nisu učitali (' + e(ogGreska) + ').</p>' + izbor + '</section>';
+  if (!OG || OG.dana !== ogDana) { ucitajOglase(); return h + '<section class="panel"><p class="prazno">Učitavam oglase iz Mete…</p></section>'; }
+  if (!OG.postavljeno) return h + '<section class="panel"><p class="prazno">Na Workeru nije postavljen META_ADS_TOKEN ili META_OGLASNI_RACUN.</p></section>';
+  var kamp = ogKampanje(), z = ogZbroj(kamp), cest = ogProizvod === "cestitka";
+  var kljucevi = ogProizvod === "sve" ? ["kuverta", "cestitka"] : [ogProizvod];
+  var budzet = kljucevi.reduce(function(a, k){ return a + Number(OG.budzet[k] || 0); }, 0), granica = kljucevi.reduce(function(a, k){ return a + Number(OG.granice[k] || 0); }, 0);
+  var rz = "zadnjih " + ogDana + " dana";
+  var zaPauzu = []; kamp.forEach(function(k){ k.skupovi.forEach(function(s){ s.oglasi.forEach(function(o){ if (o.ocjena && o.ocjena.id) zaPauzu.push(o); }); }); });
+  h += '<div style="display:flex;justify-content:flex-end">' + izbor + '</div>';
+  if (ogPoruka) h += '<p class="stavka" role="status"><span>' + e(ogPoruka) + '</span></p>';
+  h += '<section class="kpi">'
+    + '<div><span class="src">Potrošnja ' + rz + '</span><span class="v num">' + eur(z.potrosnja, true) + '</span><span class="src">aktivni dnevni budžet ' + eur(budzet) + ' od granice ' + eur(granica) + '</span><div class="bar" role="img" aria-label="Dnevni budžet ' + eur(budzet) + ' od granice ' + eur(granica) + '"><i style="width:' + Math.min(100, granica ? budzet / granica * 100 : 0).toFixed(1) + '%;' + (budzet > granica ? 'background:var(--crvena)' : '') + '"></i></div></div>'
+    + '<div><span class="src">Prikazi</span><span class="v num">' + br(z.prikazi) + '</span><span class="src">CPM ' + (z.prikazi ? eur(z.potrosnja / z.prikazi * 1000, true) : '–') + '</span></div>'
+    + '<div><span class="src">Klikovi na link</span><span class="v num">' + br(z.klikovi) + '</span><span class="src">CTR ' + postotak(z.klikovi, z.prikazi) + ' · ' + (z.klikovi ? eur(z.potrosnja / z.klikovi, true) + ' po kliku' : '–') + '</span></div>'
+    + (cest ? '' : '<div><span class="src">Registracije (naše)</span><span class="v num">' + br(z.registracije) + '</span><span class="src">' + (z.registracije ? eur(z.potrosnja / z.registracije, true) + ' po registraciji' : 'još nema') + ' · Meta broji ' + br(z.meta_registracije) + '</span></div>')
+    + '<div><span class="src">Kupnje (naše)</span><span class="v num">' + br(z.kupnje) + '</span><span class="src">prihod ' + eur(z.prihod, true) + (z.potrosnja ? ' · povrat ' + (z.prihod / z.potrosnja).toLocaleString("hr-HR", {maximumFractionDigits: 2}) + '×' : '') + '</span></div>'
+    + '</section>';
+  if (zaPauzu.length) h += '<section class="panel"><h2>Prijedlozi za pauzu (' + zaPauzu.length + ')</h2>' + zaPauzu.map(function(o){ return '<div class="stavka"><b class="hitno">' + e(o.ime) + '</b><span>' + e(o.ocjena.razlog) + ' <a href="/meta/odobri?id=' + e(o.ocjena.id) + '">Pauziraj ili ostavi</a></span></div>'; }).join("") + '</section>';
+  h += '<div class="red" style="align-items:flex-start"><section class="panel sir"><h2>Potrošnja po danu</h2>' + ogGraf() + '</section>' + ogDetalji() + '</div>';
+  h += '<section class="panel"><div><h2>Kampanje, oglasni skupovi i oglasi</h2><p class="src">Prekidač lijevo pali i gasi. Strelica otvara skupove i oglase, a klik na ime pokazuje lijevak gore desno. Plavi stupci su Metini, zeleni naši (utm_content).</p></div>'
+    + (kamp.length ? '<div class="skrol"><table class="num og-tablica"><thead><tr><th></th><th>Naziv</th><th>Stanje</th><th>Ocjena</th><th class="r m">Potrošnja</th><th class="r m">Prikazi</th><th class="r m">CPM</th><th class="r m">Klikovi</th><th class="r m">CTR</th><th class="r m">Frekv.</th><th class="r n">Posjete</th><th class="r n">Reg.</th><th class="r n">€ / reg.</th><th class="r n">Kupnje</th><th class="r n">Prihod</th></tr></thead><tbody>'
+      + kamp.map(function(k){ return ogRedak(k, "kampanja", k, 0); }).join("") + '</tbody></table></div>' : '<p class="prazno">Nema kampanja s prometom u ovom razdoblju.</p>')
+    + '<p class="src">Ocjene su iz jutarnje provjere (6:00): dobar do ' + eur(3) + ' po registraciji, pod nadzorom do ' + eur(5) + ', iznad toga prijedlog za pauzu. Iznosi su u valuti oglasnog računa.</p></section>';
+  return h;
+}
+function veziOglase(){
+  var sel = document.getElementById("og-dana"); if (sel) sel.addEventListener("change", function(){ ogDana = Number(sel.value); try { localStorage.setItem("oglasi-dana", ogDana); } catch (x) {} OG = null; crtaj(); });
+  var os = document.getElementById("og-osvjezi"); if (os) os.addEventListener("click", function(){ ogPoruka = ""; OG = null; crtaj(); });
+  var sv = document.getElementById("og-sve"); if (sv) sv.addEventListener("click", function(){ ogOdabran = null; var y = window.scrollY; crtaj(); window.scrollTo(0, y); });
+  var t = document.querySelector(".og-tablica"); if (!t) return;
+  t.addEventListener("click", function(ev){
+    var b = ev.target.closest("button"); if (!b) return;
+    var y = window.scrollY, ponovo = function(){ crtaj(); window.scrollTo(0, y); };
+    if (b.dataset.ogOtvori) { ogOtvoreni[b.dataset.ogOtvori] = !ogOtvoreni[b.dataset.ogOtvori]; return ponovo(); }
+    if (b.dataset.ogOdaberi) { ogOdabran = ogOdabran === b.dataset.ogOdaberi ? null : b.dataset.ogOdaberi; ponovo(); var d = document.getElementById("og-detalji"); if (d && window.innerWidth < 900) d.scrollIntoView({behavior: "smooth", block: "start"}); return; }
+    if (b.dataset.ogPrek) { ogPotvrda = ogPotvrda && ogPotvrda.id === b.dataset.ogPrek ? null : {id: b.dataset.ogPrek, razina: b.dataset.razina}; return ponovo(); }
+    if (b.dataset.ogNe) { ogPotvrda = null; return ponovo(); }
+    if (b.dataset.ogDa) {
+      var p = ogPotvrda; if (!p) return;
+      var x = null; ogKampanje().forEach(function(k){ if (k.id === p.id) x = k; k.skupovi.forEach(function(s){ if (s.id === p.id) x = s; s.oglasi.forEach(function(o){ if (o.id === p.id) x = o; }); }); });
+      if (!x) return;
+      var ukljuci = x.status !== "ACTIVE";
+      ogRadim = p.id; ogPotvrda = null; ogPoruka = (ukljuci ? "Palim " : "Gasim ") + "„" + x.ime + "”…"; ponovo();
+      api("/api/oglasi/status", {id: p.id, razina: p.razina, ukljuci: ukljuci}).then(function(j){
+        ogRadim = ""; ogPoruka = "„" + x.ime + "” je " + (j.status === "ACTIVE" ? "upaljen" : "ugašen") + ". Meta javlja: " + String(j.ef || j.status).toLowerCase() + ".";
+        OG = null; crtaj();
+      }).catch(function(err){ ogRadim = ""; ogPoruka = "Nije promijenjeno: " + err.message; ponovo(); });
+    }
+  });
+}
 
 // ---------- Korisnici Kuverte (na ekranu Kuverta) ----------
 var K = null, kGreska = "", kPoruka = "";
@@ -1292,7 +1498,7 @@ function veziMailove(){
   });
 }
 
-setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); if (MO) ucitajMailove(); }, 10 * 60 * 1000);
+setInterval(function(){ ucitaj(); if (R) ucitajRacune(); if (B) ucitajBanku(); if (KN) ucitajKnjige(); if (OB) ucitajObavijesti(); if (MO) ucitajMailove(); if (OG && ekran === "oglasi") { OG = null; if (!ogPotvrda) crtaj(); } }, 10 * 60 * 1000);
 })();
 </script>
 </body>
